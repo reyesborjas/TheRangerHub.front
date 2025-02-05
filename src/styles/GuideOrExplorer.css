@@ -1,0 +1,59 @@
+.container {
+    max-width: 1000px;
+}
+
+/* 🔵 Imagen Circular */
+.image-circle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    margin: 10px auto;
+    background-size: cover;
+    background-position: center;
+}
+
+/* 🎨 Imagen específica para cada sección */
+.ranger-img {
+    background-image: url('/assets/ranger-icon.png'); /* Cambia esto por la imagen del Ranger */
+    background-color: #f8d7da;
+}
+
+.explorer-img {
+    background-image: url('/assets/explorer-icon.png'); /* Cambia esto por la imagen del Explorer */
+    background-color: #d1e7dd;
+}
+
+/* 🟢 Sección Rangers */
+.ranger-section {
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+/* 🔵 Sección Explorers */
+.explorer-section {
+    background-color: #e9f5e9;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+/* ✅ Estilos de la lista */
+.features-list {
+    list-style: none;
+    padding: 0;
+}
+
+.features-list li {
+    display: flex;
+    align-items: center;
+    font-size: 1rem;
+    margin: 10px 0;
+}
+
+/* 📌 Icono cuadrado al lado de cada texto */
+.icon-box {
+    width: 40px;
+    height: 40px;
+    background-color: #ccc;
+    margin-right: 10px;
+}
