@@ -26,10 +26,10 @@ const MyNavbar = () => {
                 <div className="collapse navbar-collapse" id="navbarNav">
                     <ul className="navbar-nav me-auto">
                         <li className="nav-item">
-                            <Link className="nav-link" to="/">Home</Link>
+                            <Link className="nav-link" to="/">Inicio</Link>
                         </li>
                         <li className="nav-item">
-                            <a className="nav-link" href="#about">About Us</a>
+                            <a className="nav-link" href="#about">Sobre nosostros</a>
                         </li>
                         <li className="nav-item dropdown">
                             <a 
@@ -39,7 +39,7 @@ const MyNavbar = () => {
                                 data-bs-toggle="dropdown" 
                                 aria-expanded="false"
                             >
-                                Explore More
+                                Explora Más
                             </a>
                             <ul className="dropdown-menu" aria-labelledby="navbarDropdown">
                                 <li><a className="dropdown-item" href="#">Action</a></li>
@@ -52,7 +52,7 @@ const MyNavbar = () => {
 
                     {/* Botón de Log In con navegación a /login */}
                     <form className="d-flex ms-auto">
-                        <Link to="/login" className="btn btn-outline-dark">Log In</Link>
+                        <Link to="/login" className="btn btn-outline-dark">Iniciar Sesión</Link>
                     </form>
                 </div>
             </div>

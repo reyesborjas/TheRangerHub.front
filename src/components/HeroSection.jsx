@@ -10,10 +10,11 @@ const HeroSection = () => {
       style={{ backgroundImage: `url(${backgroundImage})` }} 
     >
       <div className="hero-content">
-        <h1>Earn money as a guide or explore the world</h1>
+        <h1>Gana dinero siendo guía o explora el mundo</h1>
         <p>
-          Join a community of passionate travelers and expert guides. Share your knowledge, 
-          create unforgettable experiences, or find unique adventures worldwide.
+        Unete a una comunidad de viajeros apasionados y guías expertos. Comparte tus conocimientos, 
+          crea experiencias inolvidables, o encuentra aventuras únicas en todo el mundo.
+
         </p>
         <div className="hero-buttons">
           <button 
@@ -21,14 +22,14 @@ const HeroSection = () => {
             onMouseEnter={() => setBackgroundImage("/public/ranger.jpg")} 
             onMouseLeave={() => setBackgroundImage("/Torres.jpeg")}
           >
-            Become a Ranger
+            Conviértete en Ranger
           </button>
           <button 
             className="btn btn-explorer"
             onMouseEnter={() => setBackgroundImage("/public/explorer.jpg")} 
             onMouseLeave={() => setBackgroundImage("/Torres.jpeg")} 
           >
-            Find Your Next Adventure
+            Ecuentra tu próxima aventura
           </button>
         </div>
       </div>

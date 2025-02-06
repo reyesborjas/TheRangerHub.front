@@ -9,46 +9,46 @@ const Login = () => {
   return (
     <div className="login-container">
       <div className="login-box">
-        <h2 className="text-center">Login to Ranger</h2>
+        <h2 className="text-center">Iniciar sesión como Ranger</h2>
         <p className="text-center text-muted">
-          Only login via email, Google, or Facebook is supported.
+        Solo se admite el inicio de sesión por correo electrónico o Google.
         </p>
 
         <form>
           <div className="input-group">
             <FontAwesomeIcon icon={faEnvelope} className="input-icon" />
-            <input type="text" placeholder="Phone number / email address" />
+            <input type="text" placeholder="Teléfono / Email " />
           </div>
 
           <div className="input-group">
             <FontAwesomeIcon icon={faLock} className="input-icon" />
-            <input type="password" placeholder="Password" />
+            <input type="password" placeholder="Contraseña" />
           </div>
 
           <div className="terms">
             <input type="checkbox" id="terms" />
             <label htmlFor="terms">
-              I confirm that I have read, consent and agree to 
-              <a href="#"> Terms of Use</a> and <a href="#">Privacy Policy</a>.
+            Confirmo que he leído, doy mi consentimiento y acepto los 
+              <a href="#"> Términos de Uso</a> y la <a href="#">Política de privacidad</a>.
             </label>
           </div>
 
-          <button className="btn btn-login">Log In</button>
+          <button className="btn btn-login">Inciar Sesión</button>
 
           <div className="extra-links">
-            <Link to="#">Forgot password?</Link>
-            <Link to="/signup">Sign up</Link> {/* REDIRECCIONA AL SIGN UP */}
+            <Link to="#">Olvidaste tu contraseña?</Link>
+            <Link to="/signup">Regístrate</Link> {/* REDIRECCIONA AL SIGN UP */}
           </div>
 
-          <div className="separator"><span>OR</span></div>
+          <div className="separator"><span></span></div>
 
           <div className="social-login">
             <button className="btn btn-google">
-              <FontAwesomeIcon icon={faGoogle} /> Log in with Google
+              <FontAwesomeIcon icon={faGoogle} /> Inicia sesión con Google
             </button>
-            <button className="btn btn-facebook">
+           {/* <button className="btn btn-facebook">
               <FontAwesomeIcon icon={faFacebook} /> Log in with Facebook
-            </button>
+            </button>*/}
           </div>
         </form>
       </div>

@@ -7,18 +7,18 @@ import "../styles/SignUp.css";
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
-    username: "",
+    ususario: "",
     email: "",
-    nationality: "",
+    nacionalidad: "",
     rut: "",
-    passport: "",
+    pasaporte: "",
     role: "",
-    bio: "",
-    experience: "",
-    specialty: "",
+    biografía: "",
+    experiencia: "",
+    especialidad: "",
     routeType: [],
-    availability: "",
-    visibility: "yes",
+    disponibilidad: "",
+    visibilidad: "yes",
   });
 
   const handleChange = (e) => {
@@ -131,10 +131,10 @@ const SignUp = () => {
                 <FontAwesomeIcon icon={faGoogle} className="me-2" />
                 Registrar con Google
               </button>
-              <button className="btn btn-outline-primary d-flex align-items-center justify-content-center">
+              {/* <button className="btn btn-outline-primary d-flex align-items-center justify-content-center">
                 <FontAwesomeIcon icon={faFacebook} className="me-2" />
                 Registrar con Facebook
-              </button>
+              </button> */}
             </div>
 
             <button type="submit" className="btn btn-dark w-100">
