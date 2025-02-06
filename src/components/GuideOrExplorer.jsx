@@ -4,7 +4,7 @@ import "../styles/GuideOrExplorer.css"; // Estilos personalizados
 const GuideOrExplorer = () => {
   return (
     <section className="container my-5">
-      <h2 className="text-center">¿Eres un Guía o un Viajero?</h2>
+      <h2 className="text-center">¿Eres Guía o un Viajero?</h2>
       <p className="text-center text-muted">Tú decides cómo vivir la aventura.</p>
 
       {/* 🏕️ Sección Rangers */}
