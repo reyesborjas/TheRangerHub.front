@@ -5,6 +5,7 @@ import HeroSection from "./components/HeroSection";
 import GuideOrExplorer from "./components/GuideOrExplorer";
 import Login from "./components/Login";
 import SignUp from "./components/SignUp";
+import RangerDashboard from "./components/RangerDashBoard";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
           <Route path="/" element={<><HeroSection /><GuideOrExplorer /></>} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
+          <Route path="/dashboard" element={<RangerDashboard />} />
         </Routes>
       </div>
     </Router>
