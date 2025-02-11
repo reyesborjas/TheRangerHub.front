@@ -1,6 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import MyNavbar from "./components/Navbar";
+import AboutUs from "./components/AboutUs.jsx";
 import HeroSection from "./components/HeroSection";
 import GuideOrExplorer from "./components/GuideOrExplorer";
 import Login from "./components/Login";
@@ -15,6 +16,7 @@ function App() {
           <Route path="/" element={<><HeroSection /><GuideOrExplorer /></>} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
+          <Route path="/AboutUs" element={<AboutUs />} />
         </Routes>
       </div>
     </Router>

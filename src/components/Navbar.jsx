@@ -29,7 +29,7 @@ const MyNavbar = () => {
                             <Link className="nav-link" to="/">Inicio</Link>
                         </li>
                         <li className="nav-item">
-                            <a className="nav-link" href="#about">Sobre nosostros</a>
+                            <Link className="nav-link" to="/AboutUs">Sobre nosostros</Link>
                         </li>
                         <li className="nav-item dropdown">
                             <a 
