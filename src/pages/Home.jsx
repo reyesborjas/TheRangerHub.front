@@ -3,6 +3,8 @@ import GuideOrExplorer from "../components/GuideOrExplorer.jsx";
 import Testimonials from "../components/Testimonials.jsx";
 import Estadisticas from "../components/Estadisticas.jsx";
 import "../styles/HeroSection.css";
+import CtaSection from "../components/CtaSection.jsx";
+import Footer from "../components/Footer.jsx";
 
 const HeroSection = () => {
     const [backgroundImage, setBackgroundImage] = useState("/Torres.jpeg");
@@ -50,6 +52,8 @@ const Home = () => {
             <GuideOrExplorer />
             <Estadisticas />
             <Testimonials />
+            <CtaSection />
+            <Footer />
         </>
     );
 }
