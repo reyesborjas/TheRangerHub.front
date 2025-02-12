@@ -2,80 +2,63 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope, faLock } from "@fortawesome/free-solid-svg-icons";
-import { faGoogle } from "@fortawesome/free-brands-svg-icons";
 import "../styles/Login.css";
 
 const Login = () => {
-  const [formData, setFormData] = useState({
-    username: "",
-    password: "",
-  });
-
+  const [formData, setFormData] = useState({ username: "", password: "" });
   const navigate = useNavigate();
 
-  const handleLogin = (event) => {
-    event.preventDefault();
-    if (formData.username === "admin" && formData.password === "1234") {
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch("https://rangerhub-back.vercel.app/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) throw new Error("Credenciales incorrectas");
+
+      const data = await response.json();
+      localStorage.setItem("token", data.token); // Guardar token de sesión
       navigate("/dashboard");
-    } else {
-      alert("Usuario o contraseña incorrectos.");
+    } catch (error) {
+      alert(error.message);
     }
   };
 
   return (
     <div className="login-container">
-      <div className="login-box">
-        <h2 className="text-center">Iniciar sesión como Ranger</h2>
-        <p className="text-center text-muted">
-          Solo se admite el inicio de sesión por correo electrónico o Google.
-        </p>
+      <div className="card p-4 shadow-lg login-box">
+        <h2 className="text-center">Iniciar Sesión</h2>
 
         <form onSubmit={handleLogin}>
-          <div className="input-group">
-            <FontAwesomeIcon icon={faEnvelope} className="input-icon" />
-            <input
-              type="text"
-              placeholder="Teléfono / Email"
-              value={formData.username}
-              onChange={(e) =>
-                setFormData({ ...formData, username: e.target.value })
-              }
-              required
-            />
+          <div className="mb-3">
+            <label className="form-label">Usuario</label>
+            <div className="input-group">
+              <span className="input-group-text"><FontAwesomeIcon icon={faEnvelope} /></span>
+              <input type="text" className="form-control" name="username" onChange={handleChange} required />
+            </div>
           </div>
 
-          <div className="input-group">
-            <FontAwesomeIcon icon={faLock} className="input-icon" />
-            <input
-              type="password"
-              placeholder="Contraseña"
-              value={formData.password}
-              onChange={(e) =>
-                setFormData({ ...formData, password: e.target.value })
-              }
-              required
-            />
+          <div className="mb-3">
+            <label className="form-label">Contraseña</label>
+            <div className="input-group">
+              <span className="input-group-text"><FontAwesomeIcon icon={faLock} /></span>
+              <input type="password" className="form-control" name="password" onChange={handleChange} required />
+            </div>
           </div>
 
-          <button type="submit" className="btn btn-login">
-            Iniciar Sesión
-          </button>
-
-          <div className="extra-links">
-            <Link to="#">Olvidaste tu contraseña?</Link>
-            <Link to="/signup">Regístrate</Link>
-          </div>
-
-          <div className="separator">
-            <span></span>
-          </div>
-
-          <div className="social-login">
-            <button className="btn btn-google">
-              <FontAwesomeIcon icon={faGoogle} /> Inicia sesión con Google
-            </button>
-          </div>
+          <button type="submit" className="btn btn-dark w-100">Ingresar</button>
         </form>
+
+        <div className="extra-links text-center mt-3">
+          <p>¿No tienes cuenta? <Link to="/signup">Regístrate aquí</Link></p>
+        </div>
       </div>
     </div>
   );
