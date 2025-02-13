@@ -30,10 +30,10 @@ const MyNavbar = () => {
                             <Link className="nav-link" to="/">Inicio</Link>
                         </li>
                         <li className="nav-item">
-                            <Link className="nav-link" to="/contact-us">Contáctanos</Link>
+                            <Link className="nav-link" to="/about-us">Sobre Nosotros</Link>
                         </li>
                         <li className="nav-item">
-                            <Link className="nav-link" to="/AboutUs">Sobre nosotros</Link>
+                            <Link className="nav-link" to="/contact-us">Contáctanos</Link>
                         </li>
                     </ul>
 

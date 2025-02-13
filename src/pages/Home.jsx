@@ -5,6 +5,7 @@ import Estadisticas from "../components/Estadisticas.jsx";
 import "../styles/HeroSection.css";
 import CtaSection from "../components/CtaSection.jsx";
 import Footer from "../components/Footer.jsx";
+import MyNavbar from "../components/Navbar.jsx";
 
 const HeroSection = () => {
     const [backgroundImage, setBackgroundImage] = useState("/Torres.jpeg");
@@ -48,6 +49,7 @@ const HeroSection = () => {
 const Home = () => {
     return (
         <>
+            <MyNavbar />
             <HeroSection />
             <GuideOrExplorer />
             <Estadisticas />
