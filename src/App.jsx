@@ -4,7 +4,7 @@ import Login from "./components/Login";
 import SignUp from "./components/SignUp";
 import Home from "./pages/Home.jsx";
 import AboutUs from "./pages/AboutUs";
-// import ContactUs from "./components/ContactUs";
+import ContactUs from "./pages/ContactUs";
 
 
 function App() {
@@ -15,7 +15,7 @@ function App() {
                 <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/about-us" element={<AboutUs />} />
-                    { /*<Route path="/contact-us" element={<ContactUs />} /> */}
+                    <Route path="/contact-us" element={<ContactUs />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/signup" element={<SignUp />} />
                 </Routes>
