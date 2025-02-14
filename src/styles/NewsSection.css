@@ -1,0 +1,161 @@
+/* NewsSection.css */
+
+/* Sección principal */
+.news-section {
+    background-color: #f8f9fa;
+    padding: 4rem 0;
+}
+
+/* Título de la sección */
+.news-section h2 {
+    color: #2A9D8F;
+    font-weight: 600;
+    margin-bottom: 2.5rem;
+    position: relative;
+}
+
+.news-section h2:after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 3px;
+    background-color: #E63946;
+}
+
+/* Tarjetas */
+.card {
+    border: none;
+    transition: all 0.3s ease;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Imagen de la tarjeta */
+.card-img-top {
+    height: 200px;
+    object-fit: cover;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Cuerpo de la tarjeta */
+.card-body {
+    padding: 1.5rem;
+}
+
+/* Título de la noticia */
+.card-title {
+    color: #264653;
+    font-size: 1.1rem;
+    font-weight: 600;
+    line-height: 1.4;
+    margin-bottom: 0.75rem;
+    min-height: 50px;
+}
+
+/* Texto de la fecha */
+.text-muted {
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+}
+
+/* Descripción de la noticia */
+.card-text {
+    color: #6c757d;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+/* Botón "Leer más" */
+.btn-outline-primary {
+    color: #2A9D8F;
+    border-color: #2A9D8F;
+    padding: 0.5rem 1.5rem;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-primary:hover {
+    background-color: #2A9D8F;
+    border-color: #2A9D8F;
+    color: white;
+}
+
+/* Botón CTA principal */
+.btn-primary.btn-lg {
+    background-color: #E63946;
+    border-color: #E63946;
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    border-radius: 30px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(230, 57, 70, 0.2);
+}
+
+.btn-primary.btn-lg:hover {
+    background-color: #dc2f3d;
+    border-color: #dc2f3d;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(230, 57, 70, 0.3);
+}
+
+/* Media Queries para responsividad */
+@media (max-width: 768px) {
+    .news-section {
+        padding: 3rem 0;
+    }
+
+    .card-title {
+        font-size: 1rem;
+        min-height: auto;
+    }
+
+    .btn-primary.btn-lg {
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+    }
+}
+
+/* Animación de carga para las tarjetas */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card {
+    animation: fadeInUp 0.6s ease-out forwards;
+}
+
+/* Retraso en la animación para cada tarjeta */
+.col-lg-4:nth-child(1) .card { animation-delay: 0.1s; }
+.col-lg-4:nth-child(2) .card { animation-delay: 0.3s; }
+.col-lg-4:nth-child(3) .card { animation-delay: 0.5s; }
+
+/* Efecto hover para las imágenes */
+.card-img-top {
+    transition: transform 0.5s ease;
+}
+
+.card:hover .card-img-top {
+    transform: scale(1.05);
+}
+
+/* Estilos para asegurar consistencia en diferentes navegadores */
+.card {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    backface-visibility: hidden;
+}
