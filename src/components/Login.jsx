@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope, faLock } from "@fortawesome/free-solid-svg-icons";
+import MyNavbar from "./Navbar"; 
 import "../styles/Login.css";
 
 const Login = () => {
@@ -47,6 +48,7 @@ const Login = () => {
   };
 
   return (
+    <div><MyNavbar />
     <div className="login-container">
       <div className="card p-4 shadow-lg login-box">
         <h2 className="text-center">Iniciar Sesión</h2>
@@ -89,6 +91,7 @@ const Login = () => {
           <p>¿No tienes cuenta? <Link to="/signup">Regístrate aquí</Link></p>
         </div>
       </div>
+    </div>
     </div>
   );
 };
