@@ -6,6 +6,7 @@ import "../styles/Login.css";
 
 const Login = () => {
   const [formData, setFormData] = useState({ username: "", password: "" });
+  const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -14,20 +15,34 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setErrorMessage(""); // Limpiar error previo
+
     try {
+      console.log("Enviando datos:", formData);
+
       const response = await fetch("https://rangerhub-back.vercel.app/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
-      if (!response.ok) throw new Error("Credenciales incorrectas");
-
       const data = await response.json();
-      localStorage.setItem("token", data.token); // Guardar token de sesión
+
+      if (!response.ok) {
+        throw new Error(data.message || "Credenciales incorrectas");
+      }
+
+      if (!data.token) {
+        throw new Error("No se recibió un token de autenticación");
+      }
+
+      localStorage.setItem("token", data.token);
+      console.log("Token guardado correctamente");
+
       navigate("/dashboard");
     } catch (error) {
-      alert(error.message);
+      console.error("Error en login:", error);
+      setErrorMessage(error.message);
     }
   };
 
@@ -36,12 +51,20 @@ const Login = () => {
       <div className="card p-4 shadow-lg login-box">
         <h2 className="text-center">Iniciar Sesión</h2>
 
+        {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
+
         <form onSubmit={handleLogin}>
           <div className="mb-3">
             <label className="form-label">Usuario</label>
             <div className="input-group">
               <span className="input-group-text"><FontAwesomeIcon icon={faEnvelope} /></span>
-              <input type="text" className="form-control" name="username" onChange={handleChange} required />
+              <input
+                type="text"
+                className="form-control"
+                name="username"
+                onChange={handleChange}
+                required
+              />
             </div>
           </div>
 
@@ -49,7 +72,13 @@ const Login = () => {
             <label className="form-label">Contraseña</label>
             <div className="input-group">
               <span className="input-group-text"><FontAwesomeIcon icon={faLock} /></span>
-              <input type="password" className="form-control" name="password" onChange={handleChange} required />
+              <input
+                type="password"
+                className="form-control"
+                name="password"
+                onChange={handleChange}
+                required
+              />
             </div>
           </div>
 

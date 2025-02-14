@@ -1,13 +1,27 @@
-import React from "react";
-import { Link } from "react-router-dom"; // Para la navegación sin recargar la página
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
 import "../styles/Navbar.css";
 
 const MyNavbar = () => {
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        // Verifica si hay un token en localStorage
+        const token = localStorage.getItem("token");
+        setIsAuthenticated(!!token);
+    }, []);
+
+    const handleLogout = () => {
+        localStorage.removeItem("token"); // Elimina el token de sesión
+        setIsAuthenticated(false);
+        navigate("/"); // Redirige al inicio
+    };
+
     return (
         <nav className="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm fixed-top">
             <div className="container">
-                {/* Logo más grande */}
                 <Link className="navbar-brand" to="/">
                     <img src={logo} alt="Logo" className="navbar-logo" />
                 </Link>
@@ -37,14 +51,22 @@ const MyNavbar = () => {
                         </li>
                     </ul>
 
-                    {/* Botón de Iniciar Sesión con borde rojo y más llamativo */}
+                    {/* Botón de Login/Logout */}
                     <form className="d-flex ms-auto">
-                        <Link to="/login" className="btn btn-outline-danger login-button">Iniciar Sesión</Link>
+                        {isAuthenticated ? (
+                            <button className="btn btn-outline-danger login-button" onClick={handleLogout}>
+                                Cerrar Sesión
+                            </button>
+                        ) : (
+                            <Link to="/login" className="btn btn-outline-danger login-button">
+                                Iniciar Sesión
+                            </Link>
+                        )}
                     </form>
                 </div>
             </div>
         </nav>
     );
-}
+};
 
 export default MyNavbar;
