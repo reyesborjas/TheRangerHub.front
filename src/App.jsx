@@ -5,7 +5,6 @@ import SignUp from "./components/SignUp";
 import Home from "./pages/Home.jsx";
 import AboutUs from "./pages/AboutUs";
 import RangerDashBoard from "./components/RangerDashBoard"; // Asegúrate de importarlo
-import ContactUs from "./components/ContactUs";
 import ContactUs from "./pages/ContactUs";
 
 
