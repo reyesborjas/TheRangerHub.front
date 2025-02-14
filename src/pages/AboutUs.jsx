@@ -2,7 +2,10 @@ import React from "react";
 import "../styles/AboutUs.css";
 import AboutFeatures from "../components/AboutFeatures";
 import MyNavbar from "../components/Navbar.jsx";
-
+import PartnersSection from "../components/PartnersSection";
+import NewsSection from "../components/NewsSection.jsx";
+import CtaSection from "../components/CtaSection.jsx";
+import Footer from "../components/Footer.jsx";
 
 const AboutUs = () => {
     return (
@@ -23,7 +26,11 @@ const AboutUs = () => {
                     </h5>
                 </div>
                 <AboutFeatures />
+                <PartnersSection />
+                <NewsSection />
             </div>
+            <CtaSection />
+            <Footer />
         </>
     );
 };
