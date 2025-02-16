@@ -6,7 +6,7 @@ import Home from "./pages/Home.jsx";
 import AboutUs from "./pages/AboutUs";
 import RangerDashBoard from "./components/RangerDashBoard"; // Asegúrate de importarlo
 import ContactUs from "./pages/ContactUs";
-
+import CreateTrip from "./components/CreateTrip.jsx";
 
 function App() {
     return (
@@ -18,7 +18,8 @@ function App() {
                     <Route path="/contact-us" element={<ContactUs />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/signup" element={<SignUp />} />
-                    <Route path="/dashboard" element={<RangerDashBoard />} /> {/* Nueva ruta agregada */}
+                    <Route path="/dashboard" element={<RangerDashBoard />} /> 
+                    <Route path="/create-trip" element={<CreateTrip />} /> 
                 </Routes>
             </div>
         </Router>
