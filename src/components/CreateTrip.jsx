@@ -2,12 +2,11 @@ import "../styles/SignUp.css";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-
 const CreateTrip = () => {
   const navigate = useNavigate();
-  const [activities, setActivities] = useState([]);
+  const [activities, setActivities] = useState([]); // ✅ Asegurar que inicia como un array
   const [formData, setFormData] = useState({
-    title: "",
+    trip_name: "",
     start_date: "",
     end_date: "",
     participants_number: "",
@@ -17,8 +16,7 @@ const CreateTrip = () => {
     total_cost: "",
     trip_image_url: "",
     activities: [],
-    destinations: []
-  });
+      });
   const [imagePreview, setImagePreview] = useState(null);
 
   useEffect(() => {
@@ -26,15 +24,24 @@ const CreateTrip = () => {
       try {
         const response = await fetch("https://rangerhub-back.vercel.app/activities");
         const data = await response.json();
-        setActivities(data);
+  
+        console.log("Respuesta de la API:", data); // 👉 Ver qué estructura devuelve
+  
+        if (data && Array.isArray(data.activities)) {
+          setActivities(data.activities); // ✅ Extrae el array correcto
+        } else {
+          console.error("Error: La API no devolvió un array válido", data);
+          setActivities([]); // Evita errores si la API falla
+        }
       } catch (error) {
         console.error("Error fetching activities:", error);
+        setActivities([]);
       }
     };
-
+  
     fetchActivities();
   }, []);
-
+  
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -91,10 +98,10 @@ const CreateTrip = () => {
             <div className="row mb-3">
               <div className="col-md-12">
                 <label className="form-label">Título</label>
-                <input type="text" className="form-control" name="title" onChange={handleChange} required />
+                <input type="text" className="form-control" name="trip_name" onChange={handleChange} required />
               </div>
             </div>
-            <div className="row mb-3">  
+            <div className="row mb-3">
               <div className="col-md-6">
                 <label className="form-label">Fecha de Inicio</label>
                 <input type="date" className="form-control" name="start_date" onChange={handleChange} required />
@@ -104,7 +111,7 @@ const CreateTrip = () => {
                 <input type="date" className="form-control" name="end_date" onChange={handleChange} required />
               </div>
             </div>
-            <div className="row mb-3">  
+            <div className="row mb-3">
               <div className="col-md-6">
                 <label className="form-label">Número de Participantes</label>
                 <input type="number" className="form-control" name="participants_number" onChange={handleChange} required />
@@ -131,9 +138,13 @@ const CreateTrip = () => {
                   required
                 >
                   <option value="">Seleccionar actividad</option>
-                  {activities.map((act) => (
-                    <option key={act.id} value={act.id}>{act.name}</option>
-                  ))}
+                  {Array.isArray(activities) && activities.length > 0 ? (
+                    activities.map((act) => (
+                      <option key={act.id} value={act.id}>{act.name}</option>
+                    ))
+                  ) : (
+                    <option disabled>Cargando actividades...</option>
+                  )}
                 </select>
               ))}
               <button type="button" className="btn btn-secondary" onClick={addActivity}>Agregar Actividad</button>
@@ -144,28 +155,16 @@ const CreateTrip = () => {
                 <label className="form-label">URL de Imagen</label>
                 <input type="text" className="form-control" name="trip_image_url" onChange={handleChange} />
               </div>
-              {/* Botón para cargar la imagen */}
               <div className="col-md-6">
                 <label className="form-label">Cargar Imagen</label>
-                <input
-                  type="file"
-                  className="form-control btn-dark"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                />
+                <input type="file" className="form-control btn-dark" accept="image/*" onChange={handleImageUpload} />
               </div>
             </div>
 
-            {/* Vista previa de la imagen cargada */}
             {imagePreview && (
               <div className="row mb-3">
                 <div className="col-md-12">
-                  <img
-                    src={imagePreview}
-                    alt="Vista previa"
-                    className="img-fluid rounded"
-                    style={{ maxHeight: "200px", objectFit: "cover" }}
-                  />
+                  <img src={imagePreview} alt="Vista previa" className="img-fluid rounded" style={{ maxHeight: "200px", objectFit: "cover" }} />
                 </div>
               </div>
             )}
@@ -179,5 +178,3 @@ const CreateTrip = () => {
 };
 
 export default CreateTrip;
-
-
