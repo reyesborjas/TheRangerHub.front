@@ -11,12 +11,12 @@ const CreateTrip = () => {
     end_date: "",
     participants_number: "",
     trip_status: "pending",
-    estimated_weather_forecast: "",
+    estimated_weather_forecast: "Temperatura mínima:  Temperatura máxima: Expectativas de lluvias (si/no): ",
     description: "",
     total_cost: "",
     trip_image_url: "",
     activities: [],
-      });
+  });
   const [imagePreview, setImagePreview] = useState(null);
 
   useEffect(() => {
@@ -35,7 +35,7 @@ const CreateTrip = () => {
         }
       } catch (error) {
         console.error("Error fetching activities:", error);
-        setActivities([]);
+        setActivities([]); // Asegura que no rompa el flujo si la API falla
       }
     };
   
@@ -70,6 +70,7 @@ const CreateTrip = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+  
     try {
       const response = await fetch("https://rangerhub-back.vercel.app/trips", {
         method: "POST",
@@ -148,6 +149,18 @@ const CreateTrip = () => {
                 </select>
               ))}
               <button type="button" className="btn btn-secondary" onClick={addActivity}>Agregar Actividad</button>
+            </div>
+
+            <div className="mb-3">
+              <label className="form-label">Pronóstico del Clima Estimado</label>
+              <textarea
+                className="form-control"
+                name="estimated_weather_forecast"
+                value={formData.estimated_weather_forecast}
+                onChange={handleChange}
+                rows="4"
+                required
+              />
             </div>
 
             <div className="row mb-3">
