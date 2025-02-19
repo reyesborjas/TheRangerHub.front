@@ -4,7 +4,8 @@ import { useNavigate } from "react-router-dom";
 
 const CreateTrip = () => {
   const navigate = useNavigate();
-  const [activities, setActivities] = useState([]); // ✅ Asegurar que inicia como un array
+  const [activities, setActivities] = useState([]);
+  const [rangers, setRangers] = useState([]);
   const [formData, setFormData] = useState({
     trip_name: "",
     start_date: "",
@@ -16,6 +17,7 @@ const CreateTrip = () => {
     total_cost: "",
     trip_image_url: "",
     activities: [],
+    lead_ranger: "",
   });
   const [imagePreview, setImagePreview] = useState(null);
 
@@ -24,24 +26,26 @@ const CreateTrip = () => {
       try {
         const response = await fetch("https://rangerhub-back.vercel.app/activities");
         const data = await response.json();
-  
-        console.log("Respuesta de la API:", data); // 👉 Ver qué estructura devuelve
-  
-        if (data && Array.isArray(data.activities)) {
-          setActivities(data.activities); // ✅ Extrae el array correcto
-        } else {
-          console.error("Error: La API no devolvió un array válido", data);
-          setActivities([]); // Evita errores si la API falla
-        }
+        setActivities(data.activities || []);
       } catch (error) {
         console.error("Error fetching activities:", error);
-        setActivities([]); // Asegura que no rompa el flujo si la API falla
       }
     };
-  
+
+    const fetchRangers = async () => {
+      try {
+        const response = await fetch("https://rangerhub-back.vercel.app/rangers");
+        const data = await response.json();
+        setRangers(data.rangers || []);
+      } catch (error) {
+        console.error("Error fetching rangers:", error);
+      }
+    };
+
     fetchActivities();
+    fetchRangers();
   }, []);
-  
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -70,17 +74,14 @@ const CreateTrip = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-  
     try {
       const response = await fetch("https://rangerhub-back.vercel.app/trips", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
-
       const data = await response.json();
       if (response.ok) {
-        console.log("Viaje creado exitosamente:", data);
         navigate("/trips");
       } else {
         console.error("Error al crear el viaje:", data.message);
@@ -149,6 +150,16 @@ const CreateTrip = () => {
                 </select>
               ))}
               <button type="button" className="btn btn-secondary" onClick={addActivity}>Agregar Actividad</button>
+            </div>
+
+            <div className="mb-3">
+              <label className="form-label">Ranger Líder</label>
+              <select className="form-control" name="lead_ranger" onChange={handleChange} required>
+                <option value="">Seleccionar Ranger</option>
+                {rangers.map((ranger) => (
+                  <option key={ranger.id} value={ranger.id}>{ranger.name}</option>
+                ))}
+              </select>
             </div>
 
             <div className="mb-3">
