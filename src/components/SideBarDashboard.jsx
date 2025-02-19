@@ -37,10 +37,10 @@ const SideBarDashboard = () => {
                     <img src={logo} alt="The Ranger Hub" />
                 </div>
 
-                <button className="new-trip-btn" onClick={() => window.location.href = "/create-trips"}>+ Nuevo Viaje
+                <button className="new-trip-btn" onClick={() => window.location.href = "/dashboard/page1"}>+ Nuevo Viaje
                 </button>
 
-                {/* Menú de Navegación */}
+
                 <nav className="nav flex-column w-100">
                     <a href="/inicio" className="nav-link">
                         <i className="fas fa-home"></i> Inicio
@@ -59,7 +59,6 @@ const SideBarDashboard = () => {
                     </a>
                 </nav>
 
-                {/* Clima */}
                 <div className="weather">
                     {error ? (
                         <p>Error al cargar el clima</p>
@@ -77,7 +76,6 @@ const SideBarDashboard = () => {
                     )}
                 </div>
 
-                {/* Iconos de Configuración y Ayuda */}
                 <div className="bottom-icons d-flex">
                     <a href="/ayuda" className="icon-btn">
                         <i className="fas fa-question-circle"></i>
