@@ -11,6 +11,7 @@ import { HomeDashboard } from "./pages/dashboard/HomeDashboard.jsx";
 import { Dashboard } from "./pages/Dashboard.jsx";
 import { Page1 } from "./pages/dashboard/Page1.jsx";
 import { Page2 } from "./pages/dashboard/Page2.jsx";
+import CreateActivity from "./components/CreateActivity.jsx";
 
 function App() {
   return (
@@ -27,7 +28,7 @@ function App() {
             <Route path="/dashboard/page1" element={<Page1 />}  />
             <Route path="/dashboard/page2" element={<Page2 />}  />
           </Route>
-
+          <Route path="/createactivity" element={<CreateActivity />} />
           <Route path="/create-trip" element={<CreateTrip />} />
         </Routes>
       </div>
