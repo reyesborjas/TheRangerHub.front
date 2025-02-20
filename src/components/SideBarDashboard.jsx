@@ -37,7 +37,7 @@ const SideBarDashboard = () => {
                     <img src={logo} alt="The Ranger Hub" />
                 </div>
 
-                <button className="new-trip-btn" onClick={() => window.location.href = "/dashboard/page1"}>+ Nuevo Viaje
+                <button className="new-trip-btn" onClick={() => window.location.href = "/dashboard/Page1"}>+ Nuevo Viaje
                 </button>
 
 

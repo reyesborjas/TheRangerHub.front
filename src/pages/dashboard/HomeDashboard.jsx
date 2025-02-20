@@ -1,3 +1,7 @@
+import SideBarDashboard from "../../components/SideBarDashboard.jsx";
+
 export const HomeDashboard = () => {
-    return <h1>Home dashboard</h1>
+    return (
+        <SideBarDashboard />
+    )
 }

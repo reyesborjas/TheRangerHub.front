@@ -23,25 +23,33 @@ const CreateActivity = () => {
 
   useEffect(() => {
     const fetchCategories = async () => {
-      try {
-        const response = await fetch("https://rangerhub-back.vercel.app/activitycategory");
-        const data = await response.json();
-        setCategories(data.categories || []);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-      }
-    };
-
-    const fetchLocations = async () => {
-      try {
-        const response = await fetch("https://rangerhub-back.vercel.app/locations");
-        const data = await response.json();
-        setLocations(data.locations || []);
-      } catch (error) {
-        console.error("Error fetching locations:", error);
-      }
-    };
-
+        try {
+          const response = await fetch("https://rangerhub-back.vercel.app/activitycategory");
+          const data = await response.json();
+          if (Array.isArray(data.categories)) {
+            setCategories(data.categories);
+          } else {
+            console.error("Expected an array of categories, but got:", data.categories);
+          }
+        } catch (error) {
+          console.error("Error fetching categories:", error);
+        }
+      };
+      
+      const fetchLocations = async () => {
+        try {
+          const response = await fetch("https://rangerhub-back.vercel.app/locations");
+          const data = await response.json();
+          if (Array.isArray(data.locations)) {
+            setLocations(data.locations);
+          } else {
+            console.error("Expected an array of locations, but got:", data.locations);
+          }
+        } catch (error) {
+          console.error("Error fetching locations:", error);
+        }
+      };
+      
     fetchCategories();
     fetchLocations();
   }, []);

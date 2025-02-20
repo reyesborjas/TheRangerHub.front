@@ -4,7 +4,7 @@ import Login from "./components/Login";
 import SignUp from "./components/SignUp";
 import Home from "./pages/Home.jsx";
 import AboutUs from "./pages/AboutUs";
-import RangerDashBoard from "./components/RangerDashBoard"; // Asegúrate de importarlo
+// import RangerDashBoard from "./components/RangerDashBoard"; // Asegúrate de importarlo
 import ContactUs from "./pages/ContactUs";
 import CreateTrip from "./components/CreateTrip.jsx";
 import { HomeDashboard } from "./pages/dashboard/HomeDashboard.jsx";

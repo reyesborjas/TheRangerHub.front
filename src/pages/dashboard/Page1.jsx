@@ -1,3 +1,11 @@
+import CreateTrip from "../../components/CreateTrip.jsx";
+
+
 export const Page1 = () => {
-    return <h1>Page1</h1>
+    return (
+        <>
+          <CreateTrip />
+        </>
+    )
+
 }
