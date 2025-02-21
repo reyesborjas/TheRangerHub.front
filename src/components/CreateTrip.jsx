@@ -18,7 +18,7 @@ const CreateTrip = () => {
     total_cost: "",
     trip_image_url: "",
     activities: [],
-    lead_ranger: "",
+    lead_ranger: [],
   });
   const [imagePreview, setImagePreview] = useState(null);
 
@@ -37,6 +37,7 @@ const CreateTrip = () => {
       try {
         const response = await fetch("https://rangerhub-back.vercel.app/rangers");
         const data = await response.json();
+        console.log(data);
         setRangers(data.rangers || []);
       } catch (error) {
         console.error("Error fetching rangers:", error);
@@ -82,10 +83,11 @@ const CreateTrip = () => {
         body: JSON.stringify(formData),
       });
       const data = await response.json();
+      console.log("Respuesta del servidor:", data);
       if (response.ok) {
         navigate("/trips");
       } else {
-        console.error("Error al crear el viaje:", data.message);
+        console.error("Error al crear el viaje:", data.message || "Error desconocido");
       }
     } catch (error) {
       console.error("Error:", error);
@@ -155,15 +157,21 @@ const CreateTrip = () => {
                   <button type="button" className="btn btn-secondary" onClick={addActivity}>Agregar Actividad</button>
                 </div>
 
-            <div className="mb-3">
-              <label className="form-label">Ranger Líder</label>
-              <select className="form-control" name="lead_ranger" onChange={handleChange} required>
-                <option value="">Seleccionar Ranger</option>
-                {rangers.map((ranger) => (
-                  <option key={ranger.id} value={ranger.id}>{ranger.name}</option>
-                ))}
-              </select>
-            </div>
+                <div className="mb-3">
+                  <label className="form-label">Ranger Líder</label>
+                  <select className="form-control" name="lead_ranger" onChange={handleChange} required>
+                    <option value="">Seleccionar Ranger</option>
+                    {Array.isArray(rangers) && rangers.length > 0 ? (
+                      rangers.map((ranger) => (
+                        <option key={ranger.uuid} value={ranger.uuid}>
+                          {ranger.full_name}
+                        </option>
+                      ))
+                    ) : (
+                      <option disabled>Cargando rangers...</option>
+                    )}
+                  </select>
+                </div>
 
             <div className="mb-3">
               <label className="form-label">Pronóstico del Clima Estimado</label>
