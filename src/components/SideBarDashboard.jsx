@@ -48,13 +48,13 @@ const SideBarDashboard = () => {
                     <a href="/mis-viajes" className="nav-link">
                         <i className="fas fa-suitcase"></i> Mis Viajes
                     </a>
-                    <a href="/viajes" className="nav-link">
+                    <a href="/dashboard/trips" className="nav-link">
                         <i className="fas fa-map"></i> Viajes
                     </a>
-                    <a href="/actividades" className="nav-link">
+                    <a href="/dashboard/activities" className="nav-link">
                         <i className="fas fa-bicycle"></i> Actividades
                     </a>
-                    <a href="/recursos" className="nav-link">
+                    <a href="/dashboard/resources" className="nav-link">
                         <i className="fas fa-book"></i> Recursos
                     </a>
                 </nav>
