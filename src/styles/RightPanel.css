@@ -1,0 +1,111 @@
+/* RightPanel.css */
+.right-panel {
+    padding: 20px;
+    background-color: #f9f9f9;
+}
+
+/* Card de Bootstrap + algo de sombra */
+.calendar-timeline-card {
+    border: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* --- MINI-CALENDARIO --- */
+.calendar-section {
+    margin-bottom: 20px;
+}
+
+.month-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+}
+
+.days-of-week {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: #666;
+}
+
+.days-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+    margin-top: 5px;
+}
+
+.day-cell {
+    width: 40px;
+    height: 40px;
+    background-color: #fff;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #333;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.day-cell:hover {
+    background-color: #e7f1ff;
+}
+
+.active-day {
+    background-color: #4285f4; /* o el color que quieras */
+    color: #fff;
+}
+
+/* --- TIMELINE --- */
+.timeline-section {
+    margin-top: 20px;
+}
+
+.timeline-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: #444;
+}
+
+.timeline-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Cada evento en el timeline */
+.timeline-event {
+    display: flex;
+    align-items: center;
+    border-radius: 8px;
+    padding: 10px;
+    color: #333;
+}
+
+.event-icon {
+    font-size: 1.2rem;
+    margin-right: 10px;
+    color: #333; /* Cambia si quieres un color de ícono distinto */
+}
+
+.event-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.event-time {
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-bottom: 3px;
+    color: #555;
+}
+
+.event-title {
+    font-size: 1rem;
+    font-weight: 600;
+}

@@ -1,6 +1,14 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from "react";
 import logo from "../assets/logo.png";
+import { Link } from "react-router-dom";
 import "../styles/SideBarDashboard.css";
+
+// Importar FontAwesome para los iconos
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+    faHome, faSuitcase, faMap, faBicycle, faBook,
+    faCloudSun, faCog, faQuestionCircle, faSignOutAlt
+} from "@fortawesome/free-solid-svg-icons";
 
 const SideBarDashboard = () => {
     const [weather, setWeather] = useState(null);
@@ -16,7 +24,7 @@ const SideBarDashboard = () => {
                 );
 
                 if (!response.ok) {
-                    throw new Error('Error al obtener datos del clima');
+                    throw new Error("Error al obtener datos del clima");
                 }
 
                 const data = await response.json();
@@ -31,61 +39,72 @@ const SideBarDashboard = () => {
     }, []);
 
     return (
-        <>
-            <div className="sidebar d-flex flex-column align-items-center">
-                <div className="logo">
-                    <img src={logo} alt="The Ranger Hub" />
-                </div>
-
-                <button className="new-trip-btn" onClick={() => window.location.href = "/dashboard/Page1"}>+ Nuevo Viaje
-                </button>
-
-
-                <nav className="nav flex-column w-100">
-                    <a href="/inicio" className="nav-link">
-                        <i className="fas fa-home"></i> Inicio
-                    </a>
-                    <a href="/mis-viajes" className="nav-link">
-                        <i className="fas fa-suitcase"></i> Mis Viajes
-                    </a>
-                    <a href="/viajes" className="nav-link">
-                        <i className="fas fa-map"></i> Viajes
-                    </a>
-                    <a href="/actividades" className="nav-link">
-                        <i className="fas fa-bicycle"></i> Actividades
-                    </a>
-                    <a href="/recursos" className="nav-link">
-                        <i className="fas fa-book"></i> Recursos
-                    </a>
-                </nav>
-
-                <div className="weather">
-                    {error ? (
-                        <p>Error al cargar el clima</p>
-                    ) : weather && weather.main ? (
-                        <>
-                            <i className="fas fa-cloud-sun"></i>
-                            <p>{weather.name}</p>
-                            <h4>{Math.round(weather.main.temp)}°C</h4>
-                            {weather.weather && weather.weather[0] && (
-                                <small>{weather.weather[0].description}</small>
-                            )}
-                        </>
-                    ) : (
-                        <p>Cargando clima...</p>
-                    )}
-                </div>
-
-                <div className="bottom-icons d-flex">
-                    <a href="/ayuda" className="icon-btn">
-                        <i className="fas fa-question-circle"></i>
-                    </a>
-                    <a href="/configuracion" className="icon-btn">
-                        <i className="fas fa-cog"></i>
-                    </a>
-                </div>
+        <div className="sidebar d-flex flex-column align-items-center">
+            {/* Logo */}
+            <div className="logo">
+                <img src={logo} alt="The Ranger Hub" />
             </div>
-        </>
+
+            {/* Botón de Nuevo Viaje */}
+            <button className="new-trip-btn" onClick={() => window.location.href = "/dashboard/Page1"}>
+                + Nuevo Viaje
+            </button>
+
+            {/* Navegación */}
+            <nav className="nav flex-column w-100">
+                <Link to="/dashboard/home" className="nav-link">
+                    <FontAwesomeIcon icon={faHome} className="nav-icon" />
+                    <span>Inicio</span>
+                </Link>
+                <Link to="/mis-viajes" className="nav-link">
+                    <FontAwesomeIcon icon={faSuitcase} className="nav-icon" />
+                    <span>Mis Viajes</span>
+                </Link>
+                <Link to="/viajes" className="nav-link">
+                    <FontAwesomeIcon icon={faMap} className="nav-icon" />
+                    <span>Viajes</span>
+                </Link>
+                <Link to="/actividades" className="nav-link">
+                    <FontAwesomeIcon icon={faBicycle} className="nav-icon" />
+                    <span>Actividades</span>
+                </Link>
+                <Link to="/recursos" className="nav-link">
+                    <FontAwesomeIcon icon={faBook} className="nav-icon" />
+                    <span>Recursos</span>
+                </Link>
+            </nav>
+
+            {/* Clima */}
+            <div className="weather text-center">
+                {error ? (
+                    <p>Error al cargar el clima</p>
+                ) : weather && weather.main ? (
+                    <>
+                        <FontAwesomeIcon icon={faCloudSun} size="2x" />
+                        <p>{weather.name}</p>
+                        <h4>{Math.round(weather.main.temp)}°C</h4>
+                        {weather.weather && weather.weather[0] && (
+                            <small>{weather.weather[0].description}</small>
+                        )}
+                    </>
+                ) : (
+                    <p>Cargando clima...</p>
+                )}
+            </div>
+
+            {/* Iconos Inferiores */}
+            <div className="bottom-icons d-flex justify-content-center mt-3">
+                <Link to="/ayuda" className="sidebar-icon">
+                    <FontAwesomeIcon icon={faQuestionCircle} size="lg" />
+                </Link>
+                <Link to="/configuracion" className="sidebar-icon">
+                    <FontAwesomeIcon icon={faCog} size="lg" />
+                </Link>
+                <Link to="/" className="sidebar-icon">
+                    <FontAwesomeIcon icon={faSignOutAlt} size="lg" />
+                </Link>
+            </div>
+        </div>
     );
 };
 

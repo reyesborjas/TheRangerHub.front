@@ -1,0 +1,148 @@
+.top-navbar {
+    width: calc(100% - 250px); /* Ajusta el ancho dejando espacio para el sidebar */
+    height: 60px;
+    background: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    box-shadow: 2px 10px 10px rgba(0,0,0,0.1);
+    position: fixed;.top-navbar {
+    width: calc(100% - 250px); /* Ajusta el ancho dejando espacio para el sidebar */
+    height: 60px;
+    background: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    box-shadow: 2px 10px 10px rgba(0,0,0,0.1);
+    position: fixed;
+    top: 0;
+    left: 250px; /* Se alinea con el sidebar */
+    right: 0;
+    z-index: 1000;
+}
+
+    .nav-left {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+
+    /* Barra de búsqueda */
+    .search-bar {
+        display: flex;
+        align-items: center;
+        background: #f1f3f5;
+        padding: 8px 12px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        width: 500px;
+        position: relative;
+        margin-left: 50px;
+    }
+
+    .search-bar input {
+        border: none;
+        outline: none;
+        background: transparent;
+        width: 100%;
+    }
+
+    .search-icon {
+        color: #777;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+    /* Sección derecha (usuario) */
+    .nav-right {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .user-name {
+        font-size: 16px;
+        font-weight: 500;
+        color: #333;
+    }
+
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #ddd;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .user-avatar:hover {
+        border-color: #e63946;
+    }
+    top: 0;
+    left: 250px; /* Se alinea con el sidebar */
+    right: 0;
+    z-index: 1000;
+}
+
+.nav-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+
+/* Barra de búsqueda */
+.search-bar {
+    display: flex;
+    align-items: center;
+    background: #f1f3f5;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    width: 500px;
+    position: relative;
+}
+
+.search-bar input {
+    border: none;
+    outline: none;
+    background: transparent;
+    width: 100%;
+}
+
+.search-icon {
+    color: #777;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+/* Sección derecha (usuario) */
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.user-name {
+    font-size: 16px;
+    font-weight: 500;
+    color: #333;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ddd;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.user-avatar:hover {
+    border-color: #e63946;
+}
