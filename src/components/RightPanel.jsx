@@ -1,11 +1,9 @@
-/
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlane, faBus, faHotel } from "@fortawesome/free-solid-svg-icons";
 import "../styles/RightPanel.css";
 
 const RightPanel = () => {
-    // Eventos de ejemplo para el timeline (puedes cargarlos desde una API real)
     const events = [
         {
             id: 1,
