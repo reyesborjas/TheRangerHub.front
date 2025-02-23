@@ -9,10 +9,12 @@ import ContactUs from "./pages/ContactUs";
 import CreateTrip from "./components/CreateTrip.jsx";
 import { HomeDashboard } from "./pages/dashboard/HomeDashboard.jsx";
 import { Dashboard } from "./pages/Dashboard.jsx";
-import { Activities } from "./pages/dashboard/Actitivities.jsx";
+import { Activities } from "./pages/dashboard/Activities.jsx";
 import { Trips } from "./pages/dashboard/Trips.jsx";
 import CreateActivity from "./components/CreateActivity.jsx";
 import { Resources } from "./pages/dashboard/Resources.jsx";
+import "bootstrap-icons/font/bootstrap-icons.css";
+import "./styles/Activities.css";
 
 function App() {
   return (
