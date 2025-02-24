@@ -130,7 +130,8 @@ const CreateTrip = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...tripData,
-          lead_ranger: formData.lead_ranger  }),
+          lead_ranger: formData.lead_ranger,
+        }),
       });
 
       if (!tripResponse.ok) {
@@ -139,8 +140,8 @@ const CreateTrip = () => {
       }
 
       const tripDataResponse = await tripResponse.json();
-      const { id: tripId } = await tripResponse.json();
-    }
+      const tripId = tripDataResponse.id;
+
       await Promise.all(
         activitiesList.map((activityId) =>
           fetch("https://rangerhub-back.vercel.app/activity-trips", {
