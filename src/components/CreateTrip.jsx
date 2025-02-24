@@ -13,7 +13,8 @@ const CreateTrip = () => {
     end_date: "",
     participants_number: "",
     trip_status: "pending",
-    estimated_weather_forecast: "Temperatura mínima:  Temperatura máxima: Expectativas de lluvias (si/no): ",
+    estimated_weather_forecast:
+      "Temperatura mínima:  Temperatura máxima: Expectativas de lluvias (si/no): ",
     description: "",
     total_cost: "",
     trip_image_url: "",
@@ -33,19 +34,23 @@ const CreateTrip = () => {
       }
     };
 
+    // Fetch Rangers optimizado y corregido
     const fetchRangers = async () => {
       try {
         const response = await fetch("https://rangerhub-back.vercel.app/rangers");
-        if (!response.ok) throw new Error("Error obteniendo rangers");
-        
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || "Error desconocido del servidor");
+        }
         const data = await response.json();
-        setRangers(data.rangers.map(r => ({
-          uuid: r.uuid,
-          label: `${r.full_name} (@${r.username})`  // Formato mejorado
-        })));
+        if (!data.rangers || !Array.isArray(data.rangers)) {
+          throw new Error("Formato de respuesta inválido");
+        }
+        setRangers(data.rangers);
       } catch (error) {
         console.error("Error fetching rangers:", error);
         alert(error.message);
+        setRangers([]);
       }
     };
 
@@ -71,13 +76,25 @@ const CreateTrip = () => {
   };
 
   const handleActivityChange = (e, index) => {
+    const newValue = e.target.value;
+    // Validar duplicados: se ignoran valores vacíos
+    if (newValue && formData.activities.some((act, i) => i !== index && act === newValue)) {
+      alert("Esta actividad ya está seleccionada. Por favor, elige otra.");
+      return;
+    }
     const updatedActivities = [...formData.activities];
-    updatedActivities[index] = e.target.value;
+    updatedActivities[index] = newValue;
     setFormData({ ...formData, activities: updatedActivities });
   };
 
   const addActivity = () => {
     setFormData({ ...formData, activities: [...formData.activities, ""] });
+  };
+
+  const removeActivity = (index) => {
+    const updatedActivities = [...formData.activities];
+    updatedActivities.splice(index, 1);
+    setFormData({ ...formData, activities: updatedActivities });
   };
 
   const handleImageUpload = (e) => {
@@ -95,20 +112,25 @@ const CreateTrip = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    if (formData.activities.length === 0 || formData.activities.some(a => !a)) {
+    if (
+      formData.activities.length === 0 ||
+      formData.activities.some((a) => !a)
+    ) {
       alert("Selecciona al menos una actividad válida");
       return;
     }
 
     try {
-      const activities = formData.activities;
+      const activitiesList = formData.activities;
       const tripData = { ...formData };
       delete tripData.activities;
 
       const tripResponse = await fetch("https://rangerhub-back.vercel.app/trips", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(tripData),
+        body: JSON.stringify({
+          ...tripData,
+          lead_ranger: formData.lead_ranger  }),
       });
 
       if (!tripResponse.ok) {
@@ -116,16 +138,18 @@ const CreateTrip = () => {
         throw new Error(errorData.message || "Error al crear el viaje");
       }
 
+      const tripDataResponse = await tripResponse.json();
       const { id: tripId } = await tripResponse.json();
-
+    }
       await Promise.all(
-        activities.map(activityId =>
+        activitiesList.map((activityId) =>
           fetch("https://rangerhub-back.vercel.app/activity-trips", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ trip_id: tripId, activity_id: activityId }),
-          }).then(res => {
-            if (!res.ok) throw new Error("Error creando relación con actividad");
+          }).then((res) => {
+            if (!res.ok)
+              throw new Error("Error creando relación con actividad");
             return res.json();
           })
         )
@@ -158,7 +182,7 @@ const CreateTrip = () => {
                   />
                 </div>
               </div>
-              
+
               <div className="row mb-3">
                 <div className="col-md-6">
                   <label className="form-label">Fecha de Inicio</label>
@@ -218,20 +242,28 @@ const CreateTrip = () => {
               <div className="mb-3">
                 <label className="form-label">Actividades</label>
                 {formData.activities.map((activity, index) => (
-                  <select
-                    key={index}
-                    className="form-control mb-2"
-                    value={activity}
-                    onChange={(e) => handleActivityChange(e, index)}
-                    required
-                  >
-                    <option value="">Seleccionar actividad</option>
-                    {activities.map((act) => (
-                       <option key={act.id} value={act.id}> {/* ✅ Usar act.id */}
-                        {act.name}
+                  <div key={index} className="d-flex align-items-center mb-2">
+                    <select
+                      className="form-control me-2"
+                      value={activity}
+                      onChange={(e) => handleActivityChange(e, index)}
+                      required
+                    >
+                      <option value="">Seleccionar actividad</option>
+                      {activities.map((act) => (
+                        <option key={act.id} value={act.id}>
+                          {act.name}
                         </option>
-                    ))}
-                  </select>
+                      ))}
+                    </select>
+                    <button
+                      type="button"
+                      className="btn btn-danger"
+                      onClick={() => removeActivity(index)}
+                    >
+                      Eliminar
+                    </button>
+                  </div>
                 ))}
                 <button
                   type="button"
@@ -244,29 +276,27 @@ const CreateTrip = () => {
 
               <div className="mb-3">
                 <label className="form-label">Ranger Líder</label>
-                <select 
-                    className="form-control" 
-                    name="lead_ranger" 
-                    value={formData.lead_ranger} 
-                    onChange={handleChange}
-                    required
-                  >
-                    <option value="">Seleccionar Ranger</option>
-                  {rangers.map((ranger) => (
-                  <option>
-                
-
-                    key={ranger.id}  // ✅ Usar id real del backend
-                    value={ranger.id}
-                  
-                    {ranger.full_name} (@{ranger.username}) {/* ✅ username ahora existe */}
-                  </option>
-                  ))}
-                  </select>
+                <select
+                  className="form-control"
+                  name="lead_ranger"
+                  value={formData.lead_ranger}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="">Seleccionar Ranger</option>
+                  {Array.isArray(rangers) &&
+                    rangers.map((ranger) => (
+                      <option key={ranger.id} value={ranger.id}>
+                        {ranger.full_name} (@{ranger.username})
+                      </option>
+                    ))}
+                </select>
               </div>
 
               <div className="mb-3">
-                <label className="form-label">Pronóstico del Clima Estimado</label>
+                <label className="form-label">
+                  Pronóstico del Clima Estimado
+                </label>
                 <textarea
                   className="form-control"
                   name="estimated_weather_forecast"

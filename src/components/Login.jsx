@@ -17,30 +17,26 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     setErrorMessage(""); // Limpiar error previo
-
+  
     try {
-      console.log("Enviando datos:", formData);
-
       const response = await fetch("https://rangerhub-back.vercel.app/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
-
+  
       const data = await response.json();
-
+  
       if (!response.ok) {
         throw new Error(data.message || "Credenciales incorrectas");
       }
-
+  
       if (!data.token) {
         throw new Error("No se recibió un token de autenticación");
       }
-
+  
       localStorage.setItem("token", data.token);
-      console.log("Token guardado correctamente");
-
-      navigate("/dashboard");
+      navigate("/dashboard/home"); // 🔴 Aquí está el cambio
     } catch (error) {
       console.error("Error en login:", error);
       setErrorMessage(error.message);

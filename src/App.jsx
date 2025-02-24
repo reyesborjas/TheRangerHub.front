@@ -14,7 +14,7 @@ import { Trips } from "./pages/dashboard/Trips.jsx";
 import CreateActivity from "./components/CreateActivity.jsx";
 import { Resources } from "./pages/dashboard/Resources.jsx";
 import "bootstrap-icons/font/bootstrap-icons.css";
-import "./styles/Activities.css";
+
 
 function App() {
   return (
