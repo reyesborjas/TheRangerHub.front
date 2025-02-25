@@ -111,55 +111,51 @@ const CreateTrip = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
-    if (
-      formData.activities.length === 0 ||
-      formData.activities.some((a) => !a)
-    ) {
-      alert("Selecciona al menos una actividad válida");
-      return;
-    }
-
+  
     try {
-      const activitiesList = formData.activities;
-      const tripData = { ...formData };
-      delete tripData.activities;
-
+      // Validación mejorada de actividades
+      const activitiesList = formData.activities.filter(activity => activity !== "");
+      if (activitiesList.length === 0) {
+        alert("Debes seleccionar al menos una actividad válida");
+        return;
+      }
+  
+      // Enviar datos básicos del viaje
       const tripResponse = await fetch("https://rangerhub-back.vercel.app/trips", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...tripData,
-          lead_ranger: formData.lead_ranger,
+          ...formData,
+          activities: undefined, // Excluir actividades del payload
         }),
       });
-
-      if (!tripResponse.ok) {
-        const errorData = await tripResponse.json();
-        throw new Error(errorData.message || "Error al crear el viaje");
-      }
-
-      const tripDataResponse = await tripResponse.json();
-      const tripId = tripDataResponse.id;
-
-      await Promise.all(
-        activitiesList.map((activityId) =>
+  
+      const { id: tripId } = await tripResponse.json();
+  
+      // Enviar actividades en paralelo con control de errores
+      const results = await Promise.allSettled(
+        activitiesList.map(activityId =>
           fetch("https://rangerhub-back.vercel.app/activity-trips", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ trip_id: tripId, activity_id: activityId }),
-          }).then((res) => {
-            if (!res.ok)
-              throw new Error("Error creando relación con actividad");
-            return res.json();
+            body: JSON.stringify({ 
+              trip_id: tripId, 
+              activity_id: activityId 
+            }),
           })
         )
       );
-
-      navigate("/trips");
+  
+      // Verificar errores en actividades
+      const failedActivities = results.filter(r => r.status === "rejected");
+      if (failedActivities.length > 0) {
+        throw new Error(`${failedActivities.length} actividades no se pudieron asociar`);
+      }
+  
+      navigate("/dashboard/trips");
     } catch (error) {
-      console.error("Error:", error.message);
-      alert("Error al crear el viaje: " + error.message);
+      console.error("Error completo:", error);
+      alert(error.message);
     }
   };
 

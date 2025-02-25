@@ -37,7 +37,7 @@ const SideBarDashboard = () => {
                     <img src={logo} alt="The Ranger Hub" />
                 </div>
 
-                <button className="new-trip-btn" onClick={() => window.location.href = "/dashboard/Page1"}>+ Nuevo Viaje
+                <button className="new-trip-btn" onClick={() => window.location.href = "/dashboard/createtrip"}>+ Nuevo Viaje
                 </button>
 
 
@@ -45,7 +45,7 @@ const SideBarDashboard = () => {
                     <a href="/inicio" className="nav-link">
                         <i className="fas fa-home"></i> Inicio
                     </a>
-                    <a href="/mis-viajes" className="nav-link">
+                    <a href="/dashboard/mytrips" className="nav-link">
                         <i className="fas fa-suitcase"></i> Mis Viajes
                     </a>
                     <a href="/dashboard/trips" className="nav-link">
