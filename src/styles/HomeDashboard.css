@@ -1,0 +1,24 @@
+.dashboard-layout {
+    display: flex;
+    height: 100vh;
+}
+
+.dashboard-content {
+    flex-grow: 1;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.main-layout {
+    display: flex;
+    flex: 1;
+}
+
+/* 75% ancho para Main, 25% para RightPanel */
+.main-layout > :first-child {
+    flex: 3;
+}
+.main-layout > :last-child {
+    flex: 1;
+}

@@ -62,11 +62,13 @@ export const Trips = () => {
             <input
               className="form-control me-2"
               type="search"
-              placeholder="Search"
+              placeholder="Buscar viaje..."
               aria-label="Search"
+              value={searchTerm} // Vincula el input con el estado
+              onChange={(e) => setSearchTerm(e.target.value)} // Actualiza el estado cuando cambie el input
             />
             <button className="btn btn-outline-success" type="submit">
-              Search
+              Buscar
             </button>
           </form>
         </div>

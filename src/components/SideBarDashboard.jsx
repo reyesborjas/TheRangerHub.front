@@ -1,7 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams } from "react-router-dom";
 import logo from "../assets/logo.png";
+import { Link } from "react-router-dom";
 import "../styles/SideBarDashboard.css";
+
+// Importar FontAwesome para los iconos
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+    faHome, faSuitcase, faMap, faBicycle, faBook,
+    faCloudSun, faCog, faQuestionCircle, faSignOutAlt
+} from "@fortawesome/free-solid-svg-icons";
 
 const SideBarDashboard = () => {
     const { username } = useParams(); // Obtenemos el username de la URL
@@ -18,7 +26,7 @@ const SideBarDashboard = () => {
                 );
 
                 if (!response.ok) {
-                    throw new Error('Error al obtener datos del clima');
+                    throw new Error("Error al obtener datos del clima");
                 }
 
                 const data = await response.json();
@@ -86,6 +94,7 @@ const SideBarDashboard = () => {
                     <i className="fas fa-cog"></i>
                 </Link>
             </div>
+        </div>
         </div>
     );
 };
