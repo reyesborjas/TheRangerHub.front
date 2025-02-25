@@ -50,29 +50,24 @@ const SideBarDashboard = () => {
                 + Nuevo Viaje
             </button>
 
-            {/* Navegación */}
-            <nav className="nav flex-column w-100">
-                <Link to="/dashboard/home" className="nav-link">
-                    <FontAwesomeIcon icon={faHome} className="nav-icon" />
-                    <span>Inicio</span>
-                </Link>
-                <Link to="/mis-viajes" className="nav-link">
-                    <FontAwesomeIcon icon={faSuitcase} className="nav-icon" />
-                    <span>Mis Viajes</span>
-                </Link>
-                <Link to="/viajes" className="nav-link">
-                    <FontAwesomeIcon icon={faMap} className="nav-icon" />
-                    <span>Viajes</span>
-                </Link>
-                <Link to="/actividades" className="nav-link">
-                    <FontAwesomeIcon icon={faBicycle} className="nav-icon" />
-                    <span>Actividades</span>
-                </Link>
-                <Link to="/recursos" className="nav-link">
-                    <FontAwesomeIcon icon={faBook} className="nav-icon" />
-                    <span>Recursos</span>
-                </Link>
-            </nav>
+
+                <nav className="nav flex-column w-100">
+                    <a href="/inicio" className="nav-link">
+                        <i className="fas fa-home"></i> Inicio
+                    </a>
+                    <a href="/mis-viajes" className="nav-link">
+                        <i className="fas fa-suitcase"></i> Mis Viajes
+                    </a>
+                    <a href="/viajes" className="nav-link">
+                        <i className="fas fa-map"></i> Viajes
+                    </a>
+                    <a href="/actividades" className="nav-link">
+                        <i className="fas fa-bicycle"></i> Actividades
+                    </a>
+                    <a href="/recursos" className="nav-link">
+                        <i className="fas fa-book"></i> Recursos
+                    </a>
+                </nav>
 
             {/* Clima */}
             <div className="weather text-center">

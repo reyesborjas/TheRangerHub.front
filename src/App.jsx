@@ -9,9 +9,12 @@ import ContactUs from "./pages/ContactUs";
 import CreateTrip from "./components/CreateTrip.jsx";
 import { HomeDashboard } from "./pages/dashboard/HomeDashboard.jsx";
 import { Dashboard } from "./pages/Dashboard.jsx";
-import { Page1 } from "./pages/dashboard/Page1.jsx";
-import { Page2 } from "./pages/dashboard/Page2.jsx";
+import { Activities } from "./pages/dashboard/Activities.jsx";
+import { Trips } from "./pages/dashboard/Trips.jsx";
 import CreateActivity from "./components/CreateActivity.jsx";
+import { Resources } from "./pages/dashboard/Resources.jsx";
+import "bootstrap-icons/font/bootstrap-icons.css";
+
 
 function App() {
   return (
@@ -25,8 +28,9 @@ function App() {
           <Route path="/signup" element={<SignUp />} />
           <Route element={<Dashboard /> }>
             <Route path="/dashboard/home" element={<HomeDashboard />}  />
-            <Route path="/dashboard/page1" element={<Page1 />}  />
-            <Route path="/dashboard/page2" element={<Page2 />}  />
+            <Route path="/dashboard/trips" element={<Trips />}  />
+            <Route path="/dashboard/activities" element={<Activities />}  />
+            <Route  path="/dashboard/resources" element={<Resources/>}  />
           </Route>
           <Route path="/createactivity" element={<CreateActivity />} />
           <Route path="/create-trip" element={<CreateTrip />} />
