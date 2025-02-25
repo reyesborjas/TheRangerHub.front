@@ -73,10 +73,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
           
-          {/*
-            Aquí definimos la ruta "padre" con el parámetro :username.
-            Todas las rutas hijas se definirán de forma relativa.
-          */}
+          
           <Route path="/secured/:username/dashboard" element={<Dashboard />}>
             <Route path="home" element={<HomeDashboard />} />
             <Route path="trips" element={<Trips />} />

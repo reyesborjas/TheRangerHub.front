@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 export const Trips = () => {
   const [trips, setTrips] = useState([]);
   const [reservingTripId, setReservingTripId] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     fetch("https://rangerhub-back.vercel.app/trips")
@@ -13,44 +14,14 @@ export const Trips = () => {
       .catch((error) => console.log(error));
   }, []);
 
+  // Añadir esta parte para el filtrado
+  const filteredTrips = trips.filter(trip => 
+    trip.trip_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (trip.description && trip.description.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
+
   const handleReservation = async (tripId) => {
-    // Obtener datos del usuario desde localStorage
-    const userId = localStorage.getItem("userId");
-    const token = localStorage.getItem("token");
-
-    if (!userId || !token) {
-      window.location.href = "/login";
-      return;
-    }
-    setReservingTripId(tripId);
-
-    try {
-      const response = await fetch(
-        "https://rangerhub-back.vercel.app/reservations",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            trip_id: tripId,
-            user_id: userId,
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Error al crear la reserva");
-      }
-
-      alert("¡Reserva exitosa!");
-    } catch (error) {
-      console.error(error);
-      alert(error.message);
-    } finally {
-      setReservingTripId(null);
-    }
+    // ... (mantener igual tu lógica de reservas)
   };
 
   return (
@@ -60,14 +31,16 @@ export const Trips = () => {
           <a className="navbar-brand">Mira los viajes que ofrecemos</a>
           <form className="d-flex">
             <input
-              className="form-control me-2"
-              type="search"
-              placeholder="Buscar viaje..."
-              aria-label="Search"
-              value={searchTerm} // Vincula el input con el estado
-              onChange={(e) => setSearchTerm(e.target.value)} // Actualiza el estado cuando cambie el input
+              type="text"
+              placeholder="Buscar viajes..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <button className="btn btn-outline-success" type="submit">
+            {/* Cambiar a type="button" para evitar submit del formulario */}
+            <button 
+              className="btn btn-outline-success" 
+              type="button" // Importante este cambio
+            >
               Buscar
             </button>
           </form>
@@ -75,8 +48,9 @@ export const Trips = () => {
       </nav>
       <div className="container">
         <div className="row">
-          {trips.length > 0 &&
-            trips.map((trip, index) => (
+          {/* Cambiar trips por filteredTrips aquí */}
+          {filteredTrips.length > 0 ? (
+            filteredTrips.map((trip, index) => (
               <div key={trip._id || index} className="col-4">
                 <div className="card">
                   <img
@@ -108,7 +82,13 @@ export const Trips = () => {
                   </div>
                 </div>
               </div>
-            ))}
+            ))
+          ) : (
+            // Añadir mensaje cuando no hay resultados
+            <div className="col-12 text-center my-5">
+              <h3>No se encontraron viajes con ese criterio de búsqueda</h3>
+            </div>
+          )}
         </div>
       </div>
     </div>
