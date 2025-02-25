@@ -1,8 +1,10 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
+import { Link, useParams } from "react-router-dom";
 import logo from "../assets/logo.png";
 import "../styles/SideBarDashboard.css";
 
 const SideBarDashboard = () => {
+    const { username } = useParams(); // Obtenemos el username de la URL
     const [weather, setWeather] = useState(null);
     const [error, setError] = useState(null);
     const city = "Santiago";
@@ -31,61 +33,60 @@ const SideBarDashboard = () => {
     }, []);
 
     return (
-        <>
-            <div className="sidebar d-flex flex-column align-items-center">
-                <div className="logo">
-                    <img src={logo} alt="The Ranger Hub" />
-                </div>
-
-                <button className="new-trip-btn" onClick={() => window.location.href = "/dashboard/createtrip"}>+ Nuevo Viaje
-                </button>
-
-
-                <nav className="nav flex-column w-100">
-                    <a href="/inicio" className="nav-link">
-                        <i className="fas fa-home"></i> Inicio
-                    </a>
-                    <a href="/dashboard/mytrips" className="nav-link">
-                        <i className="fas fa-suitcase"></i> Mis Viajes
-                    </a>
-                    <a href="/dashboard/trips" className="nav-link">
-                        <i className="fas fa-map"></i> Viajes
-                    </a>
-                    <a href="/dashboard/activities" className="nav-link">
-                        <i className="fas fa-bicycle"></i> Actividades
-                    </a>
-                    <a href="/dashboard/resources" className="nav-link">
-                        <i className="fas fa-book"></i> Recursos
-                    </a>
-                </nav>
-
-                <div className="weather">
-                    {error ? (
-                        <p>Error al cargar el clima</p>
-                    ) : weather && weather.main ? (
-                        <>
-                            <i className="fas fa-cloud-sun"></i>
-                            <p>{weather.name}</p>
-                            <h4>{Math.round(weather.main.temp)}°C</h4>
-                            {weather.weather && weather.weather[0] && (
-                                <small>{weather.weather[0].description}</small>
-                            )}
-                        </>
-                    ) : (
-                        <p>Cargando clima...</p>
-                    )}
-                </div>
-
-                <div className="bottom-icons d-flex">
-                    <a href="/ayuda" className="icon-btn">
-                        <i className="fas fa-question-circle"></i>
-                    </a>
-                    <a href="/configuracion" className="icon-btn">
-                        <i className="fas fa-cog"></i>
-                    </a>
-                </div>
+        <div className="sidebar d-flex flex-column align-items-center">
+            <div className="logo">
+                <img src={logo} alt="The Ranger Hub" />
             </div>
-        </>
+
+            {/* Botón para nuevo viaje utilizando Link y la ruta dinámica */}
+            <Link to={`/secured/${username}/dashboard/createtrip`} className="new-trip-btn">
+                + Nuevo Viaje
+            </Link>
+
+            <nav className="nav flex-column w-100">
+                <Link to={`/secured/${username}/dashboard/home`} className="nav-link">
+                    <i className="fas fa-home"></i> Inicio
+                </Link>
+                <Link to={`/secured/${username}/dashboard/mytrips`} className="nav-link">
+                    <i className="fas fa-suitcase"></i> Mis Viajes
+                </Link>
+                <Link to={`/secured/${username}/dashboard/trips`} className="nav-link">
+                    <i className="fas fa-map"></i> Viajes
+                </Link>
+                <Link to={`/secured/${username}/dashboard/activities`} className="nav-link">
+                    <i className="fas fa-bicycle"></i> Actividades
+                </Link>
+                <Link to={`/secured/${username}/dashboard/resources`} className="nav-link">
+                    <i className="fas fa-book"></i> Recursos
+                </Link>
+            </nav>
+
+            <div className="weather">
+                {error ? (
+                    <p>Error al cargar el clima</p>
+                ) : weather && weather.main ? (
+                    <>
+                        <i className="fas fa-cloud-sun"></i>
+                        <p>{weather.name}</p>
+                        <h4>{Math.round(weather.main.temp)}°C</h4>
+                        {weather.weather && weather.weather[0] && (
+                            <small>{weather.weather[0].description}</small>
+                        )}
+                    </>
+                ) : (
+                    <p>Cargando clima...</p>
+                )}
+            </div>
+
+            <div className="bottom-icons d-flex">
+                <Link to="/ayuda" className="icon-btn">
+                    <i className="fas fa-question-circle"></i>
+                </Link>
+                <Link to="/configuracion" className="icon-btn">
+                    <i className="fas fa-cog"></i>
+                </Link>
+            </div>
+        </div>
     );
 };
 

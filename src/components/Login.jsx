@@ -27,16 +27,17 @@ const Login = () => {
   
       const data = await response.json();
   
-      if (!response.ok) {
-        throw new Error(data.message || "Credenciales incorrectas");
-      }
+      if (!response.ok) throw new Error(data.message || "Ocurrió un error en login");
+      localStorage.setItem("token", data.token);
+      navigate(`/secured/${data.username}/dashboard/home`); 
+      
   
       if (!data.token) {
         throw new Error("No se recibió un token de autenticación");
       }
   
-      localStorage.setItem("token", data.token);
-      navigate("/dashboard/home"); // 🔴 Aquí está el cambio
+      
+      
     } catch (error) {
       console.error("Error en login:", error);
       setErrorMessage(error.message);
