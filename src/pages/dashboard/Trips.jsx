@@ -4,6 +4,8 @@ export const Trips = () => {
   const [trips, setTrips] = useState([]);
   const [reservingTripId, setReservingTripId] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const storedUser = localStorage.getItem("currentUser");
+  const currentUser = storedUser ? JSON.parse(storedUser) : null;
 
   useEffect(() => {
     fetch("https://rangerhub-back.vercel.app/trips")
@@ -21,8 +23,42 @@ export const Trips = () => {
   );
 
   const handleReservation = async (tripId) => {
-    // ... (mantener igual tu lógica de reservas)
-  };
+    
+    if (!currentUser) {
+      alert("Por favor, inicia sesión");
+      return;
+    } 
+    const userId = currentUser.id;
+
+    setReservingTripId(tripId);
+
+    try {
+      const reservationData = {
+        trip_id: tripId,
+        user_id: currentUser.id,
+        status: "pendiente"
+    };
+    const response = await fetch("https://rangerhub-back.vercel.app/reservations", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(reservationData)
+    });
+
+    if (!response.ok) {
+      const errorResponse = await response.json();
+      throw new Error(errorResponse.message || "Error al reservar viaje");
+  } 
+    const data = await response.json();
+    console.log(data);
+    alert("Reserva realizada con éxito");
+    setReservingTripId(null);
+  } catch (error) {
+    console.error("Error en la reservación:", error);
+    alert(error.message || "Hubo un error al procesar tu reservación");
+  } finally {
+    setReservingTripId(null);
+  }
+};
 
   return (
     <div>
@@ -63,9 +99,9 @@ export const Trips = () => {
                     <h5>Precio ${trip.total_cost}</h5>
                     <p className="card-text">{trip.description}</p>
                     <button
-                      onClick={() => handleReservation(trip._id)}
+                      onClick={() => handleReservation(trip.id)}
                       className="btn btn-primary"
-                      disabled={reservingTripId === trip._id}
+                      disabled={reservingTripId === trip.id}
                     >
                       {reservingTripId === trip._id ? (
                         <>
