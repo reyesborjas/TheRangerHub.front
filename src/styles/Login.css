@@ -2,7 +2,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    height: 500px;
     background-color: #f8f9fa;
 }
 
@@ -22,6 +22,16 @@
     border-radius: 5px;
     padding: 10px;
     margin-bottom: 15px;
+    gap: 5px;
+}
+
+.form-control{
+    margin: 0px;
+    height: 30px;
+}
+
+.form-label{
+    font-size: small;
 }
 
 .input-group input {
@@ -125,6 +135,6 @@
 }
 
 body {
-    padding-top: 60px; /* Ajusta según la altura de tu navbar */
+    padding-top: 120px; /* Ajusta según la altura de tu navbar */
   }
   

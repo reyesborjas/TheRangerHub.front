@@ -4,7 +4,6 @@
     align-items: center;
     background: url("./foto.jpeg") no-repeat center 60% / cover;
     padding: 50px;
-    border-radius: 10px;
     color: white;
     overflow: hidden;
 }
@@ -16,7 +15,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.6); 
+    background-color: rgba(0, 0, 0, 0.5); 
     z-index: 1;
 }
 

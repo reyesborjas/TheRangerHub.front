@@ -12,20 +12,62 @@ const MainDashboard = () => {
                 <div className="col-12">
                     <Carousel className="hero-slider">
                         <Carousel.Item>
-                            <img
-                                className="d-block w-100"
-                                src="/Torres.jpeg"
-                                alt="Torres del Paine"
-                                onError={(e) => (e.target.src = "https://via.placeholder.com/800x400")}
-                            />
+                            <div className="carousel-image-container">
+                                <img
+                                    className="d-block w-100"
+                                    src="https://patagoniatours.cl/wp-content/uploads/2014/02/tour-trekking-base-torres-del-paine2.jpg"
+                                    alt="Torres del Paine"
+                                    onError={(e) => (e.target.src = "https://via.placeholder.com/800x400")}
+                                />
+                                <div className="image-text">Torres del Paine, Chile</div>
+                            </div>
+                        </Carousel.Item>
+
+                        <Carousel.Item>
+                            <div className="carousel-image-container">
+                                <img
+                                    className="d-block w-100"
+                                    src="https://sietelagos.cl/wp-content/uploads/2022/06/DEPORTE-AVENTURA-RAFTING-2.jpg"
+                                    alt="Rafting Panguipulli"
+                                    onError={(e) => (e.target.src = "https://via.placeholder.com/800x400")}
+                                />
+                                <div className="image-text">Panguipulli, Chile</div>
+                            </div>
+                        </Carousel.Item>
+
+                        <Carousel.Item>
+                            <div className="carousel-image-container">
+                                <img
+                                    className="d-block w-100"
+                                    src="https://ojo.pe/resizer/v2/HFSWMWMELZGVVB6NSC55554YNA.jpeg?auth=8846b5d6a19d04083aa26aaff3b80b031f07701abc94790efc03caba86dd344b&width=580&height=330&quality=75&smart=true"
+                                    alt="Machu Picchu"
+                                    onError={(e) => (e.target.src = "https://via.placeholder.com/800x400")}
+                                />
+                                <div className="image-text">Machu Picchu, Perú</div>
+                            </div>
+                        </Carousel.Item>
+
+                        <Carousel.Item>
+                            <div className="carousel-image-container">
+                                <img
+                                    className="d-block w-100"
+                                    src="https://puconchile.travel/wp-content/uploads/2023/12/Fotos-Canopy-Vuelo-del-condor3-1024x600.jpg"
+                                    alt="Canopy Pucón"
+                                    onError={(e) => (e.target.src = "https://via.placeholder.com/800x400")}
+                                />
+                                <div className="image-text">Pucón, Chile</div>
+                            </div>
                         </Carousel.Item>
                         <Carousel.Item>
-                            <img
-                                className="d-block w-100"
-                                src="/img.png"
-                                alt="Torres del Paine"
-                                onError={(e) => (e.target.src = "https://via.placeholder.com/800x400")}
-                            />
+                            <div className="carousel-image-container">
+                                <img
+                                    className="d-block w-100"
+                                    src="https://sandboard.cl/wp-content/uploads/2025/01/GOPR1095-scaled.jpg"
+                                    alt="Sandboard San Pedro"
+                                    onError={(e) => (e.target.src = "https://via.placeholder.com/800x400")}
+                                />
+                                <div className="image-text">San Pedro de Atacama, Chile</div>
+                            </div>
                         </Carousel.Item>
                     </Carousel>
                 </div>
@@ -99,28 +141,28 @@ const MainDashboard = () => {
                             <h6>Próximos viajes</h6>
                             <table className="table table-hover">
                                 <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Nombre</th>
-                                    <th>Estado</th>
-                                </tr>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Nombre</th>
+                                        <th>Estado</th>
+                                    </tr>
                                 </thead>
                                 <tbody>
-                                <tr>
-                                    <td>1</td>
-                                    <td>Buenos Aires</td>
-                                    <td>Confirmado</td>
-                                </tr>
-                                <tr>
-                                    <td>2</td>
-                                    <td>Machu Picchu</td>
-                                    <td>Pendiente</td>
-                                </tr>
-                                <tr>
-                                    <td>3</td>
-                                    <td>San Pedro de Atacama</td>
-                                    <td>En curso</td>
-                                </tr>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>Buenos Aires</td>
+                                        <td>Confirmado</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td>Machu Picchu</td>
+                                        <td>Pendiente</td>
+                                    </tr>
+                                    <tr>
+                                        <td>3</td>
+                                        <td>San Pedro de Atacama</td>
+                                        <td>En curso</td>
+                                    </tr>
                                 </tbody>
                             </table>
                             <button className="btn btn-danger btn-lg w-100 mt-3">

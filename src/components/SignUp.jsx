@@ -207,7 +207,7 @@ const SignUp = () => {
 
               <div className="row">
                 <div className="col-md-6 mb-3">
-                  <label className="form-label">RUT (opcional)</label>
+                  <label className="form-label">RUT </label>
                   <input
                     type="text"
                     className={`form-control ${errors.rut ? 'is-invalid' : ''}`}
@@ -220,7 +220,7 @@ const SignUp = () => {
                 </div>
                 
                 <div className="col-md-6 mb-3">
-                  <label className="form-label">Número de Pasaporte (opcional)</label>
+                  <label className="form-label">Número de Pasaporte </label>
                   <input
                     type="text"
                     className="form-control"
