@@ -1,5 +1,7 @@
 import React from "react";
 import "../styles/GuideOrExplorer.css"; // Estilos personalizados
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCircleCheck } from "@fortawesome/free-solid-svg-icons";
 
 const GuideOrExplorer = () => {
   return (
@@ -17,15 +19,15 @@ const GuideOrExplorer = () => {
         <div className="col-md-6">
           <ul className="features-list">
             <li>
-              <div className="icon-box"></div>
+            <FontAwesomeIcon icon={faCircleCheck} size="2x" style={{ color: "#FF6F61", marginRight: "5px" }} />
               Monetiza tu pasión por los viajes.
             </li>
             <li>
-              <div className="icon-box"></div>
+            <FontAwesomeIcon icon={faCircleCheck} size="2x" style={{ color:  "#FF6F61", marginRight: "5px" }} />
               Elige tus precios y horarios.
             </li>
             <li>
-              <div className="icon-box"></div>
+            <FontAwesomeIcon icon={faCircleCheck} size="2x" style={{ color:  "#FF6F61", marginRight: "5px" }} />
               Conéctate con viajeros listos para reservar.
             </li>
           </ul>
@@ -42,15 +44,15 @@ const GuideOrExplorer = () => {
         <div className="col-md-6 order-md-1">
           <ul className="features-list">
             <li>
-              <div className="icon-box"></div>
+            <FontAwesomeIcon icon={faCircleCheck} size="2x" style={{ color: "lightgreen", marginRight: "5px" }} />
               Explora tours únicos creados por expertos.
             </li>
             <li>
-              <div className="icon-box"></div>
+            <FontAwesomeIcon icon={faCircleCheck} size="2x" style={{ color: "lightgreen", marginRight: "5px" }} />
               Reserva de forma segura y sin complicaciones.
             </li>
             <li>
-              <div className="icon-box"></div>
+            <FontAwesomeIcon icon={faCircleCheck} size="2x" style={{ color: "lightgreen", marginRight: "5px" }} />
               Descubre lugares como nunca antes.
             </li>
           </ul>

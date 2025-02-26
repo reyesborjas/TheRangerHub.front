@@ -16,7 +16,13 @@
     gap: 50px;
 }
 
-.stat-item {
+.stat-item1 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+}
+.stat-item2 {
     display: flex;
     flex-direction: column;
     align-items: center;

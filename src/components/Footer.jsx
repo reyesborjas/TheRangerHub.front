@@ -22,6 +22,7 @@ const Footer = () => {
                     </div>
                 </div>
                 <div className="footer-links">
+                <div className="footer-middle">
                     <ul>
                         <li><a href="#">Explorar Tours</a></li>
                         <li><a href="#">Convertirse en Ranger</a></li>
@@ -29,13 +30,16 @@ const Footer = () => {
                         <li><a href="#">Blog</a></li>
                         <li><a href="#">Nuestro Equipo</a></li>
                     </ul>
-                    <ul>
+                </div>
+                <div className="footer-right">
+                <ul>
                         <li><a href="#">Contáctanos</a></li>
                         <li><a href="#">Unirse a la Comunidad</a></li>
                         <li><a href="#">Tarjetas de Regalo</a></li>
                         <li><a href="#">Feedback</a></li>
                         <li><a href="#">Carreras</a></li>
                     </ul>
+                </div>
                 </div>
             </div>
             <div className="footer-bottom">

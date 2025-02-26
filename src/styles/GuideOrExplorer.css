@@ -14,12 +14,11 @@
 
 /* 🎨 Imagen específica para cada sección */
 .ranger-img {
-    background-image: url('/assets/ranger-icon.png'); /* Cambia esto por la imagen del Ranger */
-    background-color: #f8d7da;
+    background-image: url('https://identidadydesarrollo.com/wp-content/uploads/2017/10/Idyd_Roberto-Dupuis-600.png'); /* Cambia esto por la imagen del Ranger */
 }
 
 .explorer-img {
-    background-image: url('/assets/explorer-icon.png'); /* Cambia esto por la imagen del Explorer */
+    background-image: url('https://public21.es/wp-content/uploads/2016/10/foto-perfil-redonda.png'); /* Cambia esto por la imagen del Explorer */
     background-color: #d1e7dd;
 }
 
@@ -28,6 +27,7 @@
     background-color: #f8f9fa;
     border-radius: 10px;
     padding: 20px;
+    background-color: #f6dddf;
 }
 
 /* 🔵 Sección Explorers */
@@ -47,13 +47,6 @@
     display: flex;
     align-items: center;
     font-size: 1rem;
-    margin: 10px 0;
+    margin: 10px 5px;
 }
 
-/* 📌 Icono cuadrado al lado de cada texto */
-.icon-box {
-    width: 40px;
-    height: 40px;
-    background-color: #ccc;
-    margin-right: 10px;
-}

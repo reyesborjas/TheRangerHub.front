@@ -1,6 +1,7 @@
 import PropTypes from "prop-types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGlobe, faCog, faShieldAlt } from "@fortawesome/free-solid-svg-icons";
+import "../styles/AboutFeatures.css"
 
 const FeatureCard = (props) => {
     return (

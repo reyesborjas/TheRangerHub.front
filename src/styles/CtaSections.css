@@ -1,26 +1,33 @@
 .cta-section {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    background: url("./foto.jpeg") no-repeat center 60% /cover;
     padding: 50px;
-    background-color: #f4f4f4;
     border-radius: 10px;
+    color: white;
+    background-color: rgba(0, 0, 0, 0.6);
 }
 
 .cta-content {
-    max-width: 50%;
+    position: relative;
+    max-width: 27%;
+    z-index: 2;
+    
 }
 
 .cta-content h2 {
     font-size: 2rem;
     font-weight: bold;
     margin-bottom: 15px;
+    
 }
 
 .cta-content p {
     font-size: 1.2rem;
     margin-bottom: 20px;
-    color: #555;
+    color: white;
+    width: 650px;
+    text-align: left;
 }
 
 .cta-buttons {

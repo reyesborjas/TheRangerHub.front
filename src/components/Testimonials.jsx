@@ -7,21 +7,21 @@ const Testimonios = () => {
             ubicacion: "Guía Local, EE.UU.",
             opinion:
                 "Ranger Hub transformó mi pasión por guiar en un negocio próspero. Me encanta compartir mi conocimiento local con viajeros que aprecian experiencias únicas!",
-            imagen: "https://via.placeholder.com/150",
+            imagen: "https://agenciamoneta.com.br/wp-content/uploads/2024/03/Rafaela-Obrownick_foto-de-perfil-redonda.png",
         },
         {
             nombre: "Carlos Méndez",
             ubicacion: "Explorador, España",
             opinion:
                 "Reservar tours nunca ha sido tan fácil. Los guías son increíbles y siempre descubro lugares ocultos en cada ciudad!",
-            imagen: "https://via.placeholder.com/150",
+            imagen: "https://e7.pngegg.com/pngimages/415/765/png-clipart-user-profile-linkedin-netwerk-money-order-fulfillment-round-face-saving-expert.png",
         },
         {
-            nombre: "Sophie Lee",
+            nombre: "Jordan Lee",
             ubicacion: "Guía, Australia",
             opinion:
                 "Gracias a Ranger Hub, tengo un flujo constante de clientes que aprecian mi experiencia. ¡Muy recomendado!",
-            imagen: "https://via.placeholder.com/150",
+            imagen: "https://ancaresactiva.com/wp-content/uploads/2021/08/perfil-dani-circular.png",
         },
     ];
 

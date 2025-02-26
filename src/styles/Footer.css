@@ -6,21 +6,24 @@
 
 .footer-container {
     display: flex;
-    justify-content: space-between;
     align-items: flex-start;
     flex-wrap: wrap;
     max-width: 1200px;
     margin: 0 auto;
+    justify-content: space-between; 
+    gap: 20px; 
 }
 
 .footer-left {
     text-align: left;
     max-width: 300px;
+    text-align: center;
+    line-height: 3;
 }
 
 .footer-logo {
     width: 120px;
-    margin-bottom: 10px;
+    height: 120px;
 }
 
 .footer-socials {
@@ -43,6 +46,9 @@
 .footer-links {
     display: flex;
     gap: 50px;
+    margin: 5px;
+    float: inline-end;
+    margin-top: 25px;
 }
 
 .footer-links ul {
@@ -64,6 +70,24 @@
 .footer-links ul li a:hover {
     color: #007bff;
 }
+
+.footer-middle{
+    text-align: center;
+    width: 400px;
+    height: 300px;
+    line-height: 3.5;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+}
+
+.footer-right{
+    text-align: center;
+    width: 400px;
+    height: 300px;
+    float: right;
+    line-height: 3.5;
+}
+
 
 .footer-bottom {
     margin-top: 20px;
