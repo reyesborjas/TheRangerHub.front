@@ -29,7 +29,7 @@ const OpenLayersMap = ({ lat, lon, zoom }) => {
     return (
         <div
             ref={mapElement}
-            style={{ width: "100%", height: "300px" }}
+            style={{ width: "100%", height: "200px" }}
         />
     );
 };

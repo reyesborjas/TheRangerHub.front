@@ -27,11 +27,11 @@ const MainDashboard = () => {
                             <div className="carousel-image-container">
                                 <img
                                     className="d-block w-100"
-                                    src="https://sietelagos.cl/wp-content/uploads/2022/06/DEPORTE-AVENTURA-RAFTING-2.jpg"
-                                    alt="Rafting Panguipulli"
+                                    src="https://anacvarelar.wordpress.com/wp-content/uploads/2013/11/rafting-04y051-07-09_043.jpg"
+                                    alt="Rafting Venezuela"
                                     onError={(e) => (e.target.src = "https://via.placeholder.com/800x400")}
                                 />
-                                <div className="image-text">Panguipulli, Chile</div>
+                                <div className="image-text">Río Barinas, Venezuela</div>
                             </div>
                         </Carousel.Item>
 
@@ -73,54 +73,10 @@ const MainDashboard = () => {
                 </div>
             </div>
 
-            {/* Tarjetas de información del viaje */}
-            <div className="row mt-4">
-                <div className="col-md-4">
-                    <div className="card travel-info text-center">
-                        <div className="card-body">
-                            <h6>Fecha de viaje</h6>
-                            <h4>6 días</h4>
-                            <p>17.02.2025</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="col-md-4">
-                    <div className="card people-info text-center">
-                        <div className="card-body">
-                            <h6>Personas</h6>
-                            <h4>2 / Adultos</h4>
-                            <div className="avatars">
-                                <img
-                                    src="https://randomuser.me/api/portraits/men/40.jpg"
-                                    alt="José"
-                                    className="avatar"
-                                />
-                                <img
-                                    src="https://randomuser.me/api/portraits/women/40.jpg"
-                                    alt="Angela"
-                                    className="avatar"
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="col-md-4">
-                    <div className="card destination-info text-center">
-                        <div className="card-body">
-                            <h6>Destino</h6>
-                            <h4>Torres del Paine</h4>
-                            <p>Santiago → Puerto Varas</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             {/* Mapa y próximos viajes */}
-            <div className="row mt-4">
+            <div className="row mt-4" style={{ fontSize: "12px"}} >
                 {/* Mapa del viaje usando OpenLayers */}
-                <div className="col-md-6">
+                <div className="col-md-6" style={ {width: "100%"}}>
                     <div className="card map-container text-center">
                         <div className="card-body">
                             <h6>Mapa del viaje</h6>
@@ -132,10 +88,10 @@ const MainDashboard = () => {
                             />
                         </div>
                     </div>
-                </div>
+                </div><br></br>
 
                 {/* Tabla de próximos viajes */}
-                <div className="col-md-6">
+                <div className="col-md-6"style={ {width: "100%", marginTop: "5px"}}>
                     <div className="card upcoming-trips text-center">
                         <div className="card-body">
                             <h6>Próximos viajes</h6>
