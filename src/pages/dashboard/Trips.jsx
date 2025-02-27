@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import TopNavbar from "../../components/TopNavbar.jsx";
+import "../../styles/Trips.css"
 
 export const Trips = () => {
   let [trips, setTrips] = useState([]);

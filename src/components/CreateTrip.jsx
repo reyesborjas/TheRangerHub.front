@@ -1,7 +1,8 @@
-import "../styles/SignUp.css";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import SideBarDashboard from "./SideBarDashboard.jsx";
+import TopNavbar from "./TopNavbar.jsx";
+import "../styles/CreateTrip.css";
 
 const CreateTrip = () => {
   const navigate = useNavigate();
@@ -61,10 +62,12 @@ const CreateTrip = () => {
   const handleChange = (e) => {
     let { name, value } = e.target;
 
+    // Ajusta fecha para incluir "T00:00:00Z"
     if (name === "start_date" || name === "end_date") {
       value += "T00:00:00Z";
     }
 
+    // Convierte participantes y costo a número
     if (["participants_number", "total_cost"].includes(name)) {
       value = Number(value);
     }
@@ -125,6 +128,7 @@ const CreateTrip = () => {
       const tripData = { ...formData };
       delete tripData.activities;
 
+      // Crear viaje
       const tripResponse = await fetch("https://rangerhub-back.vercel.app/trips", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -142,6 +146,7 @@ const CreateTrip = () => {
       const tripDataResponse = await tripResponse.json();
       const tripId = tripDataResponse.id;
 
+      // Relacionar actividades con el viaje
       await Promise.all(
         activitiesList.map((activityId) =>
           fetch("https://rangerhub-back.vercel.app/activity-trips", {
@@ -207,38 +212,40 @@ const CreateTrip = () => {
                 </div>
               </div>
 
-              <div className="row mb-3">
-                <div className="col-md-6">
-                  <label className="form-label">Número de Participantes</label>
-                  <input
-                    type="number"
-                    className="form-control"
-                    name="participants_number"
-                    onChange={handleChange}
-                    required
-                  />
+                {/* Participantes y Costo */}
+                <div className="row mb-3">
+                  <div className="col-md-6">
+                    <label className="form-label fw-bold">Número de Participantes</label>
+                    <input
+                        type="number"
+                        className="form-control"
+                        name="participants_number"
+                        onChange={handleChange}
+                        required
+                    />
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label fw-bold">Costo Total</label>
+                    <input
+                        type="number"
+                        className="form-control"
+                        name="total_cost"
+                        onChange={handleChange}
+                        required
+                    />
+                  </div>
                 </div>
-                <div className="col-md-6">
-                  <label className="form-label">Costo Total</label>
-                  <input
-                    type="number"
-                    className="form-control"
-                    name="total_cost"
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-              </div>
 
-              <div className="mb-3">
-                <label className="form-label">Descripción</label>
-                <textarea
-                  className="form-control"
-                  name="description"
-                  onChange={handleChange}
-                  required
-                />
-              </div>
+                {/* Descripción */}
+                <div className="mb-3">
+                  <label className="form-label fw-bold">Descripción</label>
+                  <textarea
+                      className="form-control"
+                      name="description"
+                      onChange={handleChange}
+                      required
+                  />
+                </div>
 
               <div className="mb-3">
                 <label className="form-label">Actividades</label>
@@ -308,48 +315,51 @@ const CreateTrip = () => {
                 />
               </div>
 
-              <div className="row mb-3">
-                <div className="col-md-6">
-                  <label className="form-label">URL de Imagen</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    name="trip_image_url"
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="col-md-6">
-                  <label className="form-label">Cargar Imagen</label>
-                  <input
-                    type="file"
-                    className="form-control btn-dark"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                  />
-                </div>
-              </div>
-
-              {imagePreview && (
+                {/* URL e Imagen */}
                 <div className="row mb-3">
-                  <div className="col-md-12">
-                    <img
-                      src={imagePreview}
-                      alt="Vista previa"
-                      className="img-fluid rounded"
-                      style={{ maxHeight: "200px", objectFit: "cover" }}
+                  <div className="col-md-6">
+                    <label className="form-label fw-bold">URL de Imagen</label>
+                    <input
+                        type="text"
+                        className="form-control"
+                        name="trip_image_url"
+                        onChange={handleChange}
+                    />
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label fw-bold">Cargar Imagen</label>
+                    <input
+                        type="file"
+                        className="form-control"
+                        accept="image/*"
+                        onChange={handleImageUpload}
                     />
                   </div>
                 </div>
-              )}
 
-              <button type="submit" className="btn btn-dark w-100">
-                Crear Viaje
-              </button>
-            </form>
+                {/* Vista previa de la imagen */}
+                {imagePreview && (
+                    <div className="row mb-3">
+                      <div className="col-md-12">
+                        <img
+                            src={imagePreview}
+                            alt="Vista previa"
+                            className="img-fluid rounded"
+                            style={{ maxHeight: "200px", objectFit: "cover" }}
+                        />
+                      </div>
+                    </div>
+                )}
+
+                {/* Botón para crear viaje */}
+                <button type="submit" className="btn btn-create-trip w-100">
+                  Crear Viaje
+                </button>
+              </form>
+            </div>
           </div>
         </div>
-      </div>
-    </>
+      </>
   );
 };
 

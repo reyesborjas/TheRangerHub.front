@@ -14,7 +14,8 @@ import { Trips } from "./pages/dashboard/Trips.jsx";
 import CreateActivity from "./components/CreateActivity.jsx";
 import { Resources } from "./pages/dashboard/Resources.jsx";
 import "bootstrap-icons/font/bootstrap-icons.css";
-
+import "./styles/Activities.css";
+import MyTrips from "./pages/dashboard/MyTrips.jsx";
 
 function App() {
   return (
@@ -28,7 +29,9 @@ function App() {
           <Route path="/signup" element={<SignUp />} />
           <Route element={<Dashboard /> }>
             <Route path="/dashboard/home" element={<HomeDashboard />}  />
+            <Route path="/dashboard/mytrips" element={<MyTrips />}  />
             <Route path="/dashboard/trips" element={<Trips />}  />
+            <Route path="/dashboard/createtrips" element={<CreateTrip />}  />
             <Route path="/dashboard/activities" element={<Activities />}  />
             <Route  path="/dashboard/resources" element={<Resources/>}  />
           </Route>

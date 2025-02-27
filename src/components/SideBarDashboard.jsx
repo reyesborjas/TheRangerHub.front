@@ -1,13 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import logo from "../assets/logo.png";
 import { Link } from "react-router-dom";
 import "../styles/SideBarDashboard.css";
 
-// Importar FontAwesome para los iconos
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-    faHome, faSuitcase, faMap, faBicycle, faBook,
-    faCloudSun, faCog, faQuestionCircle, faSignOutAlt
+    faCloudSun, faCog, faQuestionCircle, faSignOutAlt, faHome,
+    faSuitcase, faMap, faBicycle, faBook
 } from "@fortawesome/free-solid-svg-icons";
 
 const SideBarDashboard = () => {
@@ -24,7 +23,7 @@ const SideBarDashboard = () => {
                 );
 
                 if (!response.ok) {
-                    throw new Error("Error al obtener datos del clima");
+                    throw new Error('Error al obtener datos del clima');
                 }
 
                 const data = await response.json();
@@ -40,34 +39,32 @@ const SideBarDashboard = () => {
 
     return (
         <div className="sidebar d-flex flex-column align-items-center">
-            {/* Logo */}
             <div className="logo">
                 <img src={logo} alt="The Ranger Hub" />
             </div>
 
-            {/* Botón de Nuevo Viaje */}
-            <button className="new-trip-btn" onClick={() => window.location.href = "/dashboard/Page1"}>
+            <button className="new-trip-btn" onClick={() => window.location.href = "/dashboard/createtrips"}>
                 + Nuevo Viaje
             </button>
 
-
-                <nav className="nav flex-column w-100">
-                    <a href="/dashboard/home" className="nav-link">
-                        <i className="fas fa-home"></i> Inicio
-                    </a>
-                    <a href="/mis-viajes" className="nav-link">
-                        <i className="fas fa-suitcase"></i> Mis Viajes
-                    </a>
-                    <a href="/dashboard/trips" className="nav-link">
-                        <i className="fas fa-map"></i> Viajes
-                    </a>
-                    <a href="/dashboard/activities" className="nav-link">
-                        <i className="fas fa-bicycle"></i> Actividades
-                    </a>
-                    <a href="/dashboard/resources" className="nav-link">
-                        <i className="fas fa-book"></i> Recursos
-                    </a>
-                </nav>
+            {/* Navegación */}
+            <nav className="nav flex-column w-100">
+                <Link to="/dashboard/home" className="nav-link">
+                    <FontAwesomeIcon icon={faHome} className="nav-icon" /> Inicio
+                </Link>
+                <Link to="/dashboard/mytrips" className="nav-link">
+                    <FontAwesomeIcon icon={faSuitcase} className="nav-icon" /> Mis Viajes
+                </Link>
+                <Link to="/dashboard/trips" className="nav-link">
+                    <FontAwesomeIcon icon={faMap} className="nav-icon" /> Viajes
+                </Link>
+                <Link to="/dashboard/activities" className="nav-link">
+                    <FontAwesomeIcon icon={faBicycle} className="nav-icon" /> Actividades
+                </Link>
+                <Link to="/dashboard/resources" className="nav-link">
+                    <FontAwesomeIcon icon={faBook} className="nav-icon" /> Recursos
+                </Link>
+            </nav>
 
             {/* Clima */}
             <div className="weather text-center">
