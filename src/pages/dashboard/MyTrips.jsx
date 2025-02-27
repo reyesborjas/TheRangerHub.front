@@ -8,7 +8,6 @@ export const MyTrips = () => {
   const [userRole, setUserRole] = useState(null);
   const [userId, setUserId] = useState(null);
   const [userReservations, setUserReservations] = useState([]);
-  const [roleId, setRoleId] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -19,157 +18,61 @@ export const MyTrips = () => {
       try {
         const decoded = jwtDecode(token);
         setUserId(decoded.user_id);
-        setRoleId(decoded.role_id);
+        setUserRole(decoded.role_name);
+        if(decoded.role_name === 'Explorer'){
+          console.log('El usuario es explorer');
+          getExplorerTrips(decoded.user_id);
+        } else {
+          console.log('El usuario es Ranger');
+          getRangerTrips(decoded.user_id);
+        }
       } catch (error) {
         console.error("Error al decodificar el token:", error);
         setError("Error al verificar la autenticación");
       }
     } else {
+      // Enviar al usuario al login TODO
       console.log("No se encontró token de autenticación");
     }
   }, []);
 
-  // Obtener el nombre del rol del usuario
-  useEffect(() => {
-    if (roleId) {
-      setIsLoading(true);
-      fetch("https://rangerhub-back.vercel.app/roles")
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error(`Error ${response.status}: No se pudo obtener información de roles`);
-          }
-          return response.json();
-        })
-        .then((data) => {
-          const role = data.roles.find((r) => r.id === roleId);
-          setUserRole(role?.role_name);
-        })
-        .catch((error) => {
-          console.error("Error al obtener roles:", error);
-          setError("No se pudieron cargar los roles");
-        })
-        .finally(() => {
-          setIsLoading(false);
-        });
-    }
-  }, [roleId]);
-
-  // Obtener reservas para Explorers
-  useEffect(() => {
-    if (userRole === "Explorer" && userId) {
-      setIsLoading(true);
-      fetch(`https://rangerhub-back.vercel.app/reservations?user_id=${userId}`)
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error(`Error ${response.status}: No se pudieron obtener las reservaciones`);
-          }
-          return response.json();
-        })
-        .then((data) => setUserReservations(data.reservations || []))
-        .catch((error) => {
-          console.error("Error al obtener reservaciones:", error);
-          setError("No se pudieron cargar tus reservaciones");
-        })
-        .finally(() => {
-          setIsLoading(false);
-        });
-    }
-  }, [userRole, userId]);
-
-  // Obtener viajes según el rol
-  useEffect(() => {
-    const fetchTrips = async () => {
-      try {
-        let url;
-        if (userRole === "Ranger" && userId) {
-          url = `https://rangerhub-back.vercel.app/trips/ranger/${userId}`;
-        } else if (userRole === "Explorer" && userId) {
-          url = `https://rangerhub-back.vercel.app/trips/explorer/${userId}`;
-        } else {
-          url = "https://rangerhub-back.vercel.app/trips";
-        }
-  
-        const response = await fetch(url);
-        
+  const getExplorerTrips = (userId) => {
+    setIsLoading(true);
+    fetch(`https://rangerhub-back.vercel.app/reservations/explorer/${userId}`)
+      .then((response) => {
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          throw new Error(`Error ${response.status}: No se pudieron obtener las reservaciones`);
         }
+        return response.json();
+      })
+      .then((data) => setUserReservations(data.trips || []))
+      .catch((error) => {
+        console.error("Error al obtener reservaciones:", error);
+        setError("No se pudieron cargar tus reservaciones");
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }
   
-        const data = await response.json();
-        setTrips(data.trips || []);
-        
-      } catch (error) {
-        console.error("Error fetching trips:", error);
-        setTrips([]);
-      }
-    };
-  
-    fetchTrips();
-  }, [userRole, userId]);
-
-  const filteredTrips = trips.filter(
-    (trip) =>
-      trip.trip_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (trip.description &&
-        trip.description.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
-
-  const handleReservation = async (tripId) => {
-    if (!userId || userRole !== "Explorer") return;
-
-    const reservation = userReservations.find((r) => r.trip_id === tripId);
-    setReservingTripId(tripId);
-
-    try {
-      if (reservation) {
-        // Cancelar reserva
-        const response = await fetch(
-          `https://rangerhub-back.vercel.app/reservations/${reservation.id}`,
-          { method: "DELETE" }
-        );
-        
+  const getRangerTrips = (userId) => {
+    setIsLoading(true);
+    fetch(`https://rangerhub-back.vercel.app/reservations/ranger/${userId}`)
+      .then((response) => {
         if (!response.ok) {
-          throw new Error(`Error ${response.status}: No se pudo cancelar la reserva`);
+          throw new Error(`Error ${response.status}: No se pudieron obtener las reservaciones`);
         }
-        
-        setUserReservations((prev) =>
-          prev.filter((r) => r.id !== reservation.id)
-        );
-      } else {
-        // Crear reserva
-        const response = await fetch("https://rangerhub-back.vercel.app/reservations", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            trip_id: tripId,
-            user_id: userId,
-            status: "pendiente",
-          }),
-        });
-        
-        if (!response.ok) {
-          throw new Error(`Error ${response.status}: No se pudo crear la reserva`);
-        }
-        
-        // Actualizar reservas
-        const res = await fetch(
-          `https://rangerhub-back.vercel.app/reservations?user_id=${userId}`
-        );
-        
-        if (!res.ok) {
-          throw new Error(`Error ${res.status}: No se pudieron obtener las reservaciones`);
-        }
-        
-        const data = await res.json();
-        setUserReservations(data.reservations || []);
-      }
-    } catch (error) {
-      console.error("Error en la reservación:", error);
-      alert(error.message || "Hubo un error al procesar tu reservación");
-    } finally {
-      setReservingTripId(null);
-    }
-  };
+        return response.json();
+      })
+      .then((data) => setUserReservations(data.trips || []))
+      .catch((error) => {
+        console.error("Error al obtener reservaciones:", error);
+        setError("No se pudieron cargar tus reservaciones");
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }
 
   return (
     <div>
@@ -205,8 +108,8 @@ export const MyTrips = () => {
           </div>
         ) : (
           <div className="row">
-            {filteredTrips.length > 0 ? (
-              filteredTrips.map((trip, index) => (
+            {userReservations.length > 0 ? (
+              userReservations.map((trip, index) => (
                 <div key={trip._id || index} className="col-md-4 mb-4">
                   <div className="card h-100">
                     {trip.trip_image_url ? (

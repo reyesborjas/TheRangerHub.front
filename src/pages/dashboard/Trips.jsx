@@ -8,6 +8,9 @@ export const Trips = () => {
   const currentUser = storedUser ? JSON.parse(storedUser) : null;
 
   useEffect(() => {
+   
+
+
     fetch("https://rangerhub-back.vercel.app/trips")
       .then((response) => response.json())
       .then((responseConverted) => {
@@ -98,7 +101,9 @@ export const Trips = () => {
                     <h3 className="card-title">{trip.trip_name}</h3>
                     <h5>Precio ${trip.total_cost}</h5>
                     <p className="card-text">{trip.description}</p>
-                    <button
+
+                    {
+                      (currentUser?.role_name !== 'Ranger') ?  <button
                       onClick={() => handleReservation(trip.id)}
                       className="btn btn-primary"
                       disabled={reservingTripId === trip.id}
@@ -114,7 +119,9 @@ export const Trips = () => {
                       ) : (
                         "Lo quiero!"
                       )}
-                    </button>
+                    </button> : ""
+                    }
+                   
                   </div>
                 </div>
               </div>
