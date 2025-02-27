@@ -1,36 +1,50 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
 .create-trip-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 20px;
-    min-width: 33%;
+    margin-top: 50px;
+    margin-bottom: 50px;
+    padding: 0px;
 }
+
 
 .create-trip-box {
     width: 100%;
-    max-width: 600px;
+    max-width: 800px;
     background: #fff;
     padding: 20px;
     border-radius: 10px;
+    border: 2px solid #e63946; /* Rojo brand */
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-.create-trip-box h2 {
+
+.create-trip-title {
     text-align: center;
-    color: #333;
+    color: #e63946;
+    font-weight: bold;
     margin-bottom: 20px;
 }
+
 
 .form-group {
     margin-bottom: 15px;
 }
 
+
 .form-label {
     display: block;
     font-weight: bold;
     margin-bottom: 5px;
-    color: #555;
+    color: #333;
 }
+
 
 .form-control {
     width: 100%;
@@ -38,12 +52,20 @@
     border: 1px solid #ccc;
     border-radius: 5px;
     font-size: 16px;
+    transition: box-shadow 0.2s ease, border 0.2s ease;
 }
+
+.form-control:focus {
+    border-color: #e63946;
+    box-shadow: 0 0 5px rgba(230, 57, 70, 0.3);
+}
+
 
 textarea.form-control {
     resize: vertical;
     min-height: 80px;
 }
+
 
 .select-control {
     width: 100%;
@@ -57,38 +79,42 @@ textarea.form-control {
 .btn-add-activity {
     display: block;
     width: 100%;
-    background-color: #2AB19F;
-    color: white;
+    background-color: #2a9d8f;
+    color: #fff;
     padding: 10px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     margin-top: 10px;
     text-align: center;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
 }
 
 .btn-add-activity:hover {
-    background-color: #239485;
+    background-color: #21867b;
 }
 
-.btn-submit {
+
+.btn-create-trip {
     width: 100%;
-    background-color: #2AB19F;
-    color: white;
+    background-color: #2a9d8f;
+    color: #fff;
     padding: 12px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     font-size: 18px;
     margin-top: 15px;
+    transition: background-color 0.3s ease;
 }
 
-.btn-submit:hover {
-    background-color: #239485;
+.btn-create-trip:hover {
+    background-color: #21867b;
 }
 
 @media (max-width: 768px) {
     .create-trip-box {
-        padding: 5px;
+        padding: 10px;
     }
 }
