@@ -1,6 +1,6 @@
 import React from "react";
 import "../styles/Footer.css";
-import logo from "../assets/logo.png";
+import logo from "../assets/logo.svg"; 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFacebook, faXTwitter, faInstagram, faLinkedin, faYoutube } from "@fortawesome/free-brands-svg-icons";
 
@@ -12,7 +12,7 @@ const Footer = () => {
                     <img src={logo} alt="Logo" className="footer-logo" />
                     <p><strong>Dirección:</strong> Av Manquehue Norte 230, Las Condes</p>
                     <p><strong>Contacto:</strong> <a href="tel:977600874">+56977600874</a></p>
-                    <p><a href="mailto:info@therangerhub.com">info@therangerhub.com</a></p>
+                    <p><a href="mailto:info@therangerhub.com">info@therangerhub.com</a></p><br></br>
                     <div className="footer-socials">
                         <a href="#"><FontAwesomeIcon icon={faFacebook} /></a>
                         <a href="#"><FontAwesomeIcon icon={faXTwitter} /></a>
@@ -29,6 +29,8 @@ const Footer = () => {
                         <li><a href="#">Blog</a></li>
                         <li><a href="#">Nuestro Equipo</a></li>
                     </ul>
+                </div>
+                <div className="footer-links" >
                     <ul>
                         <li><a href="#">Contáctanos</a></li>
                         <li><a href="#">Unirse a la Comunidad</a></li>
@@ -37,7 +39,7 @@ const Footer = () => {
                         <li><a href="#">Carreras</a></li>
                     </ul>
                 </div>
-            </div>
+            </div> 
             <div className="footer-bottom">
                 <p>© 2025 The Ranger Hub. Todos los derechos reservados.</p>
                 <div>

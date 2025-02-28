@@ -29,11 +29,13 @@ const PartnersSection = () => {
             <div className="d-flex justify-content-center flex-wrap mt-4">
                 {partners.map((partner, index) => (
                     <div key={index} className="partner-icon mx-3">
-                        <img
-                            src={partner.img}
-                            alt={partner.name}
-                            className="partner-logo hover-effect"
-                        />
+                        <div className="partner-logo-container">
+                            <img
+                                src={partner.img}
+                                alt={partner.name}
+                                className="partner-logo hover-effect"
+                            />
+                        </div>
                         <p className="mt-2">{partner.name}</p>
                     </div>
                 ))}

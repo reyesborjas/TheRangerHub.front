@@ -5,7 +5,7 @@
     background: no-repeat center center/cover; /* 🔹 Se ajusta a la imagen dinámica */
     display: flex;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: center;
     text-align: left;
     color: white;
     padding-left: 80px;
@@ -24,8 +24,10 @@
 .hero-content {
     position: relative;
     z-index: 1;
-    max-width: 600px;
-    line-height: 1.8;
+    max-width: 100%;
+    line-height: 5;
+    justify-content: center;
+    text-align: center;
 }
 
 /* Botón Ranger Rojo */

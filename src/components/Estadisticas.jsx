@@ -26,14 +26,14 @@ const Estadisticas = () => {
             <div className="statistics-content">
                 <div className="stat-item">
                     <div className="stat-number">{countTours}+</div>
-                    <div className="stat-subtitle">Tours vendidos en todo el mundo</div>
+                    <div className="stat-subtitle1">Tours vendidos en todo el mundo</div>
                 </div>
                 <div className="stat-item">
+                    <div className="stat-number">{countRebook}%</div>
                     <div className="progress-bar">
                         <div className="progress" style={{ width: `${countRebook}%` }}></div>
                     </div>
-                    <div className="stat-number">{countRebook}%</div>
-                    <div className="stat-subtitle">De los viajeros reservan nuevamente</div>
+                    <div className="stat-subtitle2">De los viajeros reservan nuevamente</div>
                 </div>
             </div>
         </div>
