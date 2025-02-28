@@ -15,7 +15,6 @@ export const MyTrips = () => {
     const token = localStorage.getItem("token");
     if (token) {
       try {
-        // Extraemos user_id y role_name sin usar jwt-decode
         const decoded = JSON.parse(atob(token.split(".")[1]));
         setUserId(decoded.user_id);
         setUserRole(decoded.role_name);

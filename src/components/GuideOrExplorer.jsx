@@ -6,7 +6,9 @@ import { faCircleCheck } from "@fortawesome/free-solid-svg-icons";
 const GuideOrExplorer = () => {
   return (
       <section className="container my-5">
-        <h2 className="text-center" id="title-h2">¿Eres Guía o un Viajero?</h2>
+        <h2 className="text-center" id="title-h2">
+          ¿Eres Guía o un Viajero?
+        </h2>
         <p className="text-center text-muted" id="p-h2">
           Tú decides cómo vivir la aventura.
         </p>
@@ -36,12 +38,6 @@ const GuideOrExplorer = () => {
         </div>
 
         <div className="row align-items-center text-center mt-5 explorer-section">
-          {/* SIN order-md-5 */}
-          <div className="col-md-6">
-            <h3>Explorer</h3>
-            <div className="image-circle explorer-img"></div>
-            <p className="fw-bold">Descubre experiencias únicas</p>
-          </div>
           <div className="col-md-6">
             <ul className="features-list">
               <li>
@@ -57,6 +53,11 @@ const GuideOrExplorer = () => {
                 Descubre lugares como nunca antes.
               </li>
             </ul>
+          </div>
+          <div className="col-md-6">
+            <h3>Explorer</h3>
+            <div className="image-circle explorer-img"></div>
+            <p className="fw-bold">Descubre experiencias únicas</p>
           </div>
         </div>
       </section>
