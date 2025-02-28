@@ -24,6 +24,9 @@
 }
 
 .new-trip-btn {
+    text-decoration: none;
+    display: block;
+    text-align: center;
     width: 100%;
     padding: 12px;
     background: #e63946;
@@ -42,6 +45,7 @@
     background: #d62839;
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(230, 57, 70, 0.3);
+    text-decoration: none;
 }
 
 .new-trip-btn:active {
@@ -165,7 +169,6 @@
     font-weight: 500;
 }
 
-/* Media query para responsividad */
 @media (max-height: 700px) {
     .sidebar {
         overflow-y: auto;
@@ -188,7 +191,7 @@
 .sidebar-icon {
     font-size: 22px !important;
     cursor: pointer;
-    color: #555 !important; /* Forzar el color gris oscuro */
+    color: #555 !important;
     transition: all 0.3s ease;
 }
 
@@ -206,6 +209,6 @@
 }
 
 .sidebar-icon:hover {
-    color: #e63946 !important; /* Se vuelve rojo al hacer hover */
+    color: #e63946 !important;
     transform: rotate(15deg);
 }

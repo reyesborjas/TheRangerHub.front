@@ -11,8 +11,6 @@ export const HomeDashboard = () => {
             <SideBarDashboard />
             <div className="dashboard-content">
                 <TopNavbar />
-
-                {/* Contenedor que divide en 2 columnas: MainDashboard y RightPanel */}
                 <div className="main-layout">
                     <MainDashboard />
                     <RightPanel />

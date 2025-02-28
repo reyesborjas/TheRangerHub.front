@@ -1,16 +1,13 @@
-/* RightPanel.css */
 .right-panel {
     padding: 20px;
-    background-color: #f9f9f9;
 }
 
-/* Card de Bootstrap + algo de sombra */
+
 .calendar-timeline-card {
     border: none;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-/* --- MINI-CALENDARIO --- */
 .calendar-section {
     margin-bottom: 20px;
 }
@@ -56,11 +53,10 @@
 }
 
 .active-day {
-    background-color: #4285f4; /* o el color que quieras */
+    background-color: #4285f4;
     color: #fff;
 }
 
-/* --- TIMELINE --- */
 .timeline-section {
     margin-top: 20px;
 }
@@ -78,7 +74,6 @@
     gap: 10px;
 }
 
-/* Cada evento en el timeline */
 .timeline-event {
     display: flex;
     align-items: center;
@@ -90,7 +85,7 @@
 .event-icon {
     font-size: 1.2rem;
     margin-right: 10px;
-    color: #333; /* Cambia si quieres un color de ícono distinto */
+    color: #333;
 }
 
 .event-info {

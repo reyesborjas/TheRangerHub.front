@@ -1,37 +1,34 @@
 import { useEffect, useState } from "react";
-import { jwtDecode } from "jwt-decode";
+import "../../styles/MyTrips.css";
+import TopNavbar from "../../components/TopNavbar.jsx";
 
 export const MyTrips = () => {
-  const [trips, setTrips] = useState([]);
-  const [reservingTripId, setReservingTripId] = useState(null);
+  const [userReservations, setUserReservations] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [userRole, setUserRole] = useState(null);
   const [userId, setUserId] = useState(null);
-  const [userReservations, setUserReservations] = useState([]);
+  const [reserving, setReserving] = useState({ tripId: null, action: null });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Decodificar el token para obtener user_id y role_id
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
       try {
-        const decoded = jwtDecode(token);
+        const decoded = JSON.parse(atob(token.split(".")[1]));
         setUserId(decoded.user_id);
         setUserRole(decoded.role_name);
-        if(decoded.role_name === 'Explorer'){
-          console.log('El usuario es explorer');
+
+        if (decoded.role_name === "Explorer") {
           getExplorerTrips(decoded.user_id);
         } else {
-          console.log('El usuario es Ranger');
           getRangerTrips(decoded.user_id);
         }
-      } catch (error) {
-        console.error("Error al decodificar el token:", error);
+      } catch (err) {
+        console.error("Error al decodificar el token:", err);
         setError("Error al verificar la autenticación");
       }
     } else {
-      // Enviar al usuario al login TODO
       console.log("No se encontró token de autenticación");
     }
   }, []);
@@ -39,137 +36,140 @@ export const MyTrips = () => {
   const getExplorerTrips = (userId) => {
     setIsLoading(true);
     fetch(`https://rangerhub-back.vercel.app/reservations/explorer/${userId}`)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`Error ${response.status}: No se pudieron obtener las reservaciones`);
-        }
-        return response.json();
-      })
-      .then((data) => setUserReservations(data.trips || []))
-      .catch((error) => {
-        console.error("Error al obtener reservaciones:", error);
-        setError("No se pudieron cargar tus reservaciones");
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }
-  
+        .then((response) => {
+          if (!response.ok) throw new Error(`Error ${response.status}: No se pudieron obtener las reservaciones`);
+          return response.json();
+        })
+        .then((data) => setUserReservations(data.trips || []))
+        .catch((error) => {
+          console.error("Error al obtener reservaciones:", error);
+          setError("No se pudieron cargar tus reservaciones");
+        })
+        .finally(() => setIsLoading(false));
+  };
+
   const getRangerTrips = (userId) => {
     setIsLoading(true);
     fetch(`https://rangerhub-back.vercel.app/reservations/ranger/${userId}`)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`Error ${response.status}: No se pudieron obtener las reservaciones`);
-        }
-        return response.json();
-      })
-      .then((data) => setUserReservations(data.trips || []))
-      .catch((error) => {
-        console.error("Error al obtener reservaciones:", error);
-        setError("No se pudieron cargar tus reservaciones");
-      })
-      .finally(() => {
-        setIsLoading(false);
+        .then((response) => {
+          if (!response.ok) throw new Error(`Error ${response.status}: No se pudieron obtener las reservaciones`);
+          return response.json();
+        })
+        .then((data) => setUserReservations(data.trips || []))
+        .catch((error) => {
+          console.error("Error al obtener reservaciones:", error);
+          setError("No se pudieron cargar tus reservaciones");
+        })
+        .finally(() => setIsLoading(false));
+  };
+
+  const handleReservation = async (tripId, action) => {
+    setReserving({ tripId, action });
+    try {
+      let url = "https://rangerhub-back.vercel.app/reservations";
+      let method = "POST";
+
+      if (action === "cancel") {
+        url = `https://rangerhub-back.vercel.app/reservations/${tripId}`;
+        method = "DELETE";
+      }
+
+      const response = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: method === "POST" ? JSON.stringify({ user_id: userId, trip_id: tripId }) : null,
       });
-  }
+
+      if (!response.ok) throw new Error("Error al procesar la reservación");
+
+      userRole === "Explorer" ? getExplorerTrips(userId) : getRangerTrips(userId);
+    } catch (error) {
+      console.error("Error al procesar la reservación:", error);
+      setError(error.message);
+    } finally {
+      setReserving({ tripId: null, action: null });
+    }
+  };
+
+  const filteredTrips = userReservations.filter((trip) =>
+      trip.trip_name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
-    <div>
-      <nav className="navbar navbar-light bg-light">
-        <div className="container-fluid">
-          <a className="navbar-brand">Mira los viajes que ofrecemos</a>
-          <form className="d-flex">
-            <input
-              type="text"
-              className="form-control me-2"
-              placeholder="Buscar viajes..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <button className="btn btn-outline-success" type="button">
-              Buscar
-            </button>
-          </form>
-        </div>
-      </nav>
-      <div className="container mt-4">
-        {error && (
-          <div className="alert alert-danger" role="alert">
-            {error}
-          </div>
-        )}
-        
-        {isLoading ? (
-          <div className="d-flex justify-content-center my-5">
-            <div className="spinner-border text-primary" role="status">
-              <span className="visually-hidden">Cargando...</span>
+      <div className="my-trips-container container">
+        <TopNavbar />
+        <h1 className="text-center my-4">Mis Viajes</h1>
+
+        <div className="row justify-content-center mb-4">
+          <div className="col-md-6">
+            <div className="input-group">
+              <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Buscar viajes..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              <button className="btn btn-search" type="button">
+                Buscar
+              </button>
             </div>
           </div>
+        </div>
+
+        {error && <div className="alert alert-danger text-center">{error}</div>}
+
+        {isLoading ? (
+            <div className="d-flex justify-content-center my-5">
+              <div className="spinner-border text-primary"></div>
+            </div>
         ) : (
-          <div className="row">
-            {userReservations.length > 0 ? (
-              userReservations.map((trip, index) => (
-                <div key={trip._id || index} className="col-md-4 mb-4">
-                  <div className="card h-100">
-                    {trip.trip_image_url ? (
-                      <img
-                        src={trip.trip_image_url}
-                        className="card-img-top"
-                        alt="Imagen del viaje"
-                        style={{ height: "200px", objectFit: "cover" }}
-                      />
-                    ) : (
-                      <div 
-                        className="bg-light d-flex align-items-center justify-content-center" 
-                        style={{ height: "200px" }}
-                      >
-                        <p className="text-muted">Sin imagen</p>
-                      </div>
-                    )}
-                    <div className="card-body">
-                      <h3 className="card-title">{trip.trip_name}</h3>
-                      <h5>Precio ${trip.total_cost}</h5>
-                      <p className="card-text">{trip.description}</p>
-                    </div>
-                    <div className="card-footer bg-white border-top-0">
-                      {userRole === "Explorer" && (
-                        <button
-                          onClick={() => handleReservation(trip._id)}
-                          className={`btn ${
-                            userReservations.some(r => r.trip_id === trip._id)
-                              ? "btn-danger"
-                              : "btn-primary"
-                          } w-100`}
-                          disabled={reservingTripId === trip._id}
-                        >
-                          {reservingTripId === trip._id ? (
-                            <>
-                              <span
-                                className="spinner-border spinner-border-sm"
-                                aria-hidden="true"
-                              ></span>
-                              <span role="status"> Procesando...</span>
-                            </>
-                          ) : userReservations.some(r => r.trip_id === trip._id) ? (
-                            "Cancelar viaje"
-                          ) : (
-                            "¡Lo quiero!"
+            <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-5">
+              {filteredTrips.length > 0 ? (
+                  filteredTrips.map((trip) => (
+                      <div key={trip.id} className="col">
+                        <div className="card h-100">
+                          <img
+                              src={trip.trip_image_url || "https://via.placeholder.com/200"}
+                              className="card-img-top"
+                              alt="Imagen del viaje"
+                              style={{ height: "200px", objectFit: "cover" }}
+                          />
+                          <div className="card-body">
+                            <h3 className="card-title">{trip.trip_name}</h3>
+                            <h5>Precio: ${trip.total_cost}</h5>
+                            <p className="card-text">{trip.description}</p>
+                          </div>
+
+                          {userRole === "Explorer" && (
+                              <div className="card-footer button-group">
+                                <button
+                                    onClick={() => handleReservation(trip.id, "pay")}
+                                    className="btn btn-pay"
+                                    disabled={reserving.tripId === trip.id && reserving.action === "pay"}
+                                >
+                                  {reserving.tripId === trip.id && reserving.action === "pay" ? "Procesando..." : "Pagar"}
+                                </button>
+
+                                <button
+                                    onClick={() => handleReservation(trip.id, "cancel")}
+                                    className="btn btn-cancel"
+                                    disabled={reserving.tripId === trip.id && reserving.action === "cancel"}
+                                >
+                                  {reserving.tripId === trip.id && reserving.action === "cancel" ? "Procesando..." : "Cancelar Viaje"}
+                                </button>
+                              </div>
                           )}
-                        </button>
-                      )}
-                    </div>
+                        </div>
+                      </div>
+                  ))
+              ) : (
+                  <div className="col-12 text-center my-5">
+                    <h3>No se encontraron viajes con ese criterio de búsqueda.</h3>
                   </div>
-                </div>
-              ))
-            ) : (
-              <div className="col-12 text-center my-5">
-                <h3>No se encontraron viajes con ese criterio de búsqueda</h3>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
         )}
       </div>
-    </div>
   );
 };

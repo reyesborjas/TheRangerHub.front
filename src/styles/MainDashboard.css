@@ -4,7 +4,6 @@
     padding: 20px;
 }
 
-/* Hero slider */
 .hero-slider img {
     width: 100%;
     height: 300px;
@@ -13,20 +12,19 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Estilos generales de las tarjetas */
 .card {
     border-radius: 12px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     border: none;
     background: white;
     transition: transform 0.2s ease-in-out;
+    min-height: auto;
 }
 
 .card:hover {
     transform: translateY(-3px);
 }
 
-/* Avatares */
 .avatars {
     display: flex;
     justify-content: center;
@@ -41,7 +39,7 @@
     border: 2px solid #ddd;
 }
 
-/* Mapa */
+
 .map-container {
     text-align: center;
 }
@@ -51,13 +49,12 @@
     border: none;
 }
 
-/* Tabla de próximos viajes */
 .upcoming-trips table {
     width: 100%;
     text-align: center;
 }
 
-/* Botón de más viajes */
+
 .upcoming-trips button {
     background: #e63946;
     color: white;
@@ -70,14 +67,13 @@
     background: #d62839;
 }
 
-/* Ejemplo de sobreescritura de estilos para los botones de zoom */
 .ol-control button {
     background-color: #fff;
     border: 1px solid #ccc;
     border-radius: 4px;
     color: #333;
     cursor: pointer;
-    font-size: 16px; /* Ajusta tamaño del icono + / - */
+    font-size: 16px;
     width: 32px;
     height: 32px;
     transition: background-color 0.2s;
@@ -87,8 +83,6 @@
     background-color: #e6e6e6;
 }
 
-
-/* Ocultar el control de rotación (la flecha) si no lo necesitas */
 .ol-rotate {
     display: none;
 }

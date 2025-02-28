@@ -1,7 +1,8 @@
-import "../styles/SignUp.css";
+import "../styles/CreateTrip.css";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import SideBarDashboard from "./SideBarDashboard.jsx";
+import TopNavbar from "./TopNavbar.jsx";
 
 const CreateTrip = () => {
   const navigate = useNavigate();
@@ -162,6 +163,7 @@ const CreateTrip = () => {
   return (
     <>
       <SideBarDashboard />
+      <TopNavbar/>
       <div className="container create-trip-container">
         <div className="content-container col-md-12">
           <div className="card p-4 shadow-lg create-trip-box">
