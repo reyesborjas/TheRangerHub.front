@@ -7,7 +7,7 @@
 /* Hero slider */
 .hero-slider img {
     width: 100%;
-    height: 300px;
+    height: 350px;
     object-fit: cover;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -87,8 +87,23 @@
     background-color: #e6e6e6;
 }
 
+.carousel-image-container {
+    position: relative;
+    width: 100%;
+}
 
-/* Ocultar el control de rotación (la flecha) si no lo necesitas */
-.ol-rotate {
-    display: none;
+.image-text {
+    position: absolute;
+    bottom: 20px; 
+    left: 20px; 
+    color: white;
+    font-size: 15px;
+    padding: 5px;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Da sombra al texto para mejor visibilidad */
+    background: rgba(0, 0, 0, 0.5); /* Fondo semitransparente detrás del texto */
+    border-radius: 5px; 
+}
+.table {
+    height: 227px;
 }
