@@ -5,6 +5,7 @@ import { faEnvelope, faLock } from "@fortawesome/free-solid-svg-icons";
 import MyNavbar from "./Navbar";
 
 import "../styles/Login.css";
+import { height } from "@fortawesome/free-brands-svg-icons/fa42Group";
 
 const Login = () => {
   const [formData, setFormData] = useState({ username: "", password: "" });
@@ -63,7 +64,7 @@ const Login = () => {
             <div className="mb-3">
               <label className="form-label">Usuario</label>
               <div className="input-group">
-                <span className="input-group-text"><FontAwesomeIcon icon={faEnvelope} /></span>
+                <span className="input-group-text" style={{marginRight: "5px"}} ><FontAwesomeIcon icon={faEnvelope} /></span>
                 <input
                   type="text"
                   className="form-control"
@@ -77,7 +78,7 @@ const Login = () => {
             <div className="mb-3">
               <label className="form-label">Contraseña</label>
               <div className="input-group">
-                <span className="input-group-text"><FontAwesomeIcon icon={faLock} /></span>
+                <span className="input-group-text" style={{marginRight: "5px"}}><FontAwesomeIcon icon={faLock} /></span>
                 <input
                   type="password"
                   className="form-control"

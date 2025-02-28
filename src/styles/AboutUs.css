@@ -56,6 +56,7 @@
     border: 1px solid #ddd !important;
     color: #333 !important;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    min-height: 350px;
 }
 
 .card:hover {

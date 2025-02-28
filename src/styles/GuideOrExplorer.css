@@ -14,13 +14,11 @@
 
 /* 🎨 Imagen específica para cada sección */
 .ranger-img {
-    background-image: url('/assets/ranger-icon.png'); /* Cambia esto por la imagen del Ranger */
-    background-color: #f8d7da;
+    background-image: url('https://agenciamoneta.com.br/wp-content/uploads/2024/03/Rafaela-Obrownick_foto-de-perfil-redonda.png'); /* Cambia esto por la imagen del Ranger */
 }
 
 .explorer-img {
-    background-image: url('/assets/explorer-icon.png'); /* Cambia esto por la imagen del Explorer */
-    background-color: #d1e7dd;
+    background-image: url('https://w7.pngwing.com/pngs/415/765/png-transparent-user-profile-linkedin-netwerk-money-order-fulfillment-round-face-saving-expert-moustache.png'); /* Cambia esto por la imagen del Explorer */
 }
 
 /* 🟢 Sección Rangers */
@@ -28,6 +26,7 @@
     background-color: #f8f9fa;
     border-radius: 10px;
     padding: 20px;
+    background-color: #f8e5e7;
 }
 
 /* 🔵 Sección Explorers */
@@ -50,10 +49,16 @@
     margin: 10px 0;
 }
 
-/* 📌 Icono cuadrado al lado de cada texto */
-.icon-box {
-    width: 40px;
-    height: 40px;
-    background-color: #ccc;
+.iconosRanger {
+    color: #ff6b6b;
+    width: 30px;
+    height: 30px;
+    margin-right: 10px;
+}
+
+.iconosExplorer {
+    color: #7cea7c;
+    width: 30px;
+    height: 30px;
     margin-right: 10px;
 }

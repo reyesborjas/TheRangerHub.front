@@ -16,7 +16,7 @@ const HeroSection = () => {
             style={{ backgroundImage: `url(${backgroundImage})` }}
         >
             <div className="hero-content">
-                <h1>Gana dinero siendo guía o explora el mundo</h1>
+                <h1 style={{ fontWeight: "bold" }}>Gana dinero siendo guía o explora el mundo</h1>
                 <p>
                     Unete a una comunidad de viajeros apasionados y guías expertos. Comparte tus conocimientos,
                     crea experiencias inolvidables, o encuentra aventuras únicas en todo el mundo.

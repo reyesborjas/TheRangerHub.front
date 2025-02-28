@@ -28,7 +28,14 @@
     color: #333;
 }
 
-.stat-subtitle {
+.stat-subtitle1 {
+    font-size: 16px;
+    color: #666;
+    margin-top: 5px;
+    margin-top: 25px;
+}
+
+.stat-subtitle2 {
     font-size: 16px;
     color: #666;
     margin-top: 5px;

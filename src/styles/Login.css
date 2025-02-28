@@ -127,4 +127,7 @@
 body {
     padding-top: 60px; /* Ajusta según la altura de tu navbar */
   }
-  
+
+  .form-control{
+    height: 30px;
+  }

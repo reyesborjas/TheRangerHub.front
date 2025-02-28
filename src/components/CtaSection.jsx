@@ -11,12 +11,21 @@ const CtaSection = () => {
                     ¡La elección es tuya!
                 </p>
                 <div className="cta-buttons">
-                    <button className="btn btn-primary">Unirse</button>
-                    <button className="btn btn-secondary">Explorar</button>
+                <button
+                        className="btn btn-ranger"
+                        onMouseEnter={() => setBackgroundImage("/public/ranger.jpg")}
+                        onMouseLeave={() => setBackgroundImage("/Torres.jpeg")}
+                    >
+                        Únete
+                    </button>
+                    <button
+                        className="btn btn-explorer"
+                        onMouseEnter={() => setBackgroundImage("/public/explorer.jpg")}
+                        onMouseLeave={() => setBackgroundImage("/Torres.jpeg")}
+                    >
+                        Explora
+                    </button>
                 </div>
-            </div>
-            <div className="cta-image">
-                <img src="#" alt="Exploración y aventura" />
             </div>
         </section>
     );
