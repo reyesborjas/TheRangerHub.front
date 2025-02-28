@@ -17,7 +17,6 @@
     text-align: center;
     justify-content: center;
     width: 250px;
-    margin-right: 0px;
     line-height: 2.7;
 }
 .footer-links {
@@ -28,7 +27,7 @@
     display: flex;
     gap: 50px;
     margin-left: 40px;
-
+    margin-top: 15px;
 }
 
 .footer-logo {
