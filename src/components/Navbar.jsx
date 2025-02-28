@@ -3,30 +3,27 @@ import { Link, useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
 import "../styles/Navbar.css";
 
-
 const MyNavbar = () => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Verifica si hay un token en localStorage
         const token = localStorage.getItem("token");
         setIsAuthenticated(!!token);
     }, []);
 
     const handleLogout = () => {
-        localStorage.removeItem("token"); // Elimina el token de sesión
+        localStorage.removeItem("token");
         setIsAuthenticated(false);
-        navigate("/"); // Redirige al inicio
+        navigate("/");
     };
 
     return (
-        <nav className="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm fixed-top">
+        <nav className="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
             <div className="container">
-                <Link className="navbar-brand" to="/">
-                    <img src={logo} alt="Logo" className="navbar-logo" />
+                <Link className="navbar-brand d-flex align-items-center" to="/">
+                    <img src={logo} alt="Logo" className="navbar-logo me-2" />
                 </Link>
-
                 <button
                     className="navbar-toggler"
                     type="button"
@@ -36,34 +33,51 @@ const MyNavbar = () => {
                     aria-expanded="false"
                     aria-label="Toggle navigation"
                 >
-                    <span className="navbar-toggler-icon"></span>
+                    <span className="navbar-toggler-icon" />
                 </button>
 
                 <div className="collapse navbar-collapse" id="navbarNav">
-                    <ul className="navbar-nav me-auto">
+                    <ul className="navbar-nav mx-auto">
                         <li className="nav-item">
-                            <Link className="nav-link" to="/">Inicio</Link>
+                            <Link className="nav-link" to="/">
+                                Inicio
+                            </Link>
                         </li>
                         <li className="nav-item">
-                            <Link className="nav-link" to="/about-us">Sobre Nosotros</Link>
+                            <Link className="nav-link" to="/about-us">
+                                Sobre Nosotros
+                            </Link>
                         </li>
                         <li className="nav-item">
-                            <Link className="nav-link" to="/contact-us">Contáctanos</Link>
+                            <Link className="nav-link" to="/contact-us">
+                                Contáctanos
+                            </Link>
                         </li>
                     </ul>
 
-                    {/* Botón de Login/Logout */}
-                    <form className="d-flex ms-auto">
-                        {isAuthenticated ? (
-                            <button className="btn btn-outline-danger login-button" onClick={handleLogout}>
-                                Cerrar Sesión
-                            </button>
-                        ) : (
-                            <Link to="/login" className="btn btn-outline-danger login-button">
-                                Iniciar Sesión
-                            </Link>
+                    <ul className="navbar-nav ms-auto d-flex align-items-center">
+                        {isAuthenticated && (
+                            <li className="nav-item me-3">
+                                <Link className="nav-link nav-dashboard" to="/secured/:username/dashboard/home">
+                                    Ir al Dashboard
+                                </Link>
+                            </li>
                         )}
-                    </form>
+                        <li className="nav-item">
+                            {isAuthenticated ? (
+                                <button
+                                    className="btn btn-outline-danger login-button"
+                                    onClick={handleLogout}
+                                >
+                                    Cerrar Sesión
+                                </button>
+                            ) : (
+                                <Link to="/login" className="btn btn-outline-danger login-button">
+                                    Iniciar Sesión
+                                </Link>
+                            )}
+                        </li>
+                    </ul>
                 </div>
             </div>
         </nav>

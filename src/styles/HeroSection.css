@@ -2,13 +2,11 @@
     position: relative;
     width: 100%;
     height: 90vh;
-    background: no-repeat center center/cover; /* 🔹 Se ajusta a la imagen dinámica */
+    background: no-repeat center center/cover;
     display: flex;
     align-items: center;
-    justify-content: center;
-    text-align: left;
     color: white;
-    padding-left: 80px;
+    padding: 0 25rem;
 }
 
 .hero::before {
@@ -18,106 +16,61 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5); /* Oscurece la imagen para mejor contraste */
+    background: rgba(0, 0, 0, 0.5);
 }
 
 .hero-content {
     position: relative;
     z-index: 1;
-    max-width: 100%;
-    line-height: 5;
-    justify-content: center;
+    max-width: 800px;
     text-align: center;
+    line-height: 1.4;
 }
 
-/* Botón Ranger Rojo */
+.hero-content h1 {
+    font-size: 4.5rem;
+    line-height: 1.1;
+    font-weight: bold;
+    margin-bottom: 3rem;
+}
+
+.hero-content p {
+    font-size: 1.5rem;
+    margin-bottom: 5rem;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+}
+
 .btn-ranger {
-    background-color: #E63946;
-    color: white;
+    background-color: #e63946;
+    color: #fff;
     border: none;
-    padding: 10px 10px;
-    font-size: 1rem;
+    padding: 16px 36px;
+    font-size: 1.3rem;
+    font-weight: 700;
     cursor: pointer;
     transition: 0.3s;
 }
 
 .btn-ranger:hover {
-    background-color: #ff0000;
+    background-color: #d62839;
 }
 
-/* Botón Explorer Verde */
 .btn-explorer {
-    background-color: #2A9D8F;
-    color: white;
+    background-color: #2a9d8f;
+    color: #fff;
     border: none;
-    padding: 10px 20px;
-    font-size: 1rem;
+    padding: 16px 36px;
+    font-size: 1.3rem;
+    font-weight: 700;
     cursor: pointer;
     transition: 0.3s;
-    margin-left: 1pc;
 }
 
 .btn-explorer:hover {
-    background-color: #00ff00;.hero {
-    position: relative;
-    width: 100%;
-    height: 90vh;
-    background: no-repeat center center/cover; /* 🔹 Se ajusta a la imagen dinámica */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: left;
-    color: white;
-    padding-left: 80px;
-}
-
-    .hero::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5); /* Oscurece la imagen para mejor contraste */
-    }
-
-    .hero-content {
-        position: relative;
-        z-index: 1;
-        max-width: 100%;
-        line-height: 5;
-        justify-content: center;
-        text-align: center;
-    }
-
-    /* Botón Ranger Rojo */
-    .btn-ranger {
-        background-color: #E63946;
-        color: white;
-        border: none;
-        padding: 10px 10px;
-        font-size: 1rem;
-        cursor: pointer;
-        transition: 0.3s;
-    }
-
-    .btn-ranger:hover {
-        background-color: #ff0000;
-    }
-
-    /* Botón Explorer Verde */
-    .btn-explorer {
-        background-color: #2A9D8F;
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        font-size: 1rem;
-        cursor: pointer;
-        transition: 0.3s;
-        margin-left: 1pc;
-    }
-
-    .btn-explorer:hover {
-        background-color: #00ff00;
-    }
+    background-color: #21867b;
 }
