@@ -80,7 +80,7 @@ export const Activities = () => {
                     </div>
                 </div>
             ) : filteredActivities.length > 0 ? (
-                <div className="row row-cols-1 row-cols-md-2 g-4">
+                <div className="row row-cols-1 row-cols-md-2 g-5">
                     {filteredActivities.map((activity, index) => (
                         <div className="col" key={activity.id || index}>
                             <div className="activity-card d-flex flex-row">

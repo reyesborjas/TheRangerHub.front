@@ -2,7 +2,6 @@
     max-width: 1000px;
 }
 
-/* 🔵 Imagen Circular */
 .image-circle {
     width: 120px;
     height: 120px;
@@ -12,34 +11,45 @@
     background-position: center;
 }
 
-/* 🎨 Imagen específica para cada sección */
 .ranger-img {
-    background-image: url('https://agenciamoneta.com.br/wp-content/uploads/2024/03/Rafaela-Obrownick_foto-de-perfil-redonda.png'); /* Cambia esto por la imagen del Ranger */
+    background-image: url("https://agenciamoneta.com.br/wp-content/uploads/2024/03/Rafaela-Obrownick_foto-de-perfil-redonda.png");
 }
 
 .explorer-img {
-    background-image: url('https://w7.pngwing.com/pngs/415/765/png-transparent-user-profile-linkedin-netwerk-money-order-fulfillment-round-face-saving-expert-moustache.png'); /* Cambia esto por la imagen del Explorer */
+    background-image: url("https://w7.pngwing.com/pngs/415/765/png-transparent-user-profile-linkedin-netwerk-money-order-fulfillment-round-face-saving-expert-moustache.png");
 }
 
-/* 🟢 Sección Rangers */
 .ranger-section {
     background-color: #f8f9fa;
     border-radius: 10px;
     padding: 20px;
-    background-color: #f8e5e7;
 }
 
-/* 🔵 Sección Explorers */
 .explorer-section {
     background-color: #e9f5e9;
     border-radius: 10px;
     padding: 20px;
 }
 
-/* ✅ Estilos de la lista */
+/* Hacemos que la fila de explorer-section se revierta solo en pantallas >=768px */
+.explorer-section .row {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+/* En pantallas pequeñas (por defecto) se muestra el orden normal (Explorer, luego la lista) */
+@media (min-width: 768px) {
+    .explorer-section .row {
+        flex-direction: row-reverse;
+    }
+}
+
 .features-list {
     list-style: none;
     padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
 }
 
 .features-list li {
@@ -61,4 +71,12 @@
     width: 30px;
     height: 30px;
     margin-right: 10px;
+}
+
+#title-h2 {
+    font-size: 3rem;
+}
+
+#p-h2 {
+    font-size: 1.2rem;
 }

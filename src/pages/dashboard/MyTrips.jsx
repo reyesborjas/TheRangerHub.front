@@ -15,10 +15,10 @@ export const MyTrips = () => {
     const token = localStorage.getItem("token");
     if (token) {
       try {
+        // Extraemos user_id y role_name sin usar jwt-decode
         const decoded = JSON.parse(atob(token.split(".")[1]));
         setUserId(decoded.user_id);
         setUserRole(decoded.role_name);
-
         if (decoded.role_name === "Explorer") {
           getExplorerTrips(decoded.user_id);
         } else {
@@ -37,7 +37,8 @@ export const MyTrips = () => {
     setIsLoading(true);
     fetch(`https://rangerhub-back.vercel.app/reservations/explorer/${userId}`)
         .then((response) => {
-          if (!response.ok) throw new Error(`Error ${response.status}: No se pudieron obtener las reservaciones`);
+          if (!response.ok)
+            throw new Error(`Error ${response.status}: No se pudieron obtener las reservaciones`);
           return response.json();
         })
         .then((data) => setUserReservations(data.trips || []))
@@ -52,7 +53,8 @@ export const MyTrips = () => {
     setIsLoading(true);
     fetch(`https://rangerhub-back.vercel.app/reservations/ranger/${userId}`)
         .then((response) => {
-          if (!response.ok) throw new Error(`Error ${response.status}: No se pudieron obtener las reservaciones`);
+          if (!response.ok)
+            throw new Error(`Error ${response.status}: No se pudieron obtener las reservaciones`);
           return response.json();
         })
         .then((data) => setUserReservations(data.trips || []))
@@ -68,20 +70,16 @@ export const MyTrips = () => {
     try {
       let url = "https://rangerhub-back.vercel.app/reservations";
       let method = "POST";
-
       if (action === "cancel") {
         url = `https://rangerhub-back.vercel.app/reservations/${tripId}`;
         method = "DELETE";
       }
-
       const response = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
         body: method === "POST" ? JSON.stringify({ user_id: userId, trip_id: tripId }) : null,
       });
-
       if (!response.ok) throw new Error("Error al procesar la reservación");
-
       userRole === "Explorer" ? getExplorerTrips(userId) : getRangerTrips(userId);
     } catch (error) {
       console.error("Error al procesar la reservación:", error);
@@ -99,7 +97,6 @@ export const MyTrips = () => {
       <div className="my-trips-container container">
         <TopNavbar />
         <h1 className="text-center my-4">Mis Viajes</h1>
-
         <div className="row justify-content-center mb-4">
           <div className="col-md-6">
             <div className="input-group">
@@ -116,9 +113,7 @@ export const MyTrips = () => {
             </div>
           </div>
         </div>
-
         {error && <div className="alert alert-danger text-center">{error}</div>}
-
         {isLoading ? (
             <div className="d-flex justify-content-center my-5">
               <div className="spinner-border text-primary"></div>
@@ -140,24 +135,30 @@ export const MyTrips = () => {
                             <h5>Precio: ${trip.total_cost}</h5>
                             <p className="card-text">{trip.description}</p>
                           </div>
-
-                          {userRole === "Explorer" && (
+                          {userRole === "Explorer" ? (
                               <div className="card-footer button-group">
                                 <button
                                     onClick={() => handleReservation(trip.id, "pay")}
                                     className="btn btn-pay"
                                     disabled={reserving.tripId === trip.id && reserving.action === "pay"}
                                 >
-                                  {reserving.tripId === trip.id && reserving.action === "pay" ? "Procesando..." : "Pagar"}
+                                  {reserving.tripId === trip.id && reserving.action === "pay"
+                                      ? "Procesando..."
+                                      : "Pagar"}
                                 </button>
-
                                 <button
                                     onClick={() => handleReservation(trip.id, "cancel")}
                                     className="btn btn-cancel"
                                     disabled={reserving.tripId === trip.id && reserving.action === "cancel"}
                                 >
-                                  {reserving.tripId === trip.id && reserving.action === "cancel" ? "Procesando..." : "Cancelar Viaje"}
+                                  {reserving.tripId === trip.id && reserving.action === "cancel"
+                                      ? "Procesando..."
+                                      : "Cancelar Viaje"}
                                 </button>
+                              </div>
+                          ) : (
+                              <div className="card-footer button-group">
+                                <button className="btn btn-details">Ver detalles</button>
                               </div>
                           )}
                         </div>
