@@ -15,7 +15,7 @@ const HeroSection = () => {
             className="hero"
             style={{ backgroundImage: `url(${backgroundImage})` }}
         >
-            <div className="hero-content">
+            <div className="hero-content text-center">
                 <h1>Gana dinero siendo guía o Explora el mundo</h1>
                 <p>
                     Comparte tus conocimientos, crea experiencias inolvidables,
