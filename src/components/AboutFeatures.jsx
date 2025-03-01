@@ -4,22 +4,22 @@ import { faGlobe, faCog, faShieldAlt } from "@fortawesome/free-solid-svg-icons";
 
 const FeatureCard = (props) => {
     return (
-        <div className="card text-center p-4 shadow-sm bg-dark text-white rounded-3">
-            <div className="card-body">
+        <div className="card text-center p-4 shadow-sm bg-dark text-white rounded-3 d-flex flex-column h-100">
+            <div className="card-body flex-grow-1 d-flex flex-column">
                 <FontAwesomeIcon
                     icon={props.icon}
                     size="2x"
                     className="mb-3 text-primary"
                 />
                 <h5 className="fw-bold">{props.title}</h5>
-                <p className="text-muted">{props.description}</p>
+                <p className="text-muted flex-grow-1">{props.description}</p>
             </div>
         </div>
     );
 };
 
 FeatureCard.propTypes = {
-    icon: PropTypes.any.isRequired, // FontAwesome icon es un objeto
+    icon: PropTypes.any.isRequired,
     title: PropTypes.string.isRequired,
     description: PropTypes.string.isRequired,
 };
@@ -50,7 +50,7 @@ const AboutFeatures = () => {
         <div className="container py-5">
             <div className="row g-4">
                 {features.map((feature, index) => (
-                    <div key={index} className="col-md-4">
+                    <div key={index} className="col-md-4 d-flex">
                         <FeatureCard
                             icon={feature.icon}
                             title={feature.title}

@@ -50,6 +50,14 @@ const SideBarDashboard = () => {
         + Nuevo Viaje
       </Link>
 
+      {/* Botón de Nueva Actividad */}
+      <Link 
+        to={`/secured/${username}/dashboard/createactivity`} 
+        className="new-trip-btn"
+      >
+        + Nueva Actividad
+      </Link>
+
       {/* Navegación principal */}
       <nav className="nav flex-column w-100">
         <Link 

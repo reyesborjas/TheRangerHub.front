@@ -30,16 +30,18 @@
 }
 
 .features-list {
+    display: flex;
+    flex-direction: column;
+    align-items:start;
     list-style: none;
     padding: 0;
     margin: 0;
-    display: flex;
-    flex-direction: column;
 }
 
 .features-list li {
     display: flex;
-    align-items: center;
+    max-width: 400px;
+    text-align: left; 
     font-size: 1rem;
     margin: 10px 0;
 }
