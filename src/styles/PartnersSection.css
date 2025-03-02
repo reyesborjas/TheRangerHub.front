@@ -1,3 +1,7 @@
+.subtitle {
+    font-size: 2rem;
+}
+
 .partners-section {
     padding: 60px 20px;
     border-radius: 10px;
@@ -36,7 +40,7 @@
 }
 
 .partner-name {
-    font-size: 14px;
+    font-size: 16px;
     color: #343a40;
     font-weight: bold;
 }
