@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import TopNavbar from "../../components/TopNavbar.jsx";
 
 export const Resources = () => {
   let [resources, setResources] = useState([]);
@@ -16,6 +17,7 @@ export const Resources = () => {
 
   return (
     <div>
+      <TopNavbar/>
       <h1>Página de Recursos</h1>
     </div>
   );
