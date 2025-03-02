@@ -15,7 +15,6 @@ export const MyTrips = () => {
     const token = localStorage.getItem("token");
     if (token) {
       try {
-        // Extraemos user_id y role_name sin usar jwt-decode
         const decoded = JSON.parse(atob(token.split(".")[1]));
         setUserId(decoded.user_id);
         setUserRole(decoded.role_name);
@@ -65,29 +64,47 @@ export const MyTrips = () => {
         .finally(() => setIsLoading(false));
   };
 
-  const handleReservation = async (tripId, action) => {
-    setReserving({ tripId, action });
-    try {
-      let url = "https://rangerhub-back.vercel.app/reservations";
-      let method = "POST";
-      if (action === "cancel") {
-        url = `https://rangerhub-back.vercel.app/reservations/${tripId}`;
-        method = "DELETE";
-      }
-      const response = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: method === "POST" ? JSON.stringify({ user_id: userId, trip_id: tripId }) : null,
-      });
-      if (!response.ok) throw new Error("Error al procesar la reservación");
-      userRole === "Explorer" ? getExplorerTrips(userId) : getRangerTrips(userId);
-    } catch (error) {
-      console.error("Error al procesar la reservación:", error);
-      setError(error.message);
-    } finally {
-      setReserving({ tripId: null, action: null });
-    }
-  };
+  // Update the handleReservation function in MyTrips.jsx
+
+        const handleReservation = async (tripId, action) => {
+          setReserving({ tripId, action });
+          try {
+            let url = "https://rangerhub-back.vercel.app/reservations";
+            let method = "POST";
+            let body = null;
+            
+            if (action === "pay") {
+              body = JSON.stringify({ 
+                user_id: userId, 
+                trip_id: tripId,
+                status: "pending" // or "paid" depending on your workflow
+              });
+            } else if (action === "cancel") {
+              // Use the new endpoint that takes both trip_id and user_id
+              url = `https://rangerhub-back.vercel.app/reservations/trip/${tripId}/user/${userId}`;
+              method = "DELETE";
+            }
+            
+            const response = await fetch(url, {
+              method,
+              headers: { "Content-Type": "application/json" },
+              body: method === "POST" ? body : null,
+            });
+            
+            if (!response.ok) {
+              const errorData = await response.json();
+              throw new Error(errorData.message || "Error al procesar la reservación");
+            }
+            
+            // Refresh the list after successful operation
+            userRole === "Explorer" ? getExplorerTrips(userId) : getRangerTrips(userId);
+          } catch (error) {
+            console.error("Error al procesar la reservación:", error);
+            setError(error.message);
+          } finally {
+            setReserving({ tripId: null, action: null });
+          }
+        };
 
   const filteredTrips = userReservations.filter((trip) =>
       trip.trip_name.toLowerCase().includes(searchTerm.toLowerCase())
