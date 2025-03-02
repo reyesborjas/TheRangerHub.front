@@ -110,55 +110,83 @@ const CreateTrip = () => {
     }
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-  
-    try {
-      // Validación mejorada de actividades
-      const activitiesList = formData.activities.filter(activity => activity !== "");
-      if (activitiesList.length === 0) {
-        alert("Debes seleccionar al menos una actividad válida");
-        return;
-      }
-  
-      // Enviar datos básicos del viaje
-      const tripResponse = await fetch("https://rangerhub-back.vercel.app/trips", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...formData,
-          activities: undefined, // Excluir actividades del payload
-        }),
-      });
-  
-      const { id: tripId } = await tripResponse.json();
-  
-      // Enviar actividades en paralelo con control de errores
-      const results = await Promise.allSettled(
-        activitiesList.map(activityId =>
-          fetch("https://rangerhub-back.vercel.app/activity-trips", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ 
-              trip_id: tripId, 
-              activity_id: activityId 
-            }),
-          })
-        )
-      );
-  
-      // Verificar errores en actividades
-      const failedActivities = results.filter(r => r.status === "rejected");
-      if (failedActivities.length > 0) {
-        throw new Error(`${failedActivities.length} actividades no se pudieron asociar`);
-      }
-  
-      navigate("/dashboard/trips");
-    } catch (error) {
-      console.error("Error completo:", error);
-      alert(error.message);
+ // Actualiza solo la función handleSubmit en el componente CreateTrip
+
+const handleSubmit = async (event) => {
+  event.preventDefault();
+
+  try {
+    // Validación mejorada de actividades
+    const activitiesList = formData.activities.filter(activity => activity !== "");
+    if (activitiesList.length === 0) {
+      alert("Debes seleccionar al menos una actividad válida");
+      return;
     }
-  };
+    
+    // Filtrar recursos vacíos
+    const resourcesList = formData.resources.filter(resource => resource !== "");
+
+    // Enviar datos básicos del viaje
+    const tripResponse = await fetch("https://rangerhub-back.vercel.app/trips", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        ...formData,
+        activities: undefined, // Excluir actividades del payload
+        resources: undefined, // Excluir recursos del payload
+      }),
+    });
+
+    const { id: tripId } = await tripResponse.json();
+
+    // Enviar actividades en paralelo con control de errores
+    const activityResults = await Promise.allSettled(
+      activitiesList.map(activityId =>
+        fetch("https://rangerhub-back.vercel.app/activity-trips", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ 
+            trip_id: tripId, 
+            activity_id: activityId 
+          }),
+        })
+      )
+    );
+    
+    // Enviar recursos en paralelo con control de errores usando la nueva ruta
+    const resourceResults = await Promise.allSettled(
+      resourcesList.map(resourceId =>
+        fetch("https://rangerhub-back.vercel.app/trips-resources", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ 
+            trip_id: tripId, 
+            resource_id: resourceId 
+          }),
+        })
+      )
+    );
+
+    // Verificar errores en actividades
+    const failedActivities = activityResults.filter(r => r.status === "rejected");
+    if (failedActivities.length > 0) {
+      console.error("Errores en actividades:", failedActivities);
+      throw new Error(`${failedActivities.length} actividades no se pudieron asociar`);
+    }
+    
+    // Verificar errores en recursos
+    const failedResources = resourceResults.filter(r => r.status === "rejected");
+    if (failedResources.length > 0) {
+      console.error("Errores en recursos:", failedResources);
+      throw new Error(`${failedResources.length} recursos no se pudieron asociar`);
+    }
+
+    navigate("/dashboard/trips");
+  } catch (error) {
+    console.error("Error completo:", error);
+    alert(error.message);
+  }
+};
 
   return (
     <>
