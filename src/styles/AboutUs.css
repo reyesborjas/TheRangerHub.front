@@ -1,11 +1,8 @@
-/* 1) Reseteo básico y box-sizing */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
-
-/* 2) Variables de color (opcional pero recomendado) */
 :root {
     --brand-red: #E63946;
     --brand-teal: #2A9D8F;
@@ -14,45 +11,36 @@
     --gray-medium: #555;
 }
 
-/* 3) Contenedor principal de AboutUs */
-#aboutUs-container {
-    max-width: 1200px;  /* Ajusta el ancho máximo de la sección */
-    margin: 0 auto;     /* Centra horizontalmente */
-    padding: 2rem;      /* Espacio interno */
-    text-align: center; /* Centra el texto */
-}
 
-/* 5) Título principal */
+
 #aboutUs-container h1 {
-    font-size: 2.2rem;   /* Ajusta el tamaño de la fuente */
-    font-weight: bold;   /* Negrita */
-    margin-bottom: 1rem; /* Separación inferior */
+    font-size: 3rem;
+    font-weight: bold;
+    margin-bottom: 1rem; /
     color: var(--brand-black);
 }
 
-/* 6) Subtítulo */
 #aboutUs-container h5 {
     font-size: 1rem;
     line-height: 1.6;
-    color: var(--gray-medium); /* Gris medio */
-    margin-bottom: 2rem;       /* Separación inferior */
-    max-width: 800px;          /* Ancho máximo para que no se expanda demasiado */
+    color: var(--gray-medium);
+    margin-bottom: 2rem;
+    max-width: 800px;
     margin-left: auto;
     margin-right: auto;
 }
 
-/* 7) Sección de Features (tarjetas) */
+
 .container {
-    max-width: 1200px !important; /* Forzamos el ancho máximo */
+    max-width: 1200px !important;
 }
 
 .row.g-4 {
-    justify-content: center;      /* Centra las columnas si usas Bootstrap */
+    justify-content: center;
 }
 
-/* 8) Tarjetas */
 .card {
-    background-color: var(--brand-white) !important; /* Fondo blanco */
+    background-color: var(--brand-white) !important;
     border: 1px solid #ddd !important;
     color: #333 !important;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -65,10 +53,10 @@
 }
 
 .card-body {
-    padding: 2rem !important; /* Aumenta el padding interno */
+    padding: 2rem !important;
 }
 
-/* 9) Texto primario (iconos o acentos) */
+
 .text-primary {
     color: var(--brand-red) !important;
 }

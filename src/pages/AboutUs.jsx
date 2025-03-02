@@ -17,7 +17,6 @@ const AboutUs = () => {
                     <br/>
                     <br/>
                     <br/>
-                    <br/>
                     <h1>Conectámos el Mundo a Través de la Aventura <br/>como Ranger o Explorer</h1>
                     <br/>
                     <h5>

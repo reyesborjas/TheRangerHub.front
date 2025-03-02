@@ -14,10 +14,6 @@ const ContactUs = () => {
     return (
         <>
             <MyNavbar />
-            <br/>
-            <br/>
-            <br/>
-            <br/>
             <div className="contact-us-container">
                 <div className="contact-form-wrapper">
                     <div className="contact-text">
