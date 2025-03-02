@@ -3,9 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "../styles/CreateActivity.css";
+import SideBarDashboard from "./SideBarDashboard.jsx";
+import TopNavbar from "./TopNavbar.jsx";
 
 
-const CreateActivity = () => {
+const CreateActivity = () => {  
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
   const [locations, setLocations] = useState([]);
@@ -64,7 +66,7 @@ const CreateActivity = () => {
       setLocationResults([]);
       return;
     }
-    
+
     setIsSearching(true);
     try {
       const response = await fetch(
@@ -162,236 +164,240 @@ const CreateActivity = () => {
   };
 
   return (
-    <div className="container create-activity-container">
-      <ToastContainer position="top-center" />
-      
-      <div className="card p-4 shadow-lg create-activity-box">
-        <h2 className="text-center mb-4">Crear Nueva Actividad</h2>
-        
-        <form onSubmit={(e) => e.preventDefault()}>
-          {/* Campo: Nombre */}
-          <div className="form-group mb-3">
-            <label className="form-label">Nombre de la Actividad</label>
-            <input
-              type="text"
-              className="form-control"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              required
-            />
-          </div>
+    <>
+      <SideBarDashboard />
+      <TopNavbar />
+      <div className="container create-activity-container">
+        <ToastContainer position="top-center" />
 
-          {/* Campo: Categoría */}
-          <div className="form-group mb-3">
-            <label className="form-label">Categoría</label>
-            <select
-              className="form-control"
-              name="category_id"
-              value={formData.category_id}
-              onChange={handleChange}
-              required
-            >
-              <option value="">Seleccione una categoría</option>
-              {categories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
-          </div>
+        <div className="card p-4 shadow-lg create-activity-box">
+          <h2 className="text-center mb-4">Crear Nueva Actividad</h2>
 
-          {/* Campo: Búsqueda de Localización */}
-          <div className="form-group mb-3 position-relative">
-            <label className="form-label">Localización</label>
-            <input
-              type="text"
-              className="form-control"
-              placeholder="Buscar localización..."
-              value={selectedLocation || locationQuery}
-              onChange={handleLocationSearch}
-              required
-            />
-            
-            {locationResults.length > 0 && (
-              <div className="location-results">
-                {locationResults.map((location) => (
-                  <div
-                    key={location.id}
-                    className="location-item"
-                    onClick={() => selectLocation(location)}
-                  >
-                    <div className="fw-bold">{location.place_name}</div>
-                    <small>{location.country}, {location.province}</small>
-                  </div>
+          <form onSubmit={(e) => e.preventDefault()}>
+            {/* Campo: Nombre */}
+            <div className="form-group mb-3">
+              <label className="form-label">Nombre de la Actividad</label>
+              <input
+                type="text"
+                className="form-control"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            {/* Campo: Categoría */}
+            <div className="form-group mb-3">
+              <label className="form-label">Categoría</label>
+              <select
+                className="form-control"
+                name="category_id"
+                value={formData.category_id}
+                onChange={handleChange}
+                required
+              >
+                <option value="">Seleccione una categoría</option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
                 ))}
-              </div>
-            )}
-            
-            {isSearching && (
-              <div className="search-loading text-muted mt-1">
-                <small>Buscando localizaciones...</small>
-              </div>
-            )}
-          </div>
+              </select>
+            </div>
 
-          {/* Campo: Costo */}
-          <div className="form-group mb-3">
-            <label className="form-label">Costo (USD)</label>
-            <input
-              type="number"
-              className="form-control"
-              name="cost"
-              value={formData.cost}
-              onChange={handleChange}
-              step="0.01"
-              required
-            />
-          </div>
+            {/* Campo: Búsqueda de Localización */}
+            <div className="form-group mb-3 position-relative">
+              <label className="form-label">Localización</label>
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Buscar localización..."
+                value={selectedLocation || locationQuery}
+                onChange={handleLocationSearch}
+                required
+              />
 
-          {/* Campo: Duración */}
-          <div className="form-group mb-3">
-            <label className="form-label">Duración (horas)</label>
-            <input
-              type="number"
-              className="form-control"
-              name="duration"
-              value={formData.duration}
-              onChange={handleChange}
-              step="0.5"
-              required
-            />
-          </div>
+              {locationResults.length > 0 && (
+                <div className="location-results">
+                  {locationResults.map((location) => (
+                    <div
+                      key={location.id}
+                      className="location-item"
+                      onClick={() => selectLocation(location)}
+                    >
+                      <div className="fw-bold">{location.place_name}</div>
+                      <small>{location.country}, {location.province}</small>
+                    </div>
+                  ))}
+                </div>
+              )}
 
-          {/* Campo: Dificultad */}
-          <div className="form-group mb-3">
-            <label className="form-label">Dificultad</label>
-            <select
-              className="form-control"
-              name="difficulty"
-              value={formData.difficulty}
-              onChange={handleChange}
-              required
-            >
-              <option value="">Seleccionar dificultad</option>
-              <option value="Fácil">Fácil</option>
-              <option value="Moderada">Moderada</option>
-              <option value="Difícil">Difícil</option>
-            </select>
-          </div>
+              {isSearching && (
+                <div className="search-loading text-muted mt-1">
+                  <small>Buscando localizaciones...</small>
+                </div>
+              )}
+            </div>
 
-          {/* Campos: Participantes */}
-          <div className="row mb-3">
-            <div className="col-md-6">
-              <label className="form-label">Mínimo de participantes</label>
+            {/* Campo: Costo */}
+            <div className="form-group mb-3">
+              <label className="form-label">Costo (USD)</label>
               <input
                 type="number"
                 className="form-control"
-                name="min_participants"
-                value={formData.min_participants}
+                name="cost"
+                value={formData.cost}
                 onChange={handleChange}
-                min="1"
+                step="0.01"
                 required
               />
             </div>
-            <div className="col-md-6">
-              <label className="form-label">Máximo de participantes</label>
+
+            {/* Campo: Duración */}
+            <div className="form-group mb-3">
+              <label className="form-label">Duración (horas)</label>
               <input
                 type="number"
                 className="form-control"
-                name="max_participants"
-                value={formData.max_participants}
+                name="duration"
+                value={formData.duration}
                 onChange={handleChange}
-                min={formData.min_participants}
+                step="0.5"
                 required
               />
             </div>
-          </div>
 
-          {/* Campos: Checkboxes */}
-          <div className="row mb-3">
-            <div className="col-md-6">
-              <div className="form-check">
+            {/* Campo: Dificultad */}
+            <div className="form-group mb-3">
+              <label className="form-label">Dificultad</label>
+              <select
+                className="form-control"
+                name="difficulty"
+                value={formData.difficulty}
+                onChange={handleChange}
+                required
+              >
+                <option value="">Seleccionar dificultad</option>
+                <option value="Fácil">Fácil</option>
+                <option value="Moderada">Moderada</option>
+                <option value="Difícil">Difícil</option>
+              </select>
+            </div>
+
+            {/* Campos: Participantes */}
+            <div className="row mb-3">
+              <div className="col-md-6">
+                <label className="form-label">Mínimo de participantes</label>
                 <input
-                  className="form-check-input"
-                  type="checkbox"
-                  name="is_available"
-                  checked={formData.is_available}
+                  type="number"
+                  className="form-control"
+                  name="min_participants"
+                  value={formData.min_participants}
                   onChange={handleChange}
-                  id="availableCheck"
+                  min="1"
+                  required
                 />
-                <label className="form-check-label" htmlFor="availableCheck">
-                  Disponible
-                </label>
+              </div>
+              <div className="col-md-6">
+                <label className="form-label">Máximo de participantes</label>
+                <input
+                  type="number"
+                  className="form-control"
+                  name="max_participants"
+                  value={formData.max_participants}
+                  onChange={handleChange}
+                  min={formData.min_participants}
+                  required
+                />
               </div>
             </div>
-            <div className="col-md-6">
-              <div className="form-check">
-                <input
-                  className="form-check-input"
-                  type="checkbox"
-                  name="is_public"
-                  checked={formData.is_public}
-                  onChange={handleChange}
-                  id="publicCheck"
-                />
-                <label className="form-check-label" htmlFor="publicCheck">
-                  Pública
-                </label>
+
+            {/* Campos: Checkboxes */}
+            <div className="row mb-3">
+              <div className="col-md-6">
+                <div className="form-check">
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    name="is_available"
+                    checked={formData.is_available}
+                    onChange={handleChange}
+                    id="availableCheck"
+                  />
+                  <label className="form-check-label" htmlFor="availableCheck">
+                    Disponible
+                  </label>
+                </div>
+              </div>
+              <div className="col-md-6">
+                <div className="form-check">
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    name="is_public"
+                    checked={formData.is_public}
+                    onChange={handleChange}
+                    id="publicCheck"
+                  />
+                  <label className="form-check-label" htmlFor="publicCheck">
+                    Pública
+                  </label>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Campo: Descripción */}
-          <div className="form-group mb-3">
-            <label className="form-label">Descripción</label>
-            <textarea
-              className="form-control"
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              rows="4"
-              required
-            />
-          </div>
+            {/* Campo: Descripción */}
+            <div className="form-group mb-3">
+              <label className="form-label">Descripción</label>
+              <textarea
+                className="form-control"
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                rows="4"
+                required
+              />
+            </div>
 
-          {/* Campo: URL Imagen */}
-          <div className="form-group mb-4">
-            <label className="form-label">URL de la imagen</label>
-            <input
-              type="url"
-              className="form-control"
-              name="activity_image_url"
-              value={formData.activity_image_url}
-              onChange={handleChange}
-              placeholder="https://ejemplo.com/imagen.jpg"
-              required
-            />
-          </div>
+            {/* Campo: URL Imagen */}
+            <div className="form-group mb-4">
+              <label className="form-label">URL de la imagen</label>
+              <input
+                type="url"
+                className="form-control"
+                name="activity_image_url"
+                value={formData.activity_image_url}
+                onChange={handleChange}
+                placeholder="https://ejemplo.com/imagen.jpg"
+                required
+              />
+            </div>
 
-          {/* Botones de Acción */}
-          <div className="d-grid gap-3 d-md-flex justify-content-md-end">
-            <button
-              type="button"
-              className="btn btn-primary btn-lg"
-              onClick={() => handleSubmit("saveAndList")}
-            >
-              <i className="bi bi-save me-2"></i>
-              Guardar y Ver Listado
-            </button>
-            
-            <button
-              type="button"
-              className="btn btn-outline-primary btn-lg"
-              onClick={() => handleSubmit("saveAndNew")}
-            >
-              <i className="bi bi-plus-circle me-2"></i>
-              Guardar y Crear Otra
-            </button>
-          </div>
-        </form>
+            {/* Botones de Acción */}
+            <div className="d-grid gap-3 d-md-flex justify-content-md-end">
+              <button
+                type="button"
+                className="btn btn-primary btn-lg"
+                onClick={() => handleSubmit("saveAndList")}
+              >
+                <i className="bi bi-save me-2"></i>
+                Guardar y Ver Listado
+              </button>
+
+              <button
+                type="button"
+                className="btn btn-outline-primary btn-lg"
+                onClick={() => handleSubmit("saveAndNew")}
+              >
+                <i className="bi bi-plus-circle me-2"></i>
+                Guardar y Crear Otra
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

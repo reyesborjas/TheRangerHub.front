@@ -1,4 +1,5 @@
-import { useState} from "react";
+import React, { useState } from "react";
+import "../styles/Testimonials.css";
 
 const Testimonios = () => {
     const testimonios = [
@@ -36,24 +37,28 @@ const Testimonios = () => {
     };
 
     return (
-        <div className="container my-5 text-center">
-            <h2>Lo que dicen nuestros clientes</h2>
-            <div className="card mt-4 p-4">
-                <div className="card-body">
-                    <img src={testimonios[indice].imagen} alt={testimonios[indice].nombre} className="rounded-circle mb-3" width="100" height="100" />
-                    <p className="card-text">"{testimonios[indice].opinion}"</p>
-                    <div className="card-footer">
+        <div className="container testimonial-container">
+            <h2 className="text-center" id="testimonial-h2">Lo que dicen nuestros clientes</h2>
+            <div className="testimonial-card row mx-auto">
+                <div
+                    className="col-md-6 testimonial-image"
+                    style={{ backgroundImage: `url(${testimonios[indice].imagen})` }}
+                ></div>
+                <div className="col-md-6 testimonial-content d-flex flex-column justify-content-center p-4">
+                    <p className="testimonial-opinion">"{testimonios[indice].opinion}"</p>
+                    <div className="testimonial-author">
                         <strong>{testimonios[indice].nombre}</strong> - {testimonios[indice].ubicacion}
                     </div>
+                    <br/>
+                    <div className="mt-4 d-flex justify-content-center gap-3">
+                        <button className="btn btn-ranger" onClick={anteriorTestimonio}>
+                            ←
+                        </button>
+                        <button className="btn btn-ranger" onClick={siguienteTestimonio}>
+                            →
+                        </button>
+                    </div>
                 </div>
-            </div>
-            <div className="mt-3">
-                <button className="btn btn-outline-dark me-2" onClick={anteriorTestimonio}>
-                    ←
-                </button>
-                <button className="btn btn-outline-dark" onClick={siguienteTestimonio}>
-                    →
-                </button>
             </div>
         </div>
     );

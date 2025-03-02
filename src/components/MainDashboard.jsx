@@ -3,8 +3,10 @@ import "../styles/MainDashboard.css";
 import { Carousel } from "react-bootstrap";
 import OpenLayersMap from "../components/OpenLayersMap.jsx";
 import 'ol/ol.css';
+import { useNavigate } from "react-router-dom";
 
 const MainDashboard = () => {
+    const navigate = useNavigate();
     return (
         <div className="container main-dashboard">
             {/* Slider de imágenes */}
@@ -73,57 +75,58 @@ const MainDashboard = () => {
                 </div>
             </div>
 
-                    {/* Mapa y próximos viajes */}
-                    <div className="row mt-4 d-flex align-items-stretch" style={{ fontSize: "12px" }}>
-                        {/* Mapa del viaje usando OpenLayers */}
-                        <div className="col-md-6 d-flex">
-                            <div className="card map-container text-center w-100 h-100">
-                                <div className="card-body">
-                                    <h6>Mapa del viaje</h6>
-                                    <OpenLayersMap lat={-51.1229} lon={-73.0486} zoom={8} />
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Tabla de próximos viajes */}
-                        <div className="col-md-6 d-flex">
-                            <div className="card upcoming-trips text-center w-100 h-100">
-                                <div className="card-body">
-                                    <h6>Próximos viajes</h6>
-                                    <table className="table table-hover">
-                                        <thead>
-                                            <tr>
-                                                <th>#</th>
-                                                <th>Nombre</th>
-                                                <th>Estado</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>1</td>
-                                                <td>Buenos Aires</td>
-                                                <td>Confirmado</td>
-                                            </tr>
-                                            <tr>
-                                                <td>2</td>
-                                                <td>Machu Picchu</td>
-                                                <td>Pendiente</td>
-                                            </tr>
-                                            <tr>
-                                                <td>3</td>
-                                                <td>San Pedro de Atacama</td>
-                                                <td>En curso</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                    <button className="btn btn-danger btn-lg w-100 mt-3">
-                                        Consultar más viajes
-                                    </button>
-                                </div>
-                            </div>
+            {/* Mapa y próximos viajes */}
+            <div className="row mt-4 d-flex align-items-stretch" style={{ fontSize: "12px" }}>
+                {/* Mapa del viaje usando OpenLayers */}
+                <div className="col-md-6 d-flex">
+                    <div className="card map-container text-center w-100 h-100">
+                        <div className="card-body">
+                            <h6>Mapa del viaje</h6>
+                            <OpenLayersMap lat={-51.1229} lon={-73.0486} zoom={8} />
                         </div>
                     </div>
                 </div>
+
+                {/* Tabla de próximos viajes */}
+                <div className="col-md-6 d-flex">
+                    <div className="card upcoming-trips text-center w-100 h-100">
+                        <div className="card-body">
+                            <h6>Próximos viajes</h6>
+                            <table className="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>Estado</th>
+                                        <th>Fecha</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>San Pedro de Atacama</td>
+                                        <td>En curso</td>
+                                        <td>04/03/2025</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Buenos Aires</td>
+                                        <td>Confirmado</td>
+                                        <td>17/02/2025</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Machu Picchu</td>
+                                        <td>Pendiente</td>
+                                        <td>23/11/2025</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <button onClick={() => navigate("/secured/${username}/dashboard/mytrips")} className="btn btn-danger btn-lg w-100 mt-3">
+                                Consultar más viajes
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     );
 };
 
