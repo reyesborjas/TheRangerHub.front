@@ -5,7 +5,7 @@
 .news-section h2 {
     color: #2A9D8F;
     font-weight: 600;
-    margin-bottom: 2.5rem;
+    margin-bottom: 5rem;
     position: relative;
 }
 
@@ -63,17 +63,17 @@
 }
 
 .btn-outline-primary {
-    color: #2A9D8F;
-    border-color: #2A9D8F;
+    color: #2A9D8F !important;
+    border-color: #2A9D8F !important;
     padding: 0.5rem 1.5rem;
     font-size: 0.9rem;
     transition: all 0.3s ease;
 }
 
 .btn-outline-primary:hover {
-    background-color: #2A9D8F;
-    border-color: #2A9D8F;
-    color: white;
+    background-color: #2A9D8F !important;
+    border-color: #2A9D8F !important;
+    color: white !important;
 }
 
 .btn-primary.btn-lg {

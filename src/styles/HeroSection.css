@@ -5,9 +5,9 @@
     background: no-repeat center center/cover;
     display: flex;
     align-items: center;
-    justify-content: center; /* Centra horizontalmente el .hero-content */
+    justify-content: center;
     color: white;
-    padding: 0 2rem; /* Reducimos el padding lateral */
+    padding: 0 2rem;
 }
 
 .hero::before {

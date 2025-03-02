@@ -23,9 +23,9 @@ const PartnersSection = () => {
             <h2 className="fw-bold text-danger">
                 Más de 2,600 viajeros y empresas confían en The Ranger Hub
             </h2>
-            <p className="text-muted">
+            <h5 className="text-muted mt-4 mb-5">
                 Descubre el mundo con el respaldo de las mejores plataformas de turismo.
-            </p>
+            </h5>
             <div className="d-flex justify-content-center flex-wrap mt-4">
                 {partners.map((partner, index) => (
                     <div key={index} className="partner-icon mx-3">
