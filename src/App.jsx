@@ -31,6 +31,7 @@ function App() {
             <Route path="home" element={<HomeDashboard />} />
             <Route path="trips" element={<Trips />} />
             <Route path="createtrip" element={<CreateTrip />} />
+            <Route path="createactivity" element={<CreateActivity />} />
             <Route path="mytrips" element={<MyTrips />} />
             <Route path="activities" element={<Activities />} />
             <Route path="resources" element={<Resources />} />
