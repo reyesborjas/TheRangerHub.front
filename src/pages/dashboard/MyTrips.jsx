@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import "../../styles/MyTrips.css";
+import "../../styles/TripDetailsModal.css";
 import TopNavbar from "../../components/TopNavbar.jsx";
+import TripDetailsModal from "./TripDetailsModal"; // Importamos el componente modal
 
 export const MyTrips = () => {
   const [userReservations, setUserReservations] = useState([]);
@@ -10,6 +12,9 @@ export const MyTrips = () => {
   const [reserving, setReserving] = useState({ tripId: null, action: null });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  // Estados para el modal
+  const [showModal, setShowModal] = useState(false);
+  const [selectedTrip, setSelectedTrip] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -32,79 +37,109 @@ export const MyTrips = () => {
     }
   }, []);
 
-  const getExplorerTrips = (userId) => {
+  const getExplorerTrips = async (userId) => {
     setIsLoading(true);
-    fetch(`https://rangerhub-back.vercel.app/reservations/explorer/${userId}`)
-        .then((response) => {
-          if (!response.ok)
-            throw new Error(`Error ${response.status}: No se pudieron obtener las reservaciones`);
-          return response.json();
-        })
-        .then((data) => setUserReservations(data.trips || []))
-        .catch((error) => {
-          console.error("Error al obtener reservaciones:", error);
-          setError("No se pudieron cargar tus reservaciones");
-        })
-        .finally(() => setIsLoading(false));
+    try {
+      const response = await fetch(`https://rangerhub-back.vercel.app/reservations/explorer/${userId}`);
+      if (!response.ok) {
+        throw new Error(`Error ${response.status}: No se pudieron obtener las reservaciones`);
+      }
+      const data = await response.json();
+      setUserReservations(data.trips || []);
+      setError(null); // Limpiar cualquier error previo
+      return data.trips || [];
+    } catch (error) {
+      console.error("Error al obtener reservaciones:", error);
+      setError("No se pudieron cargar tus reservaciones");
+      return [];
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const getRangerTrips = (userId) => {
+  const getRangerTrips = async (userId) => {
     setIsLoading(true);
-    fetch(`https://rangerhub-back.vercel.app/reservations/ranger/${userId}`)
-        .then((response) => {
-          if (!response.ok)
-            throw new Error(`Error ${response.status}: No se pudieron obtener las reservaciones`);
-          return response.json();
-        })
-        .then((data) => setUserReservations(data.trips || []))
-        .catch((error) => {
-          console.error("Error al obtener reservaciones:", error);
-          setError("No se pudieron cargar tus reservaciones");
-        })
-        .finally(() => setIsLoading(false));
+    try {
+      const response = await fetch(`https://rangerhub-back.vercel.app/reservations/ranger/${userId}`);
+      if (!response.ok) {
+        throw new Error(`Error ${response.status}: No se pudieron obtener las reservaciones`);
+      }
+      const data = await response.json();
+      setUserReservations(data.trips || []);
+      setError(null); // Limpiar cualquier error previo
+      return data.trips || [];
+    } catch (error) {
+      console.error("Error al obtener reservaciones:", error);
+      setError("No se pudieron cargar tus reservaciones");
+      return [];
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  // Update the handleReservation function in MyTrips.jsx
+  const handleReservation = async (tripId, action) => {
+    setReserving({ tripId, action });
+    try {
+      let url = "https://rangerhub-back.vercel.app/reservations";
+      let method = "POST";
+      let body = null;
+      
+      if (action === "pay") {
+        body = JSON.stringify({ 
+          user_id: userId, 
+          trip_id: tripId,
+          status: "pending" // or "paid" depending on your workflow
+        });
+      } else if (action === "cancel") {
+        // Use the new endpoint that takes both trip_id and user_id
+        url = `https://rangerhub-back.vercel.app/reservations/trip/${tripId}/user/${userId}`;
+        method = "DELETE";
+      }
+      
+      const response = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: method === "POST" ? body : null,
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Error al procesar la reservación");
+      }
+      
+      // Esperar a que la operación se complete y actualizar el estado local
+      if (action === "cancel") {
+        // Actualizar el estado local eliminando el viaje cancelado
+        setUserReservations(prevReservations => 
+          prevReservations.filter(trip => trip.id !== tripId)
+        );
+      } else {
+        // Refrescar la lista después de una operación exitosa
+        if (userRole === "Explorer") {
+          await getExplorerTrips(userId);
+        } else {
+          await getRangerTrips(userId);
+        }
+      }
+    } catch (error) {
+      console.error("Error al procesar la reservación:", error);
+      setError(error.message);
+    } finally {
+      setReserving({ tripId: null, action: null });
+    }
+  };
 
-        const handleReservation = async (tripId, action) => {
-          setReserving({ tripId, action });
-          try {
-            let url = "https://rangerhub-back.vercel.app/reservations";
-            let method = "POST";
-            let body = null;
-            
-            if (action === "pay") {
-              body = JSON.stringify({ 
-                user_id: userId, 
-                trip_id: tripId,
-                status: "pending" // or "paid" depending on your workflow
-              });
-            } else if (action === "cancel") {
-              // Use the new endpoint that takes both trip_id and user_id
-              url = `https://rangerhub-back.vercel.app/reservations/trip/${tripId}/user/${userId}`;
-              method = "DELETE";
-            }
-            
-            const response = await fetch(url, {
-              method,
-              headers: { "Content-Type": "application/json" },
-              body: method === "POST" ? body : null,
-            });
-            
-            if (!response.ok) {
-              const errorData = await response.json();
-              throw new Error(errorData.message || "Error al procesar la reservación");
-            }
-            
-            // Refresh the list after successful operation
-            userRole === "Explorer" ? getExplorerTrips(userId) : getRangerTrips(userId);
-          } catch (error) {
-            console.error("Error al procesar la reservación:", error);
-            setError(error.message);
-          } finally {
-            setReserving({ tripId: null, action: null });
-          }
-        };
+  // Función para abrir el modal con detalles del viaje
+  const handleViewDetails = (trip) => {
+    setSelectedTrip(trip);
+    setShowModal(true);
+  };
+
+  // Función para cerrar el modal
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setSelectedTrip(null);
+  };
 
   const filteredTrips = userReservations.filter((trip) =>
       trip.trip_name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -175,7 +210,12 @@ export const MyTrips = () => {
                               </div>
                           ) : (
                               <div className="card-footer button-group">
-                                <button className="btn btn-details">Ver detalles</button>
+                                <button 
+                                  className="btn btn-details"
+                                  onClick={() => handleViewDetails(trip)}
+                                >
+                                  Ver detalles
+                                </button>
                               </div>
                           )}
                         </div>
@@ -187,6 +227,15 @@ export const MyTrips = () => {
                   </div>
               )}
             </div>
+        )}
+
+        {/* Modal de detalles del viaje para Rangers */}
+        {userRole === "Ranger" && (
+          <TripDetailsModal 
+            show={showModal} 
+            trip={selectedTrip} 
+            onClose={handleCloseModal} 
+          />
         )}
       </div>
   );
