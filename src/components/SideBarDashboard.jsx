@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import logo from "../assets/logo.svg";
 import "../styles/SideBarDashboard.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useNavigate } from "react-router-dom";
 import {
   faHome, faSuitcase, faMap, faBicycle, faBook,
   faCloudSun, faCog, faQuestionCircle, faSignOutAlt
@@ -13,6 +14,7 @@ const SideBarDashboard = () => {
   const [weather, setWeather] = useState(null);
   const [error, setError] = useState(null);
   const city = "Santiago";
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchWeather = async () => {
@@ -38,9 +40,9 @@ const SideBarDashboard = () => {
   return (
     <div className="sidebar d-flex flex-column align-items-center">
       {/* Logo */}
-      <div className="logo">
-        <img src={logo} alt="The Ranger Hub" />
-      </div>
+      <div className="logo" onClick={() => navigate(`/secured/${username}/dashboard/home`)} style={{ cursor: "pointer" }}>
+      <img src={logo} alt="The Ranger Hub" />
+    </div>
 
       {/* Botón de Nuevo Viaje */}
       <Link 

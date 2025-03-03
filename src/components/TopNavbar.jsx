@@ -1,15 +1,35 @@
-// TopNavbar.jsx
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import "../styles/TopNavbar.css";
 
-const user = {
-    name: "José Reyes",
-    profilePic: "https://randomuser.me/api/portraits/men/75.jpg",
-};
-
 const TopNavbar = () => {
+    const [user, setUser] = useState(null);
+
+    const loadUser = () => {
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+            try {
+                setUser(JSON.parse(storedUser));
+            } catch (error) {
+                console.error("Error al parsear el usuario:", error);
+            }
+        }
+    };
+
+    useEffect(() => {
+        loadUser(); 
+
+        const handleStorageChange = () => {
+            loadUser();
+        };
+
+        window.addEventListener("storage", handleStorageChange);
+        return () => {
+            window.removeEventListener("storage", handleStorageChange);
+        };
+    }, []);
+
     return (
         <nav className="top-navbar">
             {/* Sección Izquierda */}
@@ -23,8 +43,14 @@ const TopNavbar = () => {
 
             {/* Sección Derecha: Usuario */}
             <div className="nav-right">
-                <span className="user-name">{user.name}</span>
-                <img src={user.profilePic} alt="Usuario" className="user-avatar" />
+                {user ? (
+                    <>
+                        <span className="user-name">{user.name}</span>
+                        <img src={user.profilePic} alt={user.name} className="user-avatar" />
+                    </>
+                ) : (
+                    <span>Cargando usuario...</span>
+                )}
             </div>
         </nav>
     );
