@@ -6,6 +6,7 @@ import "../styles/TopNavbar.css";
 const TopNavbar = () => {
     const [user, setUser] = useState(null);
 
+    // Función para cargar el usuario desde localStorage
     const loadUser = () => {
         const storedUser = localStorage.getItem("user");
         if (storedUser) {
@@ -18,8 +19,9 @@ const TopNavbar = () => {
     };
 
     useEffect(() => {
-        loadUser(); 
+        loadUser(); // Cargar usuario al montar el componente
 
+        // Escuchar cambios en localStorage para actualizar el usuario en tiempo real
         const handleStorageChange = () => {
             loadUser();
         };
@@ -32,16 +34,13 @@ const TopNavbar = () => {
 
     return (
         <nav className="top-navbar">
-            {/* Sección Izquierda */}
             <div className="nav-left">
-                {/* Barra de búsqueda */}
                 <div className="search-bar">
                     <input type="text" placeholder="Buscar..." />
                     <FontAwesomeIcon icon={faSearch} className="search-icon" />
                 </div>
             </div>
 
-            {/* Sección Derecha: Usuario */}
             <div className="nav-right">
                 {user ? (
                     <>
