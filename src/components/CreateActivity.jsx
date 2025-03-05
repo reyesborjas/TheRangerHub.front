@@ -297,7 +297,7 @@ const CreateActivity = () => {
         autoClose: 3000,
         onClose: () => {
           if (actionType === "saveAndList") {
-            navigate("/secured/:username/dashboard/activities");
+            navigate("../activities", { relative: "route" });
           } else {
             // Resetear formulario
             setFormData({
