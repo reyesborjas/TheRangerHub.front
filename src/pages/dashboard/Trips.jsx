@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import "../../styles/Trips.css";
-import TopNavbar from "../../components/TopNavbar.jsx";
 
 export const Trips = () => {
   const [trips, setTrips] = useState([]);
@@ -65,7 +64,6 @@ export const Trips = () => {
 
   return (
       <div className="my-trips-container container">
-        <TopNavbar/>
         <h1 className="text-center my-4">Lo que los Rangers Ofrecen</h1>
 
         <div className="row justify-content-center mb-4">

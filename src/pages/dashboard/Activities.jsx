@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import "../../styles/Activities.css";
-import TopNavbar from "../../components/TopNavbar.jsx";
 
 export const Activities = () => {
     const [activities, setActivities] = useState([]);
@@ -48,7 +47,6 @@ export const Activities = () => {
 
     return (
         <div className="activities-container container">
-            <TopNavbar />
             <h1 className="text-center my-4">
                 Actividades que Tenemos para Ofrecer
             </h1>

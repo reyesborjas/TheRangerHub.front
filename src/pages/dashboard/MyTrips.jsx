@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import "../../styles/MyTrips.css";
 import "../../styles/TripDetailsModal.css";
-import TopNavbar from "../../components/TopNavbar.jsx";
 import TripDetailsModal from "./TripDetailsModal"; // Importamos el componente modal
 
 export const MyTrips = () => {
@@ -147,7 +146,6 @@ export const MyTrips = () => {
 
   return (
       <div className="my-trips-container container">
-        <TopNavbar />
         <h1 className="text-center my-4">Mis Viajes</h1>
         <div className="row justify-content-center mb-4">
           <div className="col-md-6">
