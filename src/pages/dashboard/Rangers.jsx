@@ -143,7 +143,7 @@ export const Rangers = () => {
     return (
         <div className="rangers-container">
             <div className="rangers-header">
-                <h2 className="rangers-title">Nuestros Rangers</h2>
+                <h2 className="rangers-title">Conoce a Nuestros Rangers</h2>
                 <p className="rangers-subtitle">
                     Conoce a nuestro equipo de guías expertos que te acompañarán en tus aventuras
                 </p>
