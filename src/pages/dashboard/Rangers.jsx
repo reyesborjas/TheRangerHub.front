@@ -1,4 +1,3 @@
-// pages/dashboard/Rangers.jsx
 import React, { useState, useEffect } from "react";
 import RangerCard from "../../components/RangerCard";
 import "../../styles/Rangers.css";
