@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEnvelope, faLock } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUser, faLock } from '@fortawesome/free-solid-svg-icons';
 import MyNavbar from "./Navbar";
 
 import "../styles/Login.css";
-import { height } from "@fortawesome/free-brands-svg-icons/fa42Group";
+
 
 const Login = () => {
   const [formData, setFormData] = useState({ username: "", password: "" });
@@ -30,21 +30,21 @@ const Login = () => {
       const data = await response.json();
 
       if (!response.ok) throw new Error(data.message || "Ocurrió un error en login");
-      
+
       if (!data.token) {
         throw new Error("No se recibió un token de autenticación");
       }
-      
+
       localStorage.setItem("token", data.token);
-      
+
       // Si tienes datos de usuario, guárdalos también
       if (data.user) {
         localStorage.setItem("currentUser", JSON.stringify(data.user));
       }
-      
+
       // Asegúrate de que utilizas la propiedad correcta para la navegación
       navigate(`/secured/${data.username || formData.username}/dashboard/home`);
-      
+
     } catch (error) {
       console.error("Error en login:", error);
       setErrorMessage(error.message);
@@ -64,7 +64,7 @@ const Login = () => {
             <div className="mb-3">
               <label className="form-label">Usuario</label>
               <div className="input-group">
-                <span className="input-group-text" style={{marginRight: "5px"}} ><FontAwesomeIcon icon={faEnvelope} /></span>
+              <FontAwesomeIcon icon={faUser} style={{marginRight:"8px"}} />
                 <input
                   type="text"
                   className="form-control"
@@ -78,7 +78,7 @@ const Login = () => {
             <div className="mb-3">
               <label className="form-label">Contraseña</label>
               <div className="input-group">
-                <span className="input-group-text" style={{marginRight: "5px"}}><FontAwesomeIcon icon={faLock} /></span>
+                <FontAwesomeIcon icon={faLock} style={{marginRight:"8px"}} />
                 <input
                   type="password"
                   className="form-control"

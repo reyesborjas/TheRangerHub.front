@@ -6,7 +6,7 @@ import "../styles/TopNavbar.css";
 const TopNavbar = () => {
     const [user, setUser] = useState(null);
 
-    // Función para cargar el usuario desde localStorage
+    // Función para obtener el usuario desde localStorage
     const loadUser = () => {
         const storedUser = localStorage.getItem("user");
         if (storedUser) {
@@ -34,13 +34,16 @@ const TopNavbar = () => {
 
     return (
         <nav className="top-navbar">
+            {/* Sección Izquierda */}
             <div className="nav-left">
+                {/* Barra de búsqueda */}
                 <div className="search-bar">
                     <input type="text" placeholder="Buscar..." />
                     <FontAwesomeIcon icon={faSearch} className="search-icon" />
                 </div>
             </div>
 
+            {/* Sección Derecha: Usuario */}
             <div className="nav-right">
                 {user ? (
                     <>

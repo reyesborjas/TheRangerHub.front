@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import "../../styles/Resources.css"
 
 export const Resources = () => {
   const [resources, setResources] = useState([]);
@@ -22,11 +23,11 @@ export const Resources = () => {
     cost: 0
   });
   const navigate = useNavigate();
-  
-  // Get username from localStorage or context if available
+
+  // Obtener nombre de usuario desde localStorage o contexto si está disponible
   const username = localStorage.getItem("username") || "user";
 
-  // Auto-dismiss success message after 5 seconds
+  // Auto-ocultar mensaje de éxito después de 5 segundos
   useEffect(() => {
     if (success) {
       const timer = setTimeout(() => {
@@ -38,7 +39,7 @@ export const Resources = () => {
 
   const fetchResources = () => {
     setIsLoading(true);
-    // Fetch resources from the API
+    // Obtener recursos desde la API
     fetch("https://rangerhub-back.vercel.app/resources")
       .then((response) => {
         if (!response.ok) {
@@ -54,7 +55,7 @@ export const Resources = () => {
       .catch(error => {
         console.error('Error:', error);
         if (error.response && error.response.status === 409) {
-          // Show specific message about resource being in use
+          // Mostrar mensaje específico sobre el recurso en uso
           setError(`No se puede eliminar: ${error.response.data.message}`);
         } else {
           setError('Error al cargar los recursos');
@@ -67,7 +68,7 @@ export const Resources = () => {
     fetchResources();
   }, []);
 
-  // Format cost as currency
+  // Formatear costo como moneda
   const formatCost = (cost) => {
     return new Intl.NumberFormat('es-CL', { 
       style: 'currency', 
@@ -75,15 +76,15 @@ export const Resources = () => {
     }).format(cost);
   };
 
-  // Format JSON description (if it's a string, parse it; if it's already an object, use it)
+  // Formatear descripción JSON (si es una cadena, analizarla; si ya es un objeto, usarlo)
   const formatDescription = (description) => {
     try {
-      // If description is a string, try to parse it as JSON
+      // Si la descripción es una cadena, intentar analizarla como JSON
       const descObj = typeof description === 'string' 
         ? JSON.parse(description) 
         : description;
-      
-      // If it's a simple object, show key-value pairs
+
+      // Si es un objeto simple, mostrar pares clave-valor
       if (descObj && typeof descObj === 'object') {
         return (
           <div>
@@ -95,27 +96,27 @@ export const Resources = () => {
           </div>
         );
       }
-      
-      // Fallback if it's not in the expected format
+
+      // Alternativa si no está en el formato esperado
       return description;
       
     } catch (error) {
-      // If parsing fails, return the original string
+      // Si el análisis falla, devolver la cadena original
       return description;
     }
   };
 
-  // Handle delete button click
+  // Manejar clic en botón de eliminar
   const handleDeleteClick = (resource) => {
     setResourceToDelete(resource);
     setShowDeleteModal(true);
   };
 
-  // Handle edit button click
+  // Manejar clic en botón de editar
   const handleEditClick = (resource) => {
     setResourceToEdit(resource);
-    
-    // Prepare edit form with current values
+
+    // Preparar formulario de edición con valores actuales
     const descriptionStr = typeof resource.description === 'object' 
       ? JSON.stringify(resource.description) 
       : resource.description;
@@ -128,7 +129,7 @@ export const Resources = () => {
     setShowEditModal(true);
   };
 
-  // Handle Add button click
+  // Manejar clic en botón Agregar
   const handleAddClick = () => {
     setAddForm({
       name: "",
@@ -138,12 +139,12 @@ export const Resources = () => {
     setShowAddModal(true);
   };
 
-  // Handle confirm delete
+  // Manejar confirmación de eliminación
   const handleConfirmDelete = () => {
     if (!resourceToDelete) return;
     
     setIsLoading(true);
-    // Call API to delete resource
+    // Llamar a la API para eliminar recurso
     fetch(`https://rangerhub-back.vercel.app/resources/${resourceToDelete.id}`, {
       method: 'DELETE',
       headers: {
@@ -153,10 +154,8 @@ export const Resources = () => {
     .then(response => {
       return response.json().then(data => {
         if (!response.ok) {
-          // Handle 409 Conflict specifically (resource in use)
           if (response.status === 409) {
             setShowDeleteModal(false);
-            // Show more specific error with trip information
             setError(data.message || "Este recurso está en uso y no puede ser eliminado.");
             setIsLoading(false);
             return;
@@ -164,9 +163,9 @@ export const Resources = () => {
           throw new Error(data.message || 'Error al eliminar el recurso');
         }
         
-        // Success path
+
         setShowDeleteModal(false);
-        setError(null); // Clear any previous errors
+        setError(null);
         setSuccess(`Recurso "${resourceToDelete.name}" eliminado correctamente`);
         // Refresh resources
         fetchResources();
@@ -180,7 +179,7 @@ export const Resources = () => {
     });
   };
 
-  // Handle edit form change
+  // Manejar cambio en formulario de edición
   const handleEditFormChange = (e) => {
     const { name, value } = e.target;
     setEditForm({
@@ -189,7 +188,7 @@ export const Resources = () => {
     });
   };
 
-  // Handle add form change
+  // Manejar cambio en formulario de agregar
   const handleAddFormChange = (e) => {
     const { name, value } = e.target;
     setAddForm({
@@ -198,12 +197,12 @@ export const Resources = () => {
     });
   };
 
-  // Handle submit edit
+  // Manejar envío de edición
   const handleSubmitEdit = (e) => {
     e.preventDefault();
     if (!resourceToEdit) return;
-    
-    // Parse description as JSON if possible
+
+    // Analizar descripción como JSON si es posible
     let parsedDescription;
     try {
       parsedDescription = JSON.parse(editForm.description);
@@ -230,9 +229,8 @@ export const Resources = () => {
         if (!response.ok) {
           throw new Error(data.message || 'Error al actualizar el recurso');
         }
-        setError(null); // Clear any previous errors
+        setError(null);
         setSuccess(`Recurso "${editForm.name}" actualizado correctamente`);
-        // Refresh resources after successful update
         fetchResources();
         setShowEditModal(false);
       });
@@ -244,11 +242,9 @@ export const Resources = () => {
     });
   };
 
-  // Handle submit add
+  // Manejar envío de agregar
   const handleSubmitAdd = (e) => {
     e.preventDefault();
-    
-    // Parse description as JSON if possible
     let parsedDescription;
     try {
       parsedDescription = JSON.parse(addForm.description);
@@ -262,7 +258,7 @@ export const Resources = () => {
     };
     
     setIsLoading(true);
-    // Call API to create resource
+    // Llamar a la API para crear recurso
     fetch("https://rangerhub-back.vercel.app/resources", {
       method: 'POST',
       headers: {
@@ -275,9 +271,8 @@ export const Resources = () => {
         if (!response.ok) {
           throw new Error(data.message || 'Error al crear el recurso');
         }
-        setError(null); // Clear any previous errors
+        setError(null);
         setSuccess(`Recurso "${addForm.name}" creado correctamente`);
-        // Refresh resources after successful creation
         fetchResources();
         setShowAddModal(false);
       });
@@ -377,7 +372,7 @@ export const Resources = () => {
         </div>
       )}
 
-      {/* Delete Confirmation Modal */}
+      {/* Modal de Confirmación de Eliminación */}
       {showDeleteModal && (
         <div className="modal d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
           <div className="modal-dialog">
@@ -416,7 +411,7 @@ export const Resources = () => {
         </div>
       )}
 
-      {/* Edit Resource Modal */}
+      {/* Modal de Edición de Recurso */}
       {showEditModal && (
         <div className="modal d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
           <div className="modal-dialog">
@@ -495,7 +490,7 @@ export const Resources = () => {
         </div>
       )}
 
-      {/* Add New Resource Modal */}
+      {/* Modal de Edición de Recurso */}
       {showAddModal && (
         <div className="modal d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
           <div className="modal-dialog">
