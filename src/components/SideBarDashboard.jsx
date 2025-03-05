@@ -142,7 +142,7 @@ const SideBarDashboard = () => {
             <FontAwesomeIcon icon={faQuestionCircle} size="lg" />
           </Link>
           <Link
-              to={`/secured/${username}/configuracion`}
+              to={`/secured/${username}/dashboard/configuracion`}
               className="sidebar-icon"
           >
             <FontAwesomeIcon icon={faCog} size="lg" />
