@@ -70,8 +70,9 @@
 .extra-links {
     display: flex;
     justify-content: space-between;
-    font-size: 14px;
+    font-size: 17px;
     margin-bottom: 15px;
+    width: 100%;
 }
 
 .extra-links a {

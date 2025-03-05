@@ -308,7 +308,7 @@ const EditTripModal = ({ trip, show, onClose, onSave }) => {
               ></textarea>
             </div>
 
-            <div className="modal-footer">
+            <div className="modal-footer" style={{gap: "5px"}}>
               <button 
                 type="button" 
                 className="btn btn-secondary" 
