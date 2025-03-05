@@ -96,7 +96,51 @@ const TripDetailsModal = ({ trip, show, onClose }) => {
     }
   };
 
+  // Función para formatear una fecha recibida en formato ISO o similar
+  const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    
+    try {
+      // Intentar crear un objeto Date y formatear a dd/mm/yyyy
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return dateString; // Si no es una fecha válida, devolver el string original
+      
+      return date.toLocaleDateString('es-ES', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      });
+    } catch (error) {
+      console.error("Error al formatear fecha:", error);
+      return dateString;
+    }
+  };
+
+  // Función para calcular la duración basada en fecha de inicio y fin
+  const calculateDuration = () => {
+    if (!trip.start_date || !trip.end_date) return 'N/A';
+    
+    try {
+      const startDate = new Date(trip.start_date);
+      const endDate = new Date(trip.end_date);
+      
+      if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) return 'N/A';
+      
+      // Calcular diferencia en días
+      const diffTime = Math.abs(endDate - startDate);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      
+      return diffDays;
+    } catch (error) {
+      console.error("Error al calcular duración:", error);
+      return 'N/A';
+    }
+  };
+
   if (!show) return null;
+
+  // Registrar en la consola los datos del viaje para depuración
+  console.log("Trip data:", trip);
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
@@ -114,13 +158,14 @@ const TripDetailsModal = ({ trip, show, onClose }) => {
                 <strong>Precio:</strong> ${trip?.total_cost || 'N/A'}
               </div>
               <div className="trip-info-item">
-                <strong>Estado:</strong> {trip?.status || 'N/A'}
+                <strong>Estado:</strong> {trip?.trip_status || trip?.status || 'N/A'}
               </div>
               <div className="trip-info-item">
-                <strong>Fecha:</strong> {trip?.trip_date || 'N/A'}
+                <strong>Fecha:</strong> {trip?.start_date ? formatDate(trip.start_date) : 'N/A'}
+                {trip?.end_date ? ` - ${formatDate(trip.end_date)}` : ''}
               </div>
               <div className="trip-info-item">
-                <strong>Duración:</strong> {trip?.duration || 'N/A'} días
+                <strong>Duración:</strong> {calculateDuration()} días
               </div>
               <div className="trip-info-item col-span-2">
                 <strong>Descripción:</strong> {trip?.description || 'Sin descripción disponible'}
