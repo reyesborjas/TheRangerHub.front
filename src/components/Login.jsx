@@ -93,7 +93,7 @@ const Login = () => {
           </form>
 
           <div className="extra-links text-center mt-3">
-            <p>¿No tienes cuenta? <Link to="/signup">Regístrate aquí</Link></p>
+            <p className="registrate">¿No tienes cuenta? <Link to="/signup">Regístrate aquí</Link></p>
           </div>
         </div>
       </div>

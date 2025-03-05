@@ -69,10 +69,8 @@
 
 .extra-links {
     display: flex;
-    justify-content: space-between;
     font-size: 17px;
     margin-bottom: 15px;
-    width: 100%;
 }
 
 .extra-links a {
@@ -132,3 +130,10 @@ body {
   .form-control{
     height: 30px;
   }
+
+.registrate {    
+    width: 350px;
+    text-align: center;
+    align-items: center;
+    margin-top: 10px;
+}

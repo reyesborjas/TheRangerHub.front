@@ -270,7 +270,7 @@ const SignUp = () => {
             </form>
 
             <div className="extra-links">
-              <p>¿Ya tienes una cuenta? <Link to="/login">Inicia sesión aquí</Link></p>
+              <p className="login">¿Ya tienes una cuenta? <Link to="/login">Inicia sesión aquí</Link></p>
             </div>
           </div>
         </div>
