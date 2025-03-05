@@ -606,6 +606,7 @@ const CreateTrip = () => {
                     className="form-control btn-dark"
                     accept="image/*"
                     onChange={handleImageUpload}
+                    style={{height:"60px", paddingLeft: "20px", paddingTop:"15px"}}
                   />
                 </div>
               </div>

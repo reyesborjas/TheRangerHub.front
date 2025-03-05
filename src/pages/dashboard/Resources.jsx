@@ -547,7 +547,7 @@ export const Resources = () => {
                       required
                     />
                   </div>
-                  <div className="modal-footer p-0 pt-3">
+                  <div className="modal-footer p-0 pt-3" style={{backgroundColor:"white", borderColor:"white"}}>
                     <button 
                       type="button" 
                       className="btn btn-secondary" 
