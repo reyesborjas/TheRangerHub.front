@@ -15,7 +15,7 @@ const CreateTrip = () => {
     trip_name: "",
     start_date: "",
     end_date: "",
-    participants_number: "",
+    max_participants_number: "",
     trip_status: "pending",
     estimated_weather_forecast:
       "Temperatura mínima:  Temperatura máxima: Expectativas de lluvias (si/no): ",
@@ -89,7 +89,7 @@ const CreateTrip = () => {
       value += "T00:00:00Z";
     }
 
-    if (["participants_number", "total_cost"].includes(name)) {
+    if (["max_participants_number", "total_cost"].includes(name)) {
       value = Number(value);
     }
 
@@ -214,15 +214,26 @@ const CreateTrip = () => {
       // Filtrar recursos vacíos
       const resourcesList = formData.resources.filter(resource => resource !== "");
   
+      // Preparar los datos correctamente para el backend
+      const tripPayload = {
+        trip_name: formData.trip_name,
+        start_date: formData.start_date,
+        end_date: formData.end_date,
+        // La columna se llama max_participants_number, no participants_number
+        max_participants_number: formData.participants_number,
+        trip_status: formData.trip_status,
+        estimated_weather_forecast: formData.estimated_weather_forecast,
+        description: formData.description,
+        total_cost: formData.total_cost,
+        trip_image_url: formData.trip_image_url,
+        lead_ranger: formData.lead_ranger
+      };
+
       // Enviar datos básicos del viaje
       const tripResponse = await fetch("https://rangerhub-back.vercel.app/trips", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...formData,
-          activities: undefined, // Excluir actividades del payload
-          resources: undefined, // Excluir recursos del payload
-        }),
+        body: JSON.stringify(tripPayload),
       });
   
       if (!tripResponse.ok) {
@@ -275,7 +286,7 @@ const CreateTrip = () => {
         throw new Error(`${failedResources.length} recursos no se pudieron asociar`);
       }
   
-      navigate("/dashboard/trips");
+      navigate("../trips", { relative: "route" });
     } catch (error) {
       console.error("Error completo:", error);
       alert(error.message);
@@ -330,7 +341,7 @@ const CreateTrip = () => {
                   <input
                     type="number"
                     className="form-control"
-                    name="participants_number"
+                    name="max_participants_number"
                     onChange={handleChange}
                     required
                   />
