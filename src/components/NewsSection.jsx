@@ -31,7 +31,7 @@ const NewsSection = () => {
 
     return (
         <section className="news-section py-5">
-            <div className="container">
+            <div className="container" style={{marginTop: "0px"}}>
                 <h2 className="text-center mb-5">Noticias Recientes</h2>
 
                 <div className="row">

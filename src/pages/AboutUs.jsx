@@ -13,12 +13,12 @@ const AboutUs = () => {
             <MyNavbar />
             <div className="row" id="aboutUs-container">
                 <div className="col-12 text-center">
-                    <br/>
-                    <br/>
-                    <br/>
-                    <br/>
-                    <h1>Conectámos el Mundo a Través de la Aventura <br/>como Ranger o Explorer</h1>
-                    <br/>
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    <h1>Conectámos el Mundo a Través de la Aventura <br />como Ranger o Explorer</h1>
+                    <br />
                     <h5>
                         ¡No nacimos para quedarnos quietos!<br />
                         La verdadera magia ocurre cuando exploramos, cuando nos atrevemos a descubrir lo desconocido. En The Ranger Hub, rompemos las barreras entre guías apasionados y viajeros intrépidos, creando una red global de experiencias inolvidables. Cada rincón del mundo cobra vida a través de quienes lo conocen mejor.”
@@ -35,4 +35,3 @@ const AboutUs = () => {
 };
 
 export default AboutUs;
-  

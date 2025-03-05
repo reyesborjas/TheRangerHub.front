@@ -1,7 +1,10 @@
 import React from "react";
 import "../styles/CtaSections.css";
+import {useNavigate } from "react-router-dom";
+
 
 const CtaSection = () => {
+    const navigate = useNavigate();
     return (
         <section className="cta-section">
             <div className="cta-content">
@@ -15,6 +18,7 @@ const CtaSection = () => {
                         className="btn btn-ranger"
                         onMouseEnter={() => setBackgroundImage("/public/ranger.jpg")}
                         onMouseLeave={() => setBackgroundImage("/Torres.jpeg")}
+                        onClick={() => navigate("/signup")}
                     >
                         Únete
                     </button>
@@ -22,6 +26,7 @@ const CtaSection = () => {
                         className="btn btn-explorer"
                         onMouseEnter={() => setBackgroundImage("/public/explorer.jpg")}
                         onMouseLeave={() => setBackgroundImage("/Torres.jpeg")}
+                        onClick={() => navigate("/signup")}
                     >
                         Explora
                     </button>

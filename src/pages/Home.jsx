@@ -6,9 +6,11 @@ import "../styles/HeroSection.css";
 import CtaSection from "../components/CtaSection.jsx";
 import Footer from "../components/Footer.jsx";
 import MyNavbar from "../components/Navbar.jsx";
+import { useNavigate } from "react-router-dom";
 
 const HeroSection = () => {
     const [backgroundImage, setBackgroundImage] = useState("/Torres.jpeg");
+    const navigate = useNavigate();
 
     return (
         <section
@@ -26,6 +28,7 @@ const HeroSection = () => {
                         className="btn-ranger"
                         onMouseEnter={() => setBackgroundImage("/public/ranger.jpg")}
                         onMouseLeave={() => setBackgroundImage("/Torres.jpeg")}
+                        onClick={() => navigate("/signup")}
                     >
                         Conviértete en Ranger
                     </button>
@@ -33,6 +36,7 @@ const HeroSection = () => {
                         className="btn-explorer"
                         onMouseEnter={() => setBackgroundImage("/public/explorer.jpg")}
                         onMouseLeave={() => setBackgroundImage("/Torres.jpeg")}
+                        onClick={() => navigate("/signup")}
                     >
                         Encuentra tu próxima aventura
                     </button>

@@ -47,7 +47,7 @@ const AboutFeatures = () => {
     ];
 
     return (
-        <div className="container py-5">
+        <div className="container py-5"style={{marginTop:"0px"}}>
             <div className="row g-4">
                 {features.map((feature, index) => (
                     <div key={index} className="col-md-4 d-flex">
