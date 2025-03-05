@@ -1,0 +1,260 @@
+/* styles/Rangers.css */
+.rangers-container {
+    padding: 2rem 1rem;
+}
+
+.rangers-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+.rangers-title {
+    color: #2a9d8f;
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.rangers-subtitle {
+    color: #666;
+    max-width: 700px;
+    margin: 0 auto 1.5rem;
+}
+
+.rangers-filters {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.filter-btn {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    padding: 0.5rem 1.25rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    color: #495057;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.filter-btn:hover {
+    background-color: #e9ecef;
+}
+
+.filter-btn.active {
+    background-color: #2a9d8f;
+    color: white;
+    border-color: #2a9d8f;
+}
+
+/* Modal de detalles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1050;
+}
+
+.ranger-modal {
+    border-radius: 12px;
+    overflow: hidden;
+    max-width: 90vw;
+    animation: fadeInZoom 0.3s ease;
+}
+
+@keyframes fadeInZoom {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.modal-header {
+    border-bottom: 1px solid #e9ecef;
+    padding: 1.25rem 1.5rem;
+}
+
+.modal-header .modal-title {
+    color: #2a9d8f;
+    font-weight: 600;
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.modal-footer {
+    border-top: 1px solid #e9ecef;
+    padding: 1.25rem 1.5rem;
+}
+
+/* Detalles del Ranger en el Modal */
+.ranger-detail-photo {
+    position: relative;
+    overflow: hidden;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+}
+
+.ranger-detail-photo img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+}
+
+.status-indicator {
+    position: absolute;
+    bottom: 10px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 0.25rem;
+    font-size: 0.8rem;
+}
+
+.status-indicator.available {
+    background-color: rgba(42, 157, 143, 0.8);
+}
+
+.status-indicator.unavailable {
+    background-color: rgba(230, 57, 70, 0.8);
+}
+
+.ranger-detail-contact {
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-top: 1rem;
+}
+
+.ranger-detail-contact h6 {
+    color: #2a9d8f;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+.ranger-detail-contact p {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.ranger-detail-contact i {
+    color: #2a9d8f;
+    font-size: 1rem;
+}
+
+.ranger-detail-header {
+    margin-bottom: 1.5rem;
+}
+
+.ranger-detail-header h3 {
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+.ranger-detail-title {
+    color: #666;
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+}
+
+.ranger-detail-rating {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #2a9d8f;
+    font-weight: 600;
+}
+
+.ranger-detail-rating i {
+    color: #f39c12;
+}
+
+.trips-count {
+    color: #777;
+    font-weight: normal;
+    font-size: 0.9rem;
+}
+
+.ranger-detail-bio {
+    margin-bottom: 1.5rem;
+}
+
+.ranger-detail-bio h6,
+.spec-section h6 {
+    color: #2a9d8f;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.ranger-detail-specs {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.spec-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.spec-tag {
+    background-color: rgba(42, 157, 143, 0.1);
+    color: #2a9d8f;
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+}
+
+/* Botones */
+.btn-primary {
+    background-color: #2a9d8f;
+    border-color: #2a9d8f;
+}
+
+.btn-primary:hover {
+    background-color: #21867b;
+    border-color: #21867b;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .rangers-grid {
+        padding: 0 0.5rem;
+    }
+
+    .rangers-title {
+        font-size: 1.75rem;
+    }
+
+    .rangers-filters {
+        flex-wrap: wrap;
+    }
+
+    .modal-dialog {
+        margin: 0.5rem;
+    }
+
+    .ranger-detail-photo {
+        max-width: 200px;
+        margin: 0 auto 1rem;
+    }
+}

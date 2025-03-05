@@ -15,6 +15,7 @@ import { Resources } from "./pages/dashboard/Resources.jsx";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import { MyTrips } from "./pages/dashboard/MyTrips.jsx";
 import {Settings} from "./pages/dashboard/Settings.jsx";
+import Rangers from "./pages/dashboard/Rangers.jsx";
 
 function App() {
   return (
@@ -36,6 +37,7 @@ function App() {
             <Route path="mytrips" element={<MyTrips />} />
             <Route path="activities" element={<Activities />} />
             <Route path="resources" element={<Resources />} />
+            <Route path="rangers" element={<Rangers />} />
             <Route path="configuracion" element={<Settings />} />
           </Route>
 

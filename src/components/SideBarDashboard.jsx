@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useNavigate } from "react-router-dom";
 import {
   faHome, faSuitcase, faMap, faBicycle, faBook,
-  faCloudSun, faCog, faQuestionCircle, faSignOutAlt
+  faCloudSun, faCog, faQuestionCircle, faSignOutAlt,faUser
 } from "@fortawesome/free-solid-svg-icons";
 
 const SideBarDashboard = () => {
@@ -103,6 +103,12 @@ const SideBarDashboard = () => {
               className="nav-link"
           >
             <FontAwesomeIcon icon={faMap} /> Viajes
+          </Link>
+          <Link
+              to={`/secured/${username}/dashboard/rangers`}
+              className="nav-link"
+          >
+            <FontAwesomeIcon icon={faUser} /> Rangers
           </Link>
           <Link
               to={`/secured/${username}/dashboard/activities`}
