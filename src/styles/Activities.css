@@ -35,27 +35,23 @@
   background-color: var(--primary-color-hover);
 }
 
-.activity-card,
-.modal-content {
+/* Tarjeta de actividad */
+.activity-card {
   background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   display: flex;
   flex-direction: column;
   height: 100%;
 }
 
-.modal-content {
-  border-radius: 10px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+.activity-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
 }
 
-.new-layout {
-  display: flex;
-  flex-direction: column;
-}
-
+/* Imagen de la actividad */
 .activity-image-container {
   position: relative;
   width: 100%;
@@ -71,6 +67,43 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.activity-card:hover .cover-img {
+  transform: scale(1.05);
+}
+
+.activity-card:hover .activity-actions {
+  opacity: 1;
+}
+
+.edit-btn,
+.delete-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.edit-btn i {
+  color: var(--edit-color);
+}
+
+.delete-btn i {
+  color: var(--delete-color);
+}
+
+.edit-btn:hover,
+.delete-btn:hover {
+  transform: scale(1.1);
+  opacity: 1;
 }
 
 .activity-content {
@@ -138,103 +171,20 @@
   background-color: #f0f0f0;
 }
 
+
 @media (max-width: 768px) {
   .activity-image-container {
     height: 180px;
   }
 }
 
-.activity-actions {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  display: flex;
-  gap: 8px;
-  z-index: 100;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.3s ease, visibility 0.3s ease;
-}
-
-.activity-image-container:hover .activity-actions {
-  opacity: 1;
-  visibility: visible;
-}
-
-.edit-btn,
-.delete-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-}
-
-.edit-btn {
-  background-color: var(--edit-color);
-}
-
-.delete-btn {
-  background-color: var(--delete-color);
-}
-
-.edit-btn i,
-.delete-btn i {
-  color: white;
-  font-size: 14px;
-}
-
-.edit-btn:hover,
-.delete-btn:hover {
-  opacity: 1;
-  transform: scale(1.1);
-}
-
-.modal-header {
-  background-color: var(--secondary-color);
-  border-bottom: 1px solid var(--border-color);
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
-}
-
-.modal-title {
-  font-weight: 600;
-  color: var(--text-color);
-}
-
-.modal-footer {
-  border-top: 1px solid var(--border-color);
-  padding: 1rem;
-}
-
-.form-control:focus,
-.form-select:focus {
-  border-color: #80bdff;
-  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-}
-
-.btn-primary {
-  background-color: var(--primary-button);
-  border-color: var(--primary-button);
-}
-
-.btn-primary:hover {
-  background-color: var(--primary-button-hover);
-  border-color: var(--primary-button-hover);
-}
-
-.btn-secondary {
-  background-color: var(--secondary-button);
-  border-color: var(--secondary-button);
-}
-
-.btn-secondary:hover {
-  background-color: var(--secondary-button-hover);
-  border-color: var(--secondary-button-hover);
+@keyframes slideUp {
+  from {
+      opacity: 0;
+      transform: translateY(20px);
+  }
+  to {
+      opacity: 1;
+      transform: translateY(0);
+  }
 }
