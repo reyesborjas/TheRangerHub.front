@@ -1,3 +1,19 @@
+:root {
+  --primary-color: #2a9d8f;
+  --primary-color-hover: #21867b;
+  --secondary-color: #f8f9fa;
+  --border-color: #e9ecef;
+  --text-color: #343a40;
+  --text-color-light: #555;
+  --text-color-disabled: #999;
+  --edit-color: #ffc107;
+  --delete-color: #dc3545;
+  --primary-button: #0d6efd;
+  --primary-button-hover: #0b5ed7;
+  --secondary-button: #6c757d;
+  --secondary-button-hover: #5c636a;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -8,7 +24,7 @@
 }
 
 .btn-search {
-  background-color: #2a9d8f;
+  background-color: var(--primary-color);
   color: #fff;
   border: none;
   border-radius: 0 5px 5px 0;
@@ -16,29 +32,35 @@
 }
 
 .btn-search:hover {
-  background-color: #21867b;
+  background-color: var(--primary-color-hover);
 }
 
-.activity-card {
+.activity-card,
+.modal-content {
   background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
   overflow: hidden;
-  height: 100%;
   display: flex;
   flex-direction: column;
+  height: 100%;
 }
 
-/* Nuevo estilo para layout vertical */
+.modal-content {
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
 .new-layout {
   display: flex;
   flex-direction: column;
 }
 
 .activity-image-container {
+  position: relative;
   width: 100%;
   height: 220px;
-  background: #f8f9fa;
+  background: var(--secondary-color);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -65,8 +87,16 @@
 .activity-title {
   margin: 0;
   font-size: 1.5rem;
-  color: #2a9d8f;
+  color: var(--primary-color);
   font-weight: bold;
+}
+
+.activity-details,
+.difficulty-section,
+.cost-section,
+.activity-difficulty,
+.activity-cost {
+  font-size: 1.1rem;
 }
 
 .activity-details {
@@ -76,16 +106,7 @@
   margin-bottom: 1rem;
 }
 
-.difficulty-section, .cost-section {
-  font-size: 1.1rem;
-}
-
-.activity-difficulty {
-  font-size: 1.1rem;
-}
-
 .activity-cost {
-  font-size: 1.1rem;
   font-weight: 500;
 }
 
@@ -101,7 +122,7 @@
 
 .activity-description {
   margin: 0;
-  color: #555;
+  color: var(--text-color-light);
   font-size: 1rem;
   line-height: 1.5;
 }
@@ -109,7 +130,7 @@
 .no-image {
   width: 100%;
   height: 100%;
-  color: #999;
+  color: var(--text-color-disabled);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -121,4 +142,99 @@
   .activity-image-container {
     height: 180px;
   }
+}
+
+.activity-actions {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  gap: 8px;
+  z-index: 100;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.activity-image-container:hover .activity-actions {
+  opacity: 1;
+  visibility: visible;
+}
+
+.edit-btn,
+.delete-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.edit-btn {
+  background-color: var(--edit-color);
+}
+
+.delete-btn {
+  background-color: var(--delete-color);
+}
+
+.edit-btn i,
+.delete-btn i {
+  color: white;
+  font-size: 14px;
+}
+
+.edit-btn:hover,
+.delete-btn:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.modal-header {
+  background-color: var(--secondary-color);
+  border-bottom: 1px solid var(--border-color);
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+
+.modal-title {
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.modal-footer {
+  border-top: 1px solid var(--border-color);
+  padding: 1rem;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #80bdff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.btn-primary {
+  background-color: var(--primary-button);
+  border-color: var(--primary-button);
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-button-hover);
+  border-color: var(--primary-button-hover);
+}
+
+.btn-secondary {
+  background-color: var(--secondary-button);
+  border-color: var(--secondary-button);
+}
+
+.btn-secondary:hover {
+  background-color: var(--secondary-button-hover);
+  border-color: var(--secondary-button-hover);
 }

@@ -79,6 +79,7 @@ const EditTripModal = ({ trip, show, onClose, onSave }) => {
     setIsLoadingActivities(true);
     try {
       // Obtener todas las actividades
+      console.log("Obteniendo actividades...");
       const response = await fetch('https://rangerhub-back.vercel.app/activities');
       
       if (!response.ok) {
@@ -86,42 +87,53 @@ const EditTripModal = ({ trip, show, onClose, onSave }) => {
       }
       
       const data = await response.json();
+      console.log(`Se obtuvieron ${data.activities?.length || 0} actividades`);
       
-      // Obtener información de ubicación para cada actividad
-      const activitiesWithLocations = await Promise.all((data.activities || []).map(async (activity) => {
+      // Obtener todas las ubicaciones en una sola llamada
+      console.log("Obteniendo todas las ubicaciones...");
+      const locationsResponse = await fetch('https://rangerhub-back.vercel.app/locations?per_page=100');
+      
+      if (!locationsResponse.ok) {
+        throw new Error('Error al cargar las ubicaciones');
+      }
+      
+      const locationsData = await locationsResponse.json();
+      console.log(`Se obtuvieron ${locationsData.locations?.length || 0} ubicaciones`);
+      
+      // Crear mapa de ubicaciones por ID
+      const locationsMap = new Map();
+      (locationsData.locations || []).forEach(location => {
+        locationsMap.set(location.id, location);
+      });
+      
+      // Procesar cada actividad con su ubicación correspondiente
+      const activitiesWithLocations = (data.activities || []).map(activity => {
+        console.log(`Procesando actividad ${activity.id}, location_id: ${activity.location_id || 'NINGUNO'}`);
+        
+        // Si no hay location_id, devolver sin ubicación
         if (!activity.location_id) {
-          return { ...activity, locationName: 'Sin ubicación' };
+          return { ...activity, place_name: 'Sin ubicación' };
         }
         
-        try {
-          // Obtener detalles de la ubicación
-          const locationResponse = await fetch(`https://rangerhub-back.vercel.app/locations?id=${activity.location_id}`);
-          
-          if (!locationResponse.ok) {
-            console.warn(`No se pudo obtener la ubicación para actividad ${activity.id}`);
-            return { ...activity, locationName: 'Ubicación no disponible' };
-          }
-          
-          const locationData = await locationResponse.json();
-          
-          if (locationData.locations && locationData.locations.length > 0) {
-            const location = locationData.locations[0];
-            console.log(`Ubicación encontrada para actividad ${activity.id}:`, location.place_name);
-            return {
-              ...activity,
-              locationName: location.place_name
-            };
-          } else {
-            console.warn(`No se encontró la ubicación para actividad ${activity.id}`);
-            return { ...activity, locationName: 'Ubicación no encontrada' };
-          }
-        } catch (error) {
-          console.error(`Error al obtener ubicación para actividad ${activity.id}:`, error);
-          return { ...activity, locationName: 'Error al cargar ubicación' };
+        // Buscar la ubicación en el mapa
+        const location = locationsMap.get(activity.location_id);
+        
+        if (location) {
+          console.log(`✅ Ubicación encontrada para actividad ${activity.id}: ${location.place_name}`);
+          return {
+            ...activity,
+            place_name: location.place_name
+          };
+        } else {
+          console.warn(`❌ No se encontró ubicación para actividad ${activity.id} con location_id ${activity.location_id}`);
+          return { 
+            ...activity, 
+            place_name: `Ubicación no encontrada (ID: ${activity.location_id.substring(0, 8)}...)`
+          };
         }
-      }));
+      });
       
-      console.log("Actividades con ubicaciones:", activitiesWithLocations);
+      console.log("Actividades procesadas con ubicaciones:", activitiesWithLocations);
       setAllActivities(activitiesWithLocations);
     } catch (error) {
       console.error('Error al cargar actividades:', error);
@@ -513,7 +525,7 @@ const EditTripModal = ({ trip, show, onClose, onSave }) => {
                         <option value="">Seleccionar actividad para agregar</option>
                         {availableActivities.map(activity => (
                           <option key={activity.id} value={activity.id}>
-                            {activity.name} - {activity.locationName || 'Sin ubicación'}
+                            {activity.name} - {activity.place_name || 'Sin ubicación'}
                           </option>
                         ))}
                       </select>

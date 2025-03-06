@@ -1,0 +1,90 @@
+/* Estilos para los botones de acción en las tarjetas de actividades */
+.activity-image-container {
+    position: relative;
+    overflow: hidden;
+}
+
+.activity-actions {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    gap: 8px;
+}
+
+.edit-btn, .delete-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    opacity: 0.8;
+}
+
+.edit-btn {
+    background-color: #ffc107; /* Color amarillo para editar */
+}
+
+.delete-btn {
+    background-color: #dc3545; /* Color rojo para eliminar */
+}
+
+.edit-btn:hover, .delete-btn:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+/* Estilos adicionales para el modal */
+.modal-content {
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.modal-title {
+    font-weight: 600;
+    color: #343a40;
+}
+
+.modal-footer {
+    border-top: 1px solid #e9ecef;
+    padding: 1rem;
+}
+
+/* Ajustes para formularios dentro del modal */
+.form-control:focus, .form-select:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Botones del formulario */
+.btn-primary {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.btn-primary:hover {
+    background-color: #0b5ed7;
+    border-color: #0a58ca;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+
+.btn-secondary:hover {
+    background-color: #5c636a;
+    border-color: #565e64;
+}
