@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
 import "../../styles/MyTrips.css";
 import "../../styles/TripDetailsModal.css";
-import TripDetailsModal from "./TripDetailsModal"; // Importamos el componente modal
+import TripDetailsModal from "./TripDetailsModal";
+import PaymentModal from './PaymentModal'; 
 
 export const MyTrips = () => {
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [selectedTripForPayment, setSelectedTripForPayment] = useState(null);
   const [userReservations, setUserReservations] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [userRole, setUserRole] = useState(null);
@@ -181,14 +184,19 @@ export const MyTrips = () => {
                           {userRole === "Explorer" ? (
                               <div className="card-footer button-group">
                                 <button
-                                    onClick={() => handleReservation(trip.id, "pay")}
-                                    className="btn btn-pay"
-                                    disabled={reserving.tripId === trip.id && reserving.action === "pay"}
-                                >
-                                  {reserving.tripId === trip.id && reserving.action === "pay"
-                                      ? "Procesando..."
-                                      : "Pagar"}
-                                </button>
+                                        onClick={(e) => {
+                                            e.preventDefault(); // Prevenir el comportamiento predeterminado
+                                            e.stopPropagation(); // Detener la propagación del evento
+                                            setSelectedTripForPayment(trip);
+                                            setShowPaymentModal(true);
+                                        }}
+                                        className="btn btn-pay"
+                                        disabled={reserving.tripId === trip.id && reserving.action === "pay"}
+                                    >
+                                        {reserving.tripId === trip.id && reserving.action === "pay"
+                                            ? "Procesando..."
+                                            : "Pagar"}
+                                    </button>
                                 <button
                                     onClick={() => handleReservation(trip.id, "cancel")}
                                     className="btn btn-cancel"
@@ -228,6 +236,18 @@ export const MyTrips = () => {
             onClose={handleCloseModal} 
           />
         )}
+        {/* Modal de Pago */}
+              {showPaymentModal && (
+                  <PaymentModal 
+                      show={showPaymentModal}
+                      onClose={() => {
+                          setShowPaymentModal(false);
+                          setSelectedTripForPayment(null);
+                      }}
+                      trip={selectedTripForPayment}
+                      userId={userId}
+                  />
+              )}
       </div>
   );
 };
