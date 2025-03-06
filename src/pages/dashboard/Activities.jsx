@@ -47,9 +47,7 @@ export const Activities = () => {
 
     return (
         <div className="activities-container container">
-            <h1 className="text-center my-4">
-                Actividades que Tenemos para Ofrecer
-            </h1>
+            <h1 className="text-center my-4">Actividades que Tenemos para Ofrecer</h1>
             <div className="row justify-content-center mb-4">
                 <div className="col-md-6">
                     <div className="input-group">
@@ -60,17 +58,11 @@ export const Activities = () => {
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
-                        <button className="btn btn-search" type="button">
-                            Buscar
-                        </button>
+                        <button className="btn btn-search" type="button">Buscar</button>
                     </div>
                 </div>
             </div>
-            {error && (
-                <div className="alert alert-danger text-center" role="alert">
-                    {error}
-                </div>
-            )}
+            {error && <div className="alert alert-danger text-center" role="alert">{error}</div>}
             {isLoading ? (
                 <div className="d-flex justify-content-center my-5">
                     <div className="spinner-border text-primary" role="status">
@@ -78,11 +70,11 @@ export const Activities = () => {
                     </div>
                 </div>
             ) : filteredActivities.length > 0 ? (
-                <div className="row row-cols-1 row-cols-md-2 g-5">
+                <div className="row row-cols-1 row-cols-md-3 g-4">
                     {filteredActivities.map((activity, index) => (
                         <div className="col" key={activity.id || index}>
-                            <div className="activity-card d-flex flex-row">
-                                <div className="activity-image">
+                            <div className="activity-card new-layout">
+                                <div className="activity-image-container">
                                     {activity.activity_image_url ? (
                                         <img
                                             src={activity.activity_image_url}
@@ -93,22 +85,24 @@ export const Activities = () => {
                                         <div className="no-image">Sin imagen</div>
                                     )}
                                 </div>
-                                <div className="activity-info p-3">
-                                    <h3 className="activity-title">{activity.name}</h3>
-                                    <hr />
-                                    <p
-                                        className={`activity-difficulty ${getDifficultyClass(
-                                            activity.difficulty
-                                        )}`}
-                                    >
-                                        Dificultad: {activity.difficulty || "N/A"}
-                                    </p>
-                                    <hr />
-                                    <p className="activity-cost">
-                                        Costo: ${activity.cost || "0"}
-                                    </p>
-                                    <hr />
-                                    <p className="activity-description">{activity.description}</p>
+                                <div className="activity-content">
+                                    <div className="activity-header">
+                                        <h3 className="activity-title">{activity.name}</h3>
+                                    </div>
+                                    <div className="activity-details">
+                                        <div className="difficulty-section">
+                                            <span className={`activity-difficulty ${getDifficultyClass(activity.difficulty)}`}>
+                                                Dificultad: {activity.difficulty || "N/A"}
+                                            </span>
+                                        </div>
+                                        <div className="cost-section">
+                                            <span className="activity-cost">Costo: ${activity.cost || "0"}</span>
+                                        </div>
+                                    </div>
+                                    <hr className="divider" />
+                                    <div className="description-section">
+                                        <p className="activity-description">{activity.description}</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
