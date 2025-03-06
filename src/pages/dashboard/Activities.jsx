@@ -15,7 +15,8 @@ export const Activities = () => {
     const [showEditModal, setShowEditModal] = useState(false);
     const [currentActivityToEdit, setCurrentActivityToEdit] = useState(null);
 
-    useEffect(() => {
+    const fetchActivities = () => {
+        setIsLoading(true);
         fetch("https://rangerhub-back.vercel.app/activities")
             .then((response) => {
                 if (!response.ok) {
@@ -31,6 +32,10 @@ export const Activities = () => {
                 setError("No se pudieron cargar las actividades");
             })
             .finally(() => setIsLoading(false));
+    };
+
+    useEffect(() => {
+        fetchActivities();
     }, []);
 
     const filteredActivities = activities.filter(
@@ -61,6 +66,38 @@ export const Activities = () => {
         } else {
             console.error("No se encontró la actividad con ID:", activityId);
         }
+    };
+    
+    // Definir la función handleActivityUpdate
+    const handleActivityUpdate = (updatedActivity) => {
+        fetch(`https://rangerhub-back.vercel.app/activities/${updatedActivity.id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(updatedActivity),
+        })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => {
+                        throw new Error(err.message || "Error al actualizar la actividad");
+                    });
+                }
+                return response.json();
+            })
+            .then((data) => {
+                // Actualizar la lista de actividades
+                setActivities(activities.map(activity => 
+                    activity.id === updatedActivity.id ? data.activity || updatedActivity : activity
+                ));
+                setShowEditModal(false);
+                setCurrentActivityToEdit(null);
+                alert("Actividad actualizada con éxito");
+            })
+            .catch(error => {
+                console.error("Error al actualizar actividad:", error);
+                alert(error.message || "Hubo un error al actualizar la actividad");
+            });
     };
     
     const handleDelete = (activityId) => {
@@ -180,7 +217,7 @@ export const Activities = () => {
             {/* Modal de edición */}
             {showEditModal && (
                 <EditActivityModal
-                    trip={currentActivityToEdit}
+                    activity={currentActivityToEdit}
                     show={showEditModal}
                     onClose={() => {
                         setShowEditModal(false);

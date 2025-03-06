@@ -1,242 +1,415 @@
-import { useState, useEffect } from "react";
-import { Modal, Button, Form } from "react-bootstrap";
+import React, { useState, useEffect } from 'react';
+import { Modal, Button, Form, InputGroup, ListGroup } from 'react-bootstrap';
 
 const EditActivityModal = ({ activity, show, onClose, onSave }) => {
-  const [formData, setFormData] = useState({
-    name: "",
-    description: "",
-    difficulty: "",
-    cost: "",
-    duration: "",
-    min_participants: "",
-    max_participants: "",
-    activity_image_url: "",
-    is_available: true,
-    is_public: true,
-    category_id: "",
-    location_id: ""
-  });
-
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    if (activity) {
-      setFormData({
-        name: activity.name || "",
-        description: activity.description || "",
-        difficulty: activity.difficulty || "",
-        cost: activity.cost || "",
-        duration: activity.duration || "",
-        min_participants: activity.min_participants || "",
-        max_participants: activity.max_participants || "",
-        activity_image_url: activity.activity_image_url || "",
-        is_available: activity.is_available !== false,
-        is_public: activity.is_public !== false,
-        category_id: activity.category_id || "",
-        location_id: activity.location_id || ""
-      });
-    }
-  }, [activity]);
-
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
-      [name]: type === "checkbox" ? checked : value
+    const [formData, setFormData] = useState({
+        name: '',
+        description: '',
+        duration: 0,
+        difficulty: '',
+        min_participants: 0,
+        max_participants: 0,
+        cost: 0,
+        activity_image_url: '',
+        is_available: true,
+        is_public: true,
+        category_id: '',
+        location_id: ''
     });
-  };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setError(null);
+    const [categories, setCategories] = useState([]);
+    const [locations, setLocations] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [locationSearch, setLocationSearch] = useState('');
+    const [searchResults, setSearchResults] = useState([]);
+    const [isSearching, setIsSearching] = useState(false);
+    const [selectedLocation, setSelectedLocation] = useState(null);
 
-    try {
-      const response = await fetch(
-        `https://rangerhub-back.vercel.app/activities/${activity.id}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            ...formData,
-            cost: parseFloat(formData.cost),
-            duration: parseFloat(formData.duration),
-            min_participants: parseInt(formData.min_participants, 10),
-            max_participants: parseInt(formData.max_participants, 10)
-          })
+    useEffect(() => {
+        // Cargar datos de la actividad cuando se abre el modal
+        if (activity) {
+            console.log("Actividad a editar:", activity); // Depurar datos recibidos
+            
+            setFormData({
+                id: activity.id,
+                name: activity.name || '',
+                description: activity.description || '',
+                duration: activity.duration || 0,
+                difficulty: activity.difficulty || '',
+                min_participants: activity.min_participants || 0,
+                max_participants: activity.max_participants || 0,
+                cost: activity.cost || 0,
+                activity_image_url: activity.activity_image_url || '',
+                is_available: activity.is_available !== undefined ? activity.is_available : true,
+                is_public: activity.is_public !== undefined ? activity.is_public : true,
+                category_id: activity.category_id || '',
+                location_id: activity.location_id || ''
+            });
+
+            // Si hay un location_id, buscar los detalles de esa ubicación
+            if (activity.location_id) {
+                console.log("Buscando ubicación con ID:", activity.location_id);
+                fetchLocationDetails(activity.location_id);
+            }
         }
-      );
+    }, [activity]);
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Error al actualizar la actividad");
-      }
+    const fetchLocationDetails = async (locationId) => {
+        try {
+            console.log(`Buscando ubicación con ID: ${locationId}`);
+            
+            // Intentamos obtener todas las ubicaciones primero
+            const response = await fetch(`https://rangerhub-back.vercel.app/locations?per_page=100`);
+            if (response.ok) {
+                const data = await response.json();
+                console.log(`Recibidas ${data.locations ? data.locations.length : 0} ubicaciones`);
+                
+                if (data.locations && data.locations.length > 0) {
+                    // Convertimos IDs a string para asegurar una comparación correcta
+                    const stringLocationId = String(locationId);
+                    const exactLocation = data.locations.find(loc => String(loc.id) === stringLocationId);
+                    
+                    if (exactLocation) {
+                        console.log(`Ubicación encontrada:`, exactLocation);
+                        setSelectedLocation(exactLocation);
+                        return;
+                    } else {
+                        console.log(`No se encontró ubicación exacta con ID: ${locationId}`);
+                        
+                        // Si no encontramos la ubicación exacta, intentamos con búsqueda específica
+                        const searchResponse = await fetch(`https://rangerhub-back.vercel.app/locations?search=${encodeURIComponent(locationId)}`);
+                        if (searchResponse.ok) {
+                            const searchData = await searchResponse.json();
+                            if (searchData.locations && searchData.locations.length > 0) {
+                                console.log(`Se encontró ubicación mediante búsqueda:`, searchData.locations[0]);
+                                setSelectedLocation(searchData.locations[0]);
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Error al obtener detalles de la ubicación:', error);
+        }
+    };
 
-      const data = await response.json();
-      onSave({ ...activity, ...formData, id: activity.id });
-    } catch (error) {
-      setError(error.message || "Hubo un error al actualizar la actividad");
-      console.error("Error en la actualización:", error);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+    useEffect(() => {
+        // Cargar categorías si es necesario
+        const fetchCategories = async () => {
+            setIsLoading(true);
+            try {
+                const response = await fetch('https://rangerhub-back.vercel.app/activitycategory');
+                if (response.ok) {
+                    const data = await response.json();
+                    setCategories(data.categories || []);
+                }
+            } catch (error) {
+                console.error('Error al cargar categorías:', error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
 
-  return (
-    <Modal show={show} onHide={onClose} centered size="lg">
-      <Modal.Header closeButton>
-        <Modal.Title>Editar Actividad: {activity?.name}</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        {error && <div className="alert alert-danger">{error}</div>}
-        <Form onSubmit={handleSubmit}>
-          <Form.Group className="mb-3">
-            <Form.Label>Nombre</Form.Label>
-            <Form.Control
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              required
-            />
-          </Form.Group>
+        if (show) {
+            fetchCategories();
+        }
+    }, [show]);
 
-          <Form.Group className="mb-3">
-            <Form.Label>Descripción</Form.Label>
-            <Form.Control
-              as="textarea"
-              rows={3}
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-            />
-          </Form.Group>
+    // Búsqueda de ubicaciones
+    useEffect(() => {
+        const searchLocations = async () => {
+            if (locationSearch.trim().length < 2) {
+                setSearchResults([]);
+                return;
+            }
 
-          <div className="row">
-            <Form.Group className="mb-3 col-md-6">
-              <Form.Label>Dificultad</Form.Label>
-              <Form.Select
-                name="difficulty"
-                value={formData.difficulty}
-                onChange={handleChange}
-              >
-                <option value="">Seleccionar dificultad</option>
-                <option value="Fácil">Fácil</option>
-                <option value="Intermedia">Intermedia</option>
-                <option value="Difícil">Difícil</option>
-              </Form.Select>
-            </Form.Group>
+            setIsSearching(true);
+            try {
+                const response = await fetch(`https://rangerhub-back.vercel.app/locations?search=${encodeURIComponent(locationSearch)}&per_page=5`);
+                if (response.ok) {
+                    const data = await response.json();
+                    setSearchResults(data.locations || []);
+                }
+            } catch (error) {
+                console.error('Error al buscar ubicaciones:', error);
+                setSearchResults([]);
+            } finally {
+                setIsSearching(false);
+            }
+        };
 
-            <Form.Group className="mb-3 col-md-6">
-              <Form.Label>Costo ($)</Form.Label>
-              <Form.Control
-                type="number"
-                name="cost"
-                value={formData.cost}
-                onChange={handleChange}
-                required
-                min="0"
-                step="0.01"
-              />
-            </Form.Group>
-          </div>
+        // Usar un debounce para no hacer demasiadas solicitudes
+        const timeoutId = setTimeout(() => {
+            searchLocations();
+        }, 300);
 
-          <div className="row">
-            <Form.Group className="mb-3 col-md-4">
-              <Form.Label>Duración (horas)</Form.Label>
-              <Form.Control
-                type="number"
-                name="duration"
-                value={formData.duration}
-                onChange={handleChange}
-                required
-                min="0"
-                step="0.5"
-              />
-            </Form.Group>
+        return () => clearTimeout(timeoutId);
+    }, [locationSearch]);
 
-            <Form.Group className="mb-3 col-md-4">
-              <Form.Label>Mínimo de participantes</Form.Label>
-              <Form.Control
-                type="number"
-                name="min_participants"
-                value={formData.min_participants}
-                onChange={handleChange}
-                required
-                min="1"
-              />
-            </Form.Group>
+    const handleInputChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        
+        // Manejar diferentes tipos de inputs
+        if (type === 'checkbox') {
+            setFormData(prev => ({ ...prev, [name]: checked }));
+        } else if (type === 'number') {
+            setFormData(prev => ({ ...prev, [name]: parseFloat(value) || 0 }));
+        } else {
+            setFormData(prev => ({ ...prev, [name]: value }));
+        }
+    };
 
-            <Form.Group className="mb-3 col-md-4">
-              <Form.Label>Máximo de participantes</Form.Label>
-              <Form.Control
-                type="number"
-                name="max_participants"
-                value={formData.max_participants}
-                onChange={handleChange}
-                required
-                min="1"
-              />
-            </Form.Group>
-          </div>
+    const handleLocationSelect = (location) => {
+        setSelectedLocation(location);
+        setFormData(prev => ({ ...prev, location_id: location.id }));
+        setLocationSearch('');
+        setSearchResults([]);
+    };
 
-          <Form.Group className="mb-3">
-            <Form.Label>URL de la imagen</Form.Label>
-            <Form.Control
-              type="text"
-              name="activity_image_url"
-              value={formData.activity_image_url}
-              onChange={handleChange}
-              placeholder="https://ejemplo.com/imagen.jpg"
-            />
-          </Form.Group>
+    const clearSelectedLocation = () => {
+        setSelectedLocation(null);
+        setFormData(prev => ({ ...prev, location_id: '' }));
+    };
 
-          <div className="row">
-            <Form.Group className="mb-3 col-md-6">
-              <Form.Check
-                type="checkbox"
-                label="Disponible"
-                name="is_available"
-                checked={formData.is_available}
-                onChange={handleChange}
-              />
-            </Form.Group>
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        onSave(formData);
+    };
 
-            <Form.Group className="mb-3 col-md-6">
-              <Form.Check
-                type="checkbox"
-                label="Público"
-                name="is_public"
-                checked={formData.is_public}
-                onChange={handleChange}
-              />
-            </Form.Group>
-          </div>
-
-          <div className="d-flex justify-content-end">
-            <Button variant="secondary" onClick={onClose} className="me-2">
-              Cancelar
-            </Button>
-            <Button 
-              variant="primary" 
-              type="submit"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? (
-                <>
-                  <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                  Guardando...
-                </>
-              ) : (
-                "Guardar cambios"
-              )}
-            </Button>
-          </div>
-        </Form>
-      </Modal.Body>
-    </Modal>
-  );
+    return (
+        <Modal show={show} onHide={onClose} backdrop="static" keyboard={false} size="lg">
+            <Modal.Header closeButton>
+                <Modal.Title>Editar Actividad</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                {isLoading ? (
+                    <div className="text-center">
+                        <div className="spinner-border" role="status">
+                            <span className="visually-hidden">Cargando...</span>
+                        </div>
+                    </div>
+                ) : (
+                    <Form onSubmit={handleSubmit}>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Nombre</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="name"
+                                value={formData.name}
+                                onChange={handleInputChange}
+                                required
+                            />
+                        </Form.Group>
+                        
+                        <Form.Group className="mb-3">
+                            <Form.Label>Descripción</Form.Label>
+                            <Form.Control
+                                as="textarea"
+                                rows={3}
+                                name="description"
+                                value={formData.description}
+                                onChange={handleInputChange}
+                            />
+                        </Form.Group>
+                        
+                        <div className="row">
+                            <div className="col-md-6">
+                                <Form.Group className="mb-3">
+                                    <Form.Label>Duración (horas)</Form.Label>
+                                    <Form.Control
+                                        type="number"
+                                        step="0.5"
+                                        min="0"
+                                        name="duration"
+                                        value={formData.duration}
+                                        onChange={handleInputChange}
+                                    />
+                                </Form.Group>
+                            </div>
+                            
+                            <div className="col-md-6">
+                                <Form.Group className="mb-3">
+                                    <Form.Label>Dificultad</Form.Label>
+                                    <Form.Select
+                                        name="difficulty"
+                                        value={formData.difficulty}
+                                        onChange={handleInputChange}
+                                    >
+                                        <option value="">Seleccionar...</option>
+                                        <option value="Fácil">Fácil</option>
+                                        <option value="Intermedia">Intermedia</option>
+                                        <option value="Difícil">Difícil</option>
+                                    </Form.Select>
+                                </Form.Group>
+                            </div>
+                        </div>
+                        
+                        <div className="row">
+                            <div className="col-md-6">
+                                <Form.Group className="mb-3">
+                                    <Form.Label>Mínimo de participantes</Form.Label>
+                                    <Form.Control
+                                        type="number"
+                                        min="1"
+                                        name="min_participants"
+                                        value={formData.min_participants}
+                                        onChange={handleInputChange}
+                                    />
+                                </Form.Group>
+                            </div>
+                            
+                            <div className="col-md-6">
+                                <Form.Group className="mb-3">
+                                    <Form.Label>Máximo de participantes</Form.Label>
+                                    <Form.Control
+                                        type="number"
+                                        min="1"
+                                        name="max_participants"
+                                        value={formData.max_participants}
+                                        onChange={handleInputChange}
+                                    />
+                                </Form.Group>
+                            </div>
+                        </div>
+                        
+                        <Form.Group className="mb-3">
+                            <Form.Label>Costo ($)</Form.Label>
+                            <Form.Control
+                                type="number"
+                                step="0.01"
+                                min="0"
+                                name="cost"
+                                value={formData.cost}
+                                onChange={handleInputChange}
+                            />
+                        </Form.Group>
+                        
+                        <Form.Group className="mb-3">
+                            <Form.Label>URL de imagen</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="activity_image_url"
+                                value={formData.activity_image_url}
+                                onChange={handleInputChange}
+                                placeholder="https://ejemplo.com/imagen.jpg"
+                            />
+                        </Form.Group>
+                        
+                        <Form.Group className="mb-3">
+                            <Form.Label>Categoría</Form.Label>
+                            {categories.length > 0 ? (
+                                <Form.Select
+                                    name="category_id"
+                                    value={formData.category_id}
+                                    onChange={handleInputChange}
+                                >
+                                    <option value="">Seleccionar categoría...</option>
+                                    {categories.map(category => (
+                                        <option key={category.id} value={category.id}>
+                                            {category.name}
+                                        </option>
+                                    ))}
+                                </Form.Select>
+                            ) : (
+                                <div className="d-flex align-items-center">
+                                    <Form.Control
+                                        type="text"
+                                        disabled
+                                        placeholder="Cargando categorías..." 
+                                    />
+                                    <div className="spinner-border spinner-border-sm ms-2" role="status">
+                                        <span className="visually-hidden">Cargando...</span>
+                                    </div>
+                                </div>
+                            )}
+                        </Form.Group>
+                        
+                        {/* Barra de búsqueda de ubicaciones */}
+                        <Form.Group className="mb-3">
+                            <Form.Label>Ubicación</Form.Label>
+                            {selectedLocation ? (
+                                <div className="d-flex align-items-center mb-2 p-2 border rounded">
+                                    <div className="flex-grow-1">
+                                        <div><strong>{selectedLocation.place_name}</strong></div>
+                                        <div className="text-muted small">{selectedLocation.province}, {selectedLocation.country}</div>
+                                    </div>
+                                    <Button 
+                                        variant="outline-secondary" 
+                                        size="sm"
+                                        onClick={clearSelectedLocation}
+                                    >
+                                        <i className="fas fa-times"></i>
+                                    </Button>
+                                </div>
+                            ) : (
+                                <>
+                                    <InputGroup>
+                                        <Form.Control
+                                            type="text"
+                                            placeholder="Buscar ubicación..."
+                                            value={locationSearch}
+                                            onChange={(e) => setLocationSearch(e.target.value)}
+                                        />
+                                        {isSearching && (
+                                            <InputGroup.Text>
+                                                <div className="spinner-border spinner-border-sm" role="status">
+                                                    <span className="visually-hidden">Buscando...</span>
+                                                </div>
+                                            </InputGroup.Text>
+                                        )}
+                                    </InputGroup>
+                                    
+                                    {searchResults.length > 0 && (
+                                        <ListGroup className="mt-2 position-relative">
+                                            {searchResults.map(location => (
+                                                <ListGroup.Item 
+                                                    key={location.id} 
+                                                    action 
+                                                    onClick={() => handleLocationSelect(location)}
+                                                    className="py-2"
+                                                >
+                                                    <div><strong>{location.place_name}</strong></div>
+                                                    <div className="text-muted small">{location.province}, {location.country}</div>
+                                                </ListGroup.Item>
+                                            ))}
+                                        </ListGroup>
+                                    )}
+                                </>
+                            )}
+                        </Form.Group>
+                        
+                        <Form.Group className="mb-3">
+                            <Form.Check
+                                type="checkbox"
+                                label="Disponible"
+                                name="is_available"
+                                checked={formData.is_available}
+                                onChange={handleInputChange}
+                            />
+                        </Form.Group>
+                        
+                        <Form.Group className="mb-3">
+                            <Form.Check
+                                type="checkbox"
+                                label="Público"
+                                name="is_public"
+                                checked={formData.is_public}
+                                onChange={handleInputChange}
+                            />
+                        </Form.Group>
+                    </Form>
+                )}
+            </Modal.Body>
+            <Modal.Footer>
+                <Button variant="secondary" onClick={onClose}>
+                    Cancelar
+                </Button>
+                <Button variant="primary" onClick={handleSubmit} disabled={isLoading}>
+                    Guardar Cambios
+                </Button>
+            </Modal.Footer>
+        </Modal>
+    );
 };
 
 export default EditActivityModal;
