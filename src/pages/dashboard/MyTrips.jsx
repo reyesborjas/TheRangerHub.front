@@ -79,55 +79,48 @@ export const MyTrips = () => {
   const handleReservation = async (tripId, action) => {
     setReserving({ tripId, action });
     try {
-      let url = "https://rangerhub-back.vercel.app/reservations";
-      let method = "POST";
-      let body = null;
-      
-      if (action === "pay") {
-        body = JSON.stringify({ 
-          user_id: userId, 
-          trip_id: tripId,
-          status: "pending" // or "paid" depending on your workflow
-        });
-      } else if (action === "cancel") {
-        // Use the new endpoint that takes both trip_id and user_id
-        url = `https://rangerhub-back.vercel.app/reservations/trip/${tripId}/user/${userId}`;
-        method = "DELETE";
-      }
-      
-      const response = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: method === "POST" ? body : null,
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Error al procesar la reservación");
-      }
-      
-      // Esperar a que la operación se complete y actualizar el estado local
-      if (action === "cancel") {
-        // Actualizar el estado local eliminando el viaje cancelado
-        setUserReservations(prevReservations => 
-          prevReservations.filter(trip => trip.id !== tripId)
-        );
-      } else {
-        // Refrescar la lista después de una operación exitosa
-        if (userRole === "Explorer") {
-          await getExplorerTrips(userId);
-        } else {
-          await getRangerTrips(userId);
+        if (action === "cancel") {
+            const response = await fetch(
+                `https://rangerhub-back.vercel.app/reservations/trip/${tripId}/user/${userId}`, 
+                {
+                    method: "DELETE",
+                    headers: { 
+                        "Content-Type": "application/json",
+                    }
+                }
+            );
+            
+            const responseText = await response.text();
+            
+            if (!response.ok) {
+                console.error("Server error response:", responseText);
+                throw new Error(`Server error: ${response.status} - ${responseText}`);
+            }
+            
+            // Parsear la respuesta JSON si es posible
+            let responseData;
+            try {
+                responseData = JSON.parse(responseText);
+            } catch (jsonError) {
+                console.warn("Response was not JSON:", jsonError);
+                responseData = { message: responseText };
+            }
+            
+            // Actualizar la lista de reservaciones localmente
+            setUserReservations(prevReservations => 
+                prevReservations.filter(reservation => reservation.trip_id !== tripId)
+            );
+            
+            // Mostrar mensaje de éxito
+            setError(responseData.message || "Reserva eliminada correctamente");
         }
-      }
     } catch (error) {
-      console.error("Error al procesar la reservación:", error);
-      setError(error.message);
+        console.error("Reservation processing error:", error);
+        setError(`No se pudo procesar la reservación: ${error.message}`);
     } finally {
-      setReserving({ tripId: null, action: null });
+        setReserving({ tripId: null, action: null });
     }
-  };
-
+};
   // Función para abrir el modal con detalles del viaje
   const handleViewDetails = (trip) => {
     setSelectedTrip(trip);

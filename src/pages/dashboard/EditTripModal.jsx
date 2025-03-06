@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const EditTripModal = ({ trip, show, onClose, onSave }) => {
   const [formData, setFormData] = useState({
@@ -132,8 +134,9 @@ const EditTripModal = ({ trip, show, onClose, onSave }) => {
   const fetchTripActivities = async (tripId) => {
     setIsLoadingActivities(true);
     try {
-      // Obtener actividades del viaje
-      const response = await fetch(`https://rangerhub-back.vercel.app/trips/${tripId}/activities`);
+      // Añadir un parámetro para evitar caché
+      const timestamp = new Date().getTime();
+      const response = await fetch(`https://rangerhub-back.vercel.app/trips/${tripId}/activities?_=${timestamp}`);
       
       if (!response.ok) {
         throw new Error(`Error ${response.status}: No se pudieron obtener las actividades del viaje`);
@@ -141,8 +144,8 @@ const EditTripModal = ({ trip, show, onClose, onSave }) => {
       
       const data = await response.json();
       console.log("Datos crudos de actividades del viaje:", data);
-
-      setTripActivities(data.activities);
+  
+      setTripActivities(data.activities || []);
     } catch (error) {
       console.error('Error al cargar actividades del viaje:', error);
       // No mostrar error al usuario, solo log
@@ -245,21 +248,32 @@ const EditTripModal = ({ trip, show, onClose, onSave }) => {
   const handleRemoveActivity = async (activityId) => {
     setIsLoading(true);
     try {
-      const response = await fetch(`https://rangerhub-back.vercel.app/activity-trips`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          trip_id: trip.id,
-          activity_id: activityId
-        })
+      // Información detallada para debugging
+      console.log("Eliminando actividad:", activityId);
+      console.log("Del viaje:", trip.id);
+      console.log("Todas las actividades del viaje:", tripActivities);
+      
+      const url = `https://rangerhub-back.vercel.app/activity-trips/${trip.id}/${activityId}`;
+      console.log("URL DELETE:", url);
+      
+      const response = await fetch(url, {
+        method: 'DELETE'
       });
-
-      if (!response.ok) {
-        throw new Error(`Error ${response.status}: No se pudo eliminar la actividad`);
+      
+      const responseData = await response.json();
+      console.log("Respuesta del servidor:", responseData);
+      
+      // Si recibimos un 404 con el mensaje específico, considerarlo un éxito
+      if (response.status === 404 && 
+          responseData.message && 
+          responseData.message.includes("No se encontró la relación")) {
+        // La relación ya no existe, lo consideramos un "éxito"
+        console.log("La relación ya no existe en la base de datos, continuando...");
+        // Seguimos con la eliminación de la UI
+      } else if (!response.ok) {
+        throw new Error(`Error ${response.status}: ${responseData.message}`);
       }
-
+  
       // Remover la actividad de la lista local
       setTripActivities(prevActivities => 
         prevActivities.filter(activity => activity.id !== activityId)
@@ -269,11 +283,17 @@ const EditTripModal = ({ trip, show, onClose, onSave }) => {
     } catch (error) {
       console.error('Error al eliminar actividad:', error);
       setError('No se pudo eliminar la actividad. ' + error.message);
+      
+      // Actualizar UI de todos modos
+      setTripActivities(prevActivities => 
+        prevActivities.filter(activity => activity.id !== activityId)
+      );
+      
+      toast.warn('Se eliminó la actividad de la vista pero podría no haberse eliminado del servidor.');
     } finally {
       setIsLoading(false);
     }
   };
-
   // Filtrar actividades disponibles (que no están ya asignadas al viaje)
   const availableActivities = allActivities.filter(activity => 
     !tripActivities.some(tripActivity => tripActivity.id === activity.id)
