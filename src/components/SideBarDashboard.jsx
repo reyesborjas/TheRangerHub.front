@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import logo from "../assets/logo.svg";
 import "../styles/SideBarDashboard.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faInbox } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from "react-router-dom";
 import {
   faHome, faSuitcase, faMap, faBicycle, faBook,
@@ -109,6 +110,12 @@ const SideBarDashboard = () => {
               className="nav-link"
           >
             <FontAwesomeIcon icon={faUser} /> Rangers
+          </Link>
+          <Link
+              to={`/secured/${username}/dashboard/blog`}
+              className="nav-link"
+          >
+            <FontAwesomeIcon icon={faInbox} /> Blog
           </Link>
           <Link
               to={`/secured/${username}/dashboard/activities`}
