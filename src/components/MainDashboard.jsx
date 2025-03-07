@@ -1,12 +1,147 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "../styles/MainDashboard.css";
 import { Carousel } from "react-bootstrap";
 import OpenLayersMap from "../components/OpenLayersMap.jsx";
 import 'ol/ol.css';
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const MainDashboard = () => {
     const navigate = useNavigate();
+    const [trips, setTrips] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [nextTripId, setNextTripId] = useState(null);
+    const [nextTrip, setNextTrip] = useState(null);
+    
+    // Obtener datos del usuario desde el token JWT
+    const [userId, setUserId] = useState(null);
+    const [userRole, setUserRole] = useState(null);
+    const [username, setUsername] = useState('');
+    
+    // URL base para las peticiones
+    const baseUrl = "https://rangerhub-back.vercel.app";
+    
+    // Cargar datos de usuario al inicio desde el token JWT
+    useEffect(() => {
+        try {
+            // Intentar obtener y decodificar el token JWT
+            const token = localStorage.getItem("token");
+            if (token) {
+                try {
+                    const decoded = JSON.parse(atob(token.split(".")[1]));
+                    setUserId(decoded.user_id);
+                    setUserRole(decoded.role_name);
+                    setUsername(decoded.username || '');
+                    console.log("Token decodificado:", decoded);
+                    console.log("ID de usuario obtenido:", decoded.user_id);
+                    console.log("Rol de usuario obtenido:", decoded.role_name);
+                } catch (err) {
+                    console.error("Error al decodificar el token:", err);
+                    setError("Error al verificar la autenticación");
+                }
+            } else {
+                // Intentar obtener desde currentUser como respaldo
+                const currentUserStr = localStorage.getItem('currentUser');
+                if (currentUserStr) {
+                    try {
+                        const currentUser = JSON.parse(currentUserStr);
+                        setUserId(currentUser.id);
+                        setUserRole(currentUser.role_name);
+                        setUsername(currentUser.username || '');
+                        console.log("Datos obtenidos de currentUser:", currentUser);
+                    } catch (parseErr) {
+                        console.error("Error al parsear currentUser:", parseErr);
+                    }
+                } else {
+                    console.error("No se encontró token ni currentUser");
+                    setError("No se pudo identificar al usuario");
+                }
+            }
+        } catch (err) {
+            console.error("Error al procesar datos del usuario:", err);
+            setError("Error al identificar usuario");
+        }
+    }, []);
+    
+    // Función para formatear la fecha
+    const formatDate = (dateString) => {
+        try {
+            const date = dateString instanceof Date ? dateString : new Date(dateString);
+            if (isNaN(date.getTime())) {
+                return "Fecha pendiente";
+            }
+            return date.toLocaleDateString('es-ES', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+        } catch (err) {
+            return "Fecha pendiente";
+        }
+    };
+
+    // Cargar viajes cuando tengamos el ID y rol
+    useEffect(() => {
+        const fetchTrips = async () => {
+            try {
+                if (!userId) {
+                    return; // Salir si no hay userId
+                }
+                
+                setLoading(true);
+                
+                // Seleccionar el endpoint correcto según el rol del usuario
+                const endpoint = userRole === 'Ranger' || userRole === 'ranger'
+                    ? `/trips/ranger/${userId}` 
+                    : `/trips/explorer/${userId}`;
+                
+                const url = `${baseUrl}${endpoint}`;
+                console.log("Consultando endpoint:", url);
+                
+                const response = await axios.get(url);
+                console.log("Respuesta del servidor:", response.data);
+                
+                // Procesar y ordenar los viajes por fecha
+                if (response.data && response.data.trips) {
+                    // Convertir fechas y ordenar por start_date
+                    const processedTrips = response.data.trips.map(trip => ({
+                        ...trip,
+                        start_date: trip.start_date ? new Date(trip.start_date) : new Date()
+                    }));
+                    
+                    // Ordenar por fecha (los más próximos primero)
+                    const sortedTrips = [...processedTrips].sort((a, b) => a.start_date - b.start_date);
+                    
+                    // Tomar solo los 3 primeros para mostrar
+                    const tripsToDisplay = sortedTrips.slice(0, 3);
+                    
+                    console.log("Viajes procesados:", tripsToDisplay);
+                    setTrips(tripsToDisplay);
+                    
+                    // Usar el primer viaje de la lista como próximo viaje para el mapa
+                    if (sortedTrips.length > 0) {
+                        setNextTripId(sortedTrips[0].id);
+                        setNextTrip(sortedTrips[0]);
+                        console.log("ID del próximo viaje:", sortedTrips[0].id);
+                    }
+                } else {
+                    console.log("No se encontraron viajes en la respuesta", response.data);
+                }
+                
+                setLoading(false);
+            } catch (err) {
+                console.error("Error al cargar los viajes:", err);
+                setError("Error al cargar los viajes");
+                setLoading(false);
+            }
+        };
+        
+        if (userId && userRole) {
+            fetchTrips();
+        }
+    }, [userId, userRole, baseUrl]);
+
     return (
         <div className="container main-dashboard">
             {/* Slider de imágenes */}
@@ -81,8 +216,27 @@ const MainDashboard = () => {
                 <div className="col-md-6 d-flex">
                     <div className="card map-container text-center w-100 h-100">
                         <div className="card-body">
-                            <h6>Mapa del viaje</h6>
-                            <OpenLayersMap lat={-51.1229} lon={-73.0486} zoom={8} />
+                            <h6>
+                                {nextTrip ? (
+                                    <>Mapa del viaje: <span className="text-primary">{nextTrip.trip_name}</span></>
+                                ) : (
+                                    "Mapa del viaje"
+                                )}
+                            </h6>
+                            {nextTripId ? (
+                                <OpenLayersMap 
+                                    tripId={nextTripId} 
+                                    defaultLat={-33.4489} 
+                                    defaultLon={-70.6693} 
+                                    defaultZoom={6} 
+                                />
+                            ) : (
+                                <OpenLayersMap 
+                                    defaultLat={-33.4489} 
+                                    defaultLon={-70.6693} 
+                                    defaultZoom={6} 
+                                />
+                            )}
                         </div>
                     </div>
                 </div>
@@ -92,36 +246,65 @@ const MainDashboard = () => {
                     <div className="card upcoming-trips text-center w-100 h-100">
                         <div className="card-body">
                             <h6>Próximos viajes</h6>
-                            <table className="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Nombre</th>
-                                        <th>Estado</th>
-                                        <th>Fecha</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>San Pedro de Atacama</td>
-                                        <td>En curso</td>
-                                        <td>04/03/2025</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Buenos Aires</td>
-                                        <td>Confirmado</td>
-                                        <td>17/02/2025</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Machu Picchu</td>
-                                        <td>Pendiente</td>
-                                        <td>23/11/2025</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <button onClick={() => navigate("/secured/${username}/dashboard/mytrips")} className="btn btn-danger btn-lg w-100 mt-3">
+                            {loading ? (
+                                <div className="text-center">
+                                    <div className="spinner-border text-danger" role="status">
+                                        <span className="visually-hidden">Cargando...</span>
+                                    </div>
+                                </div>
+                            ) : error ? (
+                                <div className="alert alert-danger" role="alert">
+                                    {error}
+                                </div>
+                            ) : (
+                                <table className="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Nombre</th>
+                                            <th>Estado</th>
+                                            <th>Fecha</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {trips && trips.length > 0 ? (
+                                            trips.map((trip, index) => (
+                                                <tr 
+                                                    key={trip.id || index}
+                                                    className={trip.id === nextTripId ? "table-primary" : ""}
+                                                    title={trip.id === nextTripId ? "Este viaje se muestra en el mapa" : ""}
+                                                >
+                                                    <td>{trip.trip_name || 'Sin nombre'}</td>
+                                                    <td>{trip.trip_status || 'Desconocido'}</td>
+                                                    <td>{formatDate(trip.start_date)}</td>
+                                                </tr>
+                                            ))
+                                        ) : (
+                                            <tr>
+                                                <td colSpan="3">No hay viajes programados</td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            )}
+                            <button 
+                                onClick={() => {
+                                    // Usar nombre de usuario del localStorage o del estado
+                                    const userFromStorage = localStorage.getItem('currentUser') ? 
+                                        JSON.parse(localStorage.getItem('currentUser')).username : '';
+                                    const tokenData = localStorage.getItem('token') ? 
+                                        JSON.parse(atob(localStorage.getItem('token').split('.')[1])) : '';
+                                    const usernameToUse = username || 
+                                                         (tokenData && tokenData.username) || 
+                                                         userFromStorage || 
+                                                         'explorer_reyes';
+                                    
+                                    console.log("Navegando a:", `/secured/${usernameToUse}/dashboard/mytrips`);
+                                    navigate(`/secured/${usernameToUse}/dashboard/mytrips`);
+                                }} 
+                                className="btn btn-danger btn-lg w-100 mt-3"
+                            >
                                 Consultar más viajes
                             </button>
-
                         </div>
                     </div>
                 </div>
