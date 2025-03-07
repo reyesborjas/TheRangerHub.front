@@ -98,18 +98,65 @@ const EditActivityModal = ({ activity, show, onClose, onSave }) => {
         const fetchCategories = async () => {
             setIsLoading(true);
             try {
+                console.log("Solicitando categorías...");
                 const response = await fetch('https://rangerhub-back.vercel.app/activitycategory');
-                if (response.ok) {
-                    const data = await response.json();
-                    setCategories(data.categories || []);
+
+                // Verificar respuesta HTTP
+                if (!response.ok) {
+                    throw new Error(`Error HTTP ${response.status}: ${response.statusText}`);
                 }
+
+                // Convertir respuesta a JSON con manejo de errores
+                const rawData = await response.text();
+                console.log("Respuesta de categorías (raw):", rawData);
+
+                let data;
+                try {
+                    data = JSON.parse(rawData);
+                } catch (parseError) {
+                    console.error("Error al parsear JSON:", parseError);
+                    throw new Error("La respuesta no es un JSON válido");
+                }
+
+                // Verificar estructura de datos
+                console.log("Datos de categorías:", data);
+
+                if (!data || typeof data !== 'object') {
+                    throw new Error("La respuesta no tiene el formato esperado");
+                }
+
+                // Determinar dónde están las categorías en la respuesta
+                let categoriesToUse = [];
+
+                if (Array.isArray(data)) {
+                    // Si la respuesta es directamente un array
+                    categoriesToUse = data;
+                } else if (data.categories && Array.isArray(data.categories)) {
+                    // Si la respuesta tiene una propiedad 'categories'
+                    categoriesToUse = data.categories;
+                } else if (data.data && Array.isArray(data.data)) {
+                    // Si la respuesta tiene una propiedad 'data'
+                    categoriesToUse = data.data;
+                } else {
+                    // Buscar cualquier array en la respuesta
+                    const possibleArrayProps = Object.keys(data).find(key => Array.isArray(data[key]));
+                    if (possibleArrayProps) {
+                        categoriesToUse = data[possibleArrayProps];
+                    }
+                }
+
+                console.log(`Se encontraron ${categoriesToUse.length} categorías:`, categoriesToUse);
+                setCategories(categoriesToUse);
             } catch (error) {
                 console.error('Error al cargar categorías:', error);
+                // Mostrar un mensaje de error al usuario
+                alert(`Error al cargar categorías: ${error.message}`);
             } finally {
                 setIsLoading(false);
             }
         };
 
+        // Llamar a la función si el modal está visible
         if (show) {
             fetchCategories();
         }
@@ -148,17 +195,20 @@ const EditActivityModal = ({ activity, show, onClose, onSave }) => {
 
     const handleInputChange = (e) => {
         const { name, value, type, checked } = e.target;
-        
+
         // Manejar diferentes tipos de inputs
         if (type === 'checkbox') {
             setFormData(prev => ({ ...prev, [name]: checked }));
+        } else if (name === 'category_id') {
+            // Para las categorías, asegurarnos de que se maneje correctamente
+            console.log(`Categoría seleccionada: ID=${value}`);
+            setFormData(prev => ({ ...prev, [name]: value }));
         } else if (type === 'number') {
             setFormData(prev => ({ ...prev, [name]: parseFloat(value) || 0 }));
         } else {
             setFormData(prev => ({ ...prev, [name]: value }));
         }
     };
-
     const handleLocationSelect = (location) => {
         setSelectedLocation(location);
         setFormData(prev => ({ ...prev, location_id: location.id }));
