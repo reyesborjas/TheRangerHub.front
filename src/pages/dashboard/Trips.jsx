@@ -12,8 +12,7 @@ export const Trips = () => {
   // Estado para el modal de edición
   const [showEditModal, setShowEditModal] = useState(false);
   const [currentTripToEdit, setCurrentTripToEdit] = useState(null);
-  // Estado para indicar operaciones en proceso
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false); // Estado para indicar operaciones en proceso
 
   useEffect(() => {
     fetchTrips();
@@ -80,17 +79,28 @@ export const Trips = () => {
       return;
     }
     
+    setIsProcessing(true);
     const tripToEdit = trips.find(trip => trip.id === tripId);
+    
     if (tripToEdit) {
-      // Verificar primero si el viaje tiene reservaciones
-      fetch(`https://rangerhub-back.vercel.app/trips/${tripId}/check`, {
-        method: 'GET',
+      // Verificar primero si el viaje tiene reservaciones usando el nuevo endpoint POST
+      fetch(`https://rangerhub-back.vercel.app/trips/action`, {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
+        },
+        body: JSON.stringify({
+          action: 'check',
+          trip_id: tripId
+        })
       })
-      .then(response => response.json())
+      .then(response => {
+        if (!response.ok) {
+          throw new Error("Error al verificar reservaciones");
+        }
+        return response.json();
+      })
       .then(data => {
         if (data.hasReservations) {
           alert("No se puede editar el viaje porque tiene reservaciones existentes");
@@ -101,10 +111,16 @@ export const Trips = () => {
       })
       .catch(error => {
         console.error("Error al verificar reservaciones:", error);
-        alert("Hubo un error al verificar si el viaje tiene reservaciones");
+        // En caso de error, intentamos editar de todas formas
+        setCurrentTripToEdit(tripToEdit);
+        setShowEditModal(true);
+      })
+      .finally(() => {
+        setIsProcessing(false);
       });
     } else {
       console.error("No se encontró el viaje con ID:", tripId);
+      setIsProcessing(false);
     }
   };
 
@@ -129,14 +145,19 @@ export const Trips = () => {
     }
     
     if (window.confirm("¿Estás seguro de que deseas eliminar este viaje? Esta acción no se puede deshacer.")) {
-      setIsDeleting(true);
+      setIsProcessing(true);
       
-      fetch(`https://rangerhub-back.vercel.app/trips/${tripId}`, {
-        method: 'DELETE',
+      // Usar el nuevo endpoint POST para eliminar el viaje
+      fetch(`https://rangerhub-back.vercel.app/trips/action`, {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
+        },
+        body: JSON.stringify({
+          action: 'delete',
+          trip_id: tripId
+        })
       })
       .then(response => {
         if (!response.ok) {
@@ -146,17 +167,23 @@ export const Trips = () => {
         }
         return response.json();
       })
-      .then(() => {
+      .then(data => {
         // Actualizar la lista de viajes eliminando el viaje borrado
         setTrips(trips.filter(trip => trip.id !== tripId));
-        alert("Viaje eliminado con éxito");
+        alert(data.message || "Viaje eliminado con éxito");
       })
       .catch(error => {
         console.error("Error al eliminar viaje:", error);
-        alert(error.message || "Hubo un error al eliminar el viaje");
+        
+        // Verificar si el error fue por tener reservaciones
+        if (error.message && error.message.includes("tiene reservaciones")) {
+          alert("No se puede eliminar el viaje porque tiene reservaciones existentes");
+        } else {
+          alert(error.message || "Hubo un error al eliminar el viaje");
+        }
       })
       .finally(() => {
-        setIsDeleting(false);
+        setIsProcessing(false);
       });
     }
   };
@@ -185,7 +212,7 @@ export const Trips = () => {
       {filteredTrips.length > 0 ? (
         <div className="trips-grid">
           {filteredTrips.map((trip, index) => (
-            <div key={trip._id || index} className="trip-card">
+            <div key={trip._id || trip.id || index} className="trip-card">
               <div className="trip-image-container">
                 <img
                   src={trip.trip_image_url}
@@ -199,7 +226,7 @@ export const Trips = () => {
                       className="edit-btn"
                       onClick={() => handleEdit(trip.id)}
                       title="Editar viaje"
-                      disabled={isDeleting}
+                      disabled={isProcessing}
                     >
                       <i className="fas fa-pencil-alt"></i>
                     </button>
@@ -207,7 +234,7 @@ export const Trips = () => {
                       className="delete-btn"
                       onClick={() => handleDelete(trip.id)}
                       title="Eliminar viaje"
-                      disabled={isDeleting}
+                      disabled={isProcessing}
                     >
                       <i className="fas fa-trash-alt"></i>
                     </button>
@@ -217,7 +244,7 @@ export const Trips = () => {
                   <button
                     className="overlay-btn"
                     onClick={() => handleReservation(trip.id)}
-                    disabled={reservingTripId === trip.id}
+                    disabled={reservingTripId === trip.id || isProcessing}
                   >
                     {reservingTripId === trip.id ? (
                       <>
