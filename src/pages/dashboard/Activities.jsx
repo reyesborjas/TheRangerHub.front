@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import "../../styles/Activities.css";
 import EditActivityModal from "./EditActivityModal";
-import TopNavbar from "../../components/TopNavbar";
+
 
 export const Activities = () => {
     const [activities, setActivities] = useState([]);
@@ -125,10 +125,9 @@ export const Activities = () => {
     };
     return (
         <div className="my-trips-container container">
-            <TopNavbar />
             <h1 className="text-center my-4">Actividades que Tenemos para Ofrecer</h1>
             <div className="col-md-6">
-                <div className="input-group">
+                <div className="input-group" style={{marginLeft:"290px", marginBottom:"40px"}} >
                     <input
                         type="text"
                         className="form-control"
