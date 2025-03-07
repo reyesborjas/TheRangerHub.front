@@ -12,8 +12,6 @@ export const Trips = () => {
   // Estado para el modal de edición
   const [showEditModal, setShowEditModal] = useState(false);
   const [currentTripToEdit, setCurrentTripToEdit] = useState(null);
-  // Estado para indicar operaciones en proceso
-  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     fetchTrips();
@@ -75,34 +73,10 @@ export const Trips = () => {
 
   // Función para manejar la edición de un viaje
   const handleEdit = (tripId) => {
-    if (!currentUser || currentUser.role_name !== "Ranger") {
-      alert("Solo los usuarios con rol Ranger pueden editar viajes");
-      return;
-    }
-    
     const tripToEdit = trips.find(trip => trip.id === tripId);
     if (tripToEdit) {
-      // Verificar primero si el viaje tiene reservaciones
-      fetch(`https://rangerhub-back.vercel.app/trips/${tripId}/check`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.hasReservations) {
-          alert("No se puede editar el viaje porque tiene reservaciones existentes");
-        } else {
-          setCurrentTripToEdit(tripToEdit);
-          setShowEditModal(true);
-        }
-      })
-      .catch(error => {
-        console.error("Error al verificar reservaciones:", error);
-        alert("Hubo un error al verificar si el viaje tiene reservaciones");
-      });
+      setCurrentTripToEdit(tripToEdit);
+      setShowEditModal(true);
     } else {
       console.error("No se encontró el viaje con ID:", tripId);
     }
@@ -123,41 +97,27 @@ export const Trips = () => {
 
   // Función para manejar la eliminación de un viaje
   const handleDelete = (tripId) => {
-    if (!currentUser || currentUser.role_name !== "Ranger") {
-      alert("Solo los usuarios con rol Ranger pueden eliminar viajes");
-      return;
-    }
-    
-    if (window.confirm("¿Estás seguro de que deseas eliminar este viaje? Esta acción no se puede deshacer.")) {
-      setIsDeleting(true);
-      
+    if (window.confirm("¿Estás seguro de que deseas eliminar este viaje?")) {
       fetch(`https://rangerhub-back.vercel.app/trips/${tripId}`, {
         method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
       })
-      .then(response => {
-        if (!response.ok) {
-          return response.json().then(err => {
-            throw new Error(err.message || "Error al eliminar el viaje");
-          });
-        }
-        return response.json();
-      })
-      .then(() => {
-        // Actualizar la lista de viajes eliminando el viaje borrado
-        setTrips(trips.filter(trip => trip.id !== tripId));
-        alert("Viaje eliminado con éxito");
-      })
-      .catch(error => {
-        console.error("Error al eliminar viaje:", error);
-        alert(error.message || "Hubo un error al eliminar el viaje");
-      })
-      .finally(() => {
-        setIsDeleting(false);
-      });
+        .then(response => {
+          if (!response.ok) {
+            return response.json().then(err => {
+              throw new Error(err.message || "Error al eliminar el viaje");
+            });
+          }
+          return response.json();
+        })
+        .then(() => {
+          // Actualizar la lista de viajes eliminando el viaje borrado
+          setTrips(trips.filter(trip => trip.id !== tripId));
+          alert("Viaje eliminado con éxito");
+        })
+        .catch(error => {
+          console.error("Error al eliminar viaje:", error);
+          alert(error.message || "Hubo un error al eliminar el viaje");
+        });
     }
   };
 
@@ -199,7 +159,6 @@ export const Trips = () => {
                       className="edit-btn"
                       onClick={() => handleEdit(trip.id)}
                       title="Editar viaje"
-                      disabled={isDeleting}
                     >
                       <i className="fas fa-pencil-alt"></i>
                     </button>
@@ -207,7 +166,6 @@ export const Trips = () => {
                       className="delete-btn"
                       onClick={() => handleDelete(trip.id)}
                       title="Eliminar viaje"
-                      disabled={isDeleting}
                     >
                       <i className="fas fa-trash-alt"></i>
                     </button>
