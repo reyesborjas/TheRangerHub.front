@@ -2,6 +2,7 @@
     min-height: 100vh;
     background: white;
     padding: 20px;
+    margin-top: 0px !important;
 }
 
 .hero-slider img {
