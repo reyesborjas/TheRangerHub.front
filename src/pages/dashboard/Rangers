@@ -1,6 +1,106 @@
 import React, { useState, useEffect } from "react";
-import RangerCard from "../../components/RangerCard.jsx";
+import RangerCard from "../../components/RangerCard";
 import "../../styles/Rangers.css";
+
+// Datos de ejemplo (reemplazar con llamada a API real cuando esté disponible)
+const rangerData = [
+    {
+        id: 1,
+        name: "Carlos Rodriguez",
+        title: "Experto en Senderismo",
+        photo: "https://randomuser.me/api/portraits/men/32.jpg",
+        email: "carlos@rangerhub.com",
+        phone: "+56 9 1234 5678",
+        location: "Santiago, Chile",
+        rating: 4.8,
+        trips: 145,
+        isAvailable: true,
+        bio: "Guía con más de 10 años de experiencia en rutas de montaña y senderismo. Especialista en flora y fauna nativa de la Cordillera de los Andes.",
+        specialties: ["Montañismo", "Senderismo", "Observación de aves"],
+        languages: ["Español", "Inglés", "Portugués"],
+        certifications: ["Primeros Auxilios en Áreas Silvestres", "Guía UIAGM"]
+    },
+    {
+        id: 2,
+        name: "Ana Martínez",
+        title: "Guía de Montaña",
+        photo: "https://randomuser.me/api/portraits/women/44.jpg",
+        email: "ana@rangerhub.com",
+        phone: "+56 9 8765 4321",
+        location: "Valparaíso, Chile",
+        rating: 4.9,
+        trips: 98,
+        isAvailable: true,
+        bio: "Apasionada por la montaña y la naturaleza. Experta en rutas de trekking y escalada en Chile central.",
+        specialties: ["Escalada", "Trekking", "Campismo"],
+        languages: ["Español", "Inglés", "Francés"],
+        certifications: ["WFR", "Técnico en Turismo Aventura"]
+    },
+    {
+        id: 3,
+        name: "Javier Morales",
+        title: "Especialista en Travesías",
+        photo: "https://randomuser.me/api/portraits/men/62.jpg",
+        email: "javier@rangerhub.com",
+        phone: "+56 9 5555 6666",
+        location: "Concepción, Chile",
+        rating: 4.7,
+        trips: 72,
+        isAvailable: false,
+        bio: "Guía con amplia experiencia en travesías de larga duración en la Patagonia. Experto en supervivencia y orientación.",
+        specialties: ["Trekking", "Supervivencia", "Fotografía de naturaleza"],
+        languages: ["Español", "Inglés"],
+        certifications: ["WFR", "Orientación y Cartografía"]
+    },
+    {
+        id: 4,
+        name: "Lucía Valdés",
+        title: "Guía de Kayak y Rafting",
+        photo: "https://randomuser.me/api/portraits/women/28.jpg",
+        email: "lucia@rangerhub.com",
+        phone: "+56 9 7777 8888",
+        location: "Puerto Varas, Chile",
+        rating: 4.6,
+        trips: 115,
+        isAvailable: true,
+        bio: "Especialista en deportes acuáticos con más de 8 años de experiencia. Instructora certificada de kayak y rafting.",
+        specialties: ["Kayak", "Rafting", "Pesca deportiva"],
+        languages: ["Español", "Inglés", "Alemán"],
+        certifications: ["Instructor de Kayak IRF", "Primeros Auxilios"]
+    },
+    {
+        id: 5,
+        name: "Miguel Fuentes",
+        title: "Experto en Aventura",
+        photo: "https://randomuser.me/api/portraits/men/77.jpg",
+        email: "miguel@rangerhub.com",
+        phone: "+56 9 3333 4444",
+        location: "La Serena, Chile",
+        rating: 4.5,
+        trips: 88,
+        isAvailable: true,
+        bio: "Guía multiaventura con experiencia en diversos terrenos. Especialista en circuitos de aventura para todos los niveles.",
+        specialties: ["Ciclismo de montaña", "Rappel", "Canopy"],
+        languages: ["Español", "Inglés"],
+        certifications: ["Técnico Deportivo", "Rescate Vertical"]
+    },
+    {
+        id: 6,
+        name: "Camila Lagos",
+        title: "Guía de Ecoturismo",
+        photo: "https://randomuser.me/api/portraits/women/63.jpg",
+        email: "camila@rangerhub.com",
+        phone: "+56 9 2222 1111",
+        location: "Pucón, Chile",
+        rating: 4.9,
+        trips: 102,
+        isAvailable: false,
+        bio: "Bióloga y guía especializada en ecoturismo. Experta en flora y fauna nativa con enfoque en conservación.",
+        specialties: ["Observación de fauna", "Senderismo interpretativo", "Educación ambiental"],
+        languages: ["Español", "Inglés", "Italiano"],
+        certifications: ["Bióloga", "Guía de Turismo Sustentable"]
+    }
+];
 
 export const Rangers = () => {
     const [rangers, setRangers] = useState([]);
@@ -11,51 +111,17 @@ export const Rangers = () => {
     const [filterStatus, setFilterStatus] = useState("all"); // "all", "available", "unavailable"
 
     useEffect(() => {
-        // Función para obtener los rangers de la API mejorada
-        const fetchRangers = async () => {
-            setIsLoading(true);
-            setError(null);
-            
-            try {
-                // Con la API extendida, ahora obtenemos toda la información necesaria en una sola llamada
-                const response = await fetch('https://rangerhub-back.vercel.app/rangers');
-                
-                if (!response.ok) {
-                    throw new Error(`Error al obtener rangers: ${response.status}`);
-                }
-                
-                const data = await response.json();
-                setRangers(data.rangers);
-            } catch (err) {
-                setError("Error al cargar los datos de rangers: " + err.message);
-                console.error("Error al cargar rangers:", err);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-        
-        fetchRangers();
+        // Simulación de carga de datos (reemplazar con fetch a API real)
+        setIsLoading(true);
+        setTimeout(() => {
+            setRangers(rangerData);
+            setIsLoading(false);
+        }, 800);
     }, []);
 
-    const handleRangerClick = async (ranger) => {
-        try {
-            // Obtener detalles completos del ranger si necesitamos datos adicionales
-            const response = await fetch(`https://rangerhub-back.vercel.app/rangers/${ranger.id}`);
-            
-            if (response.ok) {
-                const detailedRanger = await response.json();
-                setSelectedRanger(detailedRanger);
-            } else {
-                // Si falla, usamos los datos que ya tenemos
-                setSelectedRanger(ranger);
-            }
-            setShowModal(true);
-        } catch (err) {
-            console.error("Error al obtener detalles del ranger:", err);
-            // En caso de error, usamos los datos que ya tenemos
-            setSelectedRanger(ranger);
-            setShowModal(true);
-        }
+    const handleRangerClick = (ranger) => {
+        setSelectedRanger(ranger);
+        setShowModal(true);
     };
 
     const handleCloseModal = () => {
@@ -138,7 +204,7 @@ export const Rangers = () => {
             {/* Modal de detalles del Ranger */}
             {showModal && selectedRanger && (
                 <div className="modal-overlay">
-                    <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+                    <div className="modal-dialog modal-dialog-centered modal-lg">
                         <div className="modal-content ranger-modal">
                             <div className="modal-header">
                                 <h5 className="modal-title">Detalles del Ranger</h5>
@@ -153,14 +219,7 @@ export const Rangers = () => {
                                 <div className="row">
                                     <div className="col-md-4">
                                         <div className="ranger-detail-photo">
-                                            <img 
-                                                src={selectedRanger.photo} 
-                                                alt={selectedRanger.name} 
-                                                onError={(e) => {
-                                                    e.target.onerror = null;
-                                                    e.target.src = "https://via.placeholder.com/300x400?text=Ranger";
-                                                }}
-                                            />
+                                            <img src={selectedRanger.photo} alt={selectedRanger.name} />
                                             <div className={`status-indicator ${selectedRanger.isAvailable ? 'available' : 'unavailable'}`}>
                                                 {selectedRanger.isAvailable ? 'Disponible' : 'No Disponible'}
                                             </div>
@@ -192,38 +251,30 @@ export const Rangers = () => {
                                             <p>{selectedRanger.bio}</p>
                                         </div>
                                         <div className="ranger-detail-specs">
-                                            {selectedRanger.specialties && selectedRanger.specialties.length > 0 && (
-                                                <div className="spec-section">
-                                                    <h6>Especialidades</h6>
-                                                    <div className="spec-tags">
-                                                        {selectedRanger.specialties.map((spec, index) => (
-                                                            <span key={index} className="spec-tag">{spec}</span>
-                                                        ))}
-                                                    </div>
+                                            <div className="spec-section">
+                                                <h6>Especialidades</h6>
+                                                <div className="spec-tags">
+                                                    {selectedRanger.specialties.map((spec, index) => (
+                                                        <span key={index} className="spec-tag">{spec}</span>
+                                                    ))}
                                                 </div>
-                                            )}
-                                            
-                                            {selectedRanger.languages && selectedRanger.languages.length > 0 && (
-                                                <div className="spec-section">
-                                                    <h6>Idiomas</h6>
-                                                    <div className="spec-tags">
-                                                        {selectedRanger.languages.map((lang, index) => (
-                                                            <span key={index} className="spec-tag">{lang}</span>
-                                                        ))}
-                                                    </div>
+                                            </div>
+                                            <div className="spec-section">
+                                                <h6>Idiomas</h6>
+                                                <div className="spec-tags">
+                                                    {selectedRanger.languages.map((lang, index) => (
+                                                        <span key={index} className="spec-tag">{lang}</span>
+                                                    ))}
                                                 </div>
-                                            )}
-                                            
-                                            {selectedRanger.certifications && selectedRanger.certifications.length > 0 && (
-                                                <div className="spec-section">
-                                                    <h6>Certificaciones</h6>
-                                                    <div className="spec-tags">
-                                                        {selectedRanger.certifications.map((cert, index) => (
-                                                            <span key={index} className="spec-tag">{cert}</span>
-                                                        ))}
-                                                    </div>
+                                            </div>
+                                            <div className="spec-section">
+                                                <h6>Certificaciones</h6>
+                                                <div className="spec-tags">
+                                                    {selectedRanger.certifications.map((cert, index) => (
+                                                        <span key={index} className="spec-tag">{cert}</span>
+                                                    ))}
                                                 </div>
-                                            )}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
