@@ -11,13 +11,13 @@ export const Rangers = () => {
     const [filterStatus, setFilterStatus] = useState("all"); // "all", "available", "unavailable"
 
     useEffect(() => {
-        // Función para obtener los rangers de la API mejorada
+        // Función para obtener los rangers de la API
         const fetchRangers = async () => {
             setIsLoading(true);
             setError(null);
             
             try {
-                // Con la API extendida, ahora obtenemos toda la información necesaria en una sola llamada
+                // Obtener datos de la API
                 const response = await fetch('https://rangerhub-back.vercel.app/rangers');
                 
                 if (!response.ok) {
@@ -25,10 +25,17 @@ export const Rangers = () => {
                 }
                 
                 const data = await response.json();
-                setRangers(data.rangers);
+                
+                if (data.rangers && Array.isArray(data.rangers)) {
+                    setRangers(data.rangers);
+                } else {
+                    setRangers([]);
+                    setError("La respuesta del servidor no contiene datos de rangers válidos");
+                }
             } catch (err) {
+                console.error("Error al cargar rangers desde la API:", err);
                 setError("Error al cargar los datos de rangers: " + err.message);
-                console.error("Error al cargar rangers:", err);
+                setRangers([]);
             } finally {
                 setIsLoading(false);
             }
@@ -37,25 +44,10 @@ export const Rangers = () => {
         fetchRangers();
     }, []);
 
-    const handleRangerClick = async (ranger) => {
-        try {
-            // Obtener detalles completos del ranger si necesitamos datos adicionales
-            const response = await fetch(`https://rangerhub-back.vercel.app/rangers/${ranger.id}`);
-            
-            if (response.ok) {
-                const detailedRanger = await response.json();
-                setSelectedRanger(detailedRanger);
-            } else {
-                // Si falla, usamos los datos que ya tenemos
-                setSelectedRanger(ranger);
-            }
-            setShowModal(true);
-        } catch (err) {
-            console.error("Error al obtener detalles del ranger:", err);
-            // En caso de error, usamos los datos que ya tenemos
-            setSelectedRanger(ranger);
-            setShowModal(true);
-        }
+    const handleRangerClick = (ranger) => {
+        // Usar directamente los datos del ranger sin hacer petición adicional
+        setSelectedRanger(ranger);
+        setShowModal(true);
     };
 
     const handleCloseModal = () => {
@@ -64,6 +56,30 @@ export const Rangers = () => {
 
     const handleFilterChange = (status) => {
         setFilterStatus(status);
+    };
+
+    // Función para truncar el email en formato "d...@g...com"
+    const getTruncatedEmail = (email) => {
+        if (!email) return "No disponible";
+        
+        const parts = email.split('@');
+        if (parts.length !== 2) return email;
+        
+        const username = parts[0];
+        const domain = parts[1];
+        
+        // Dividir el dominio en nombre y extensión
+        const domainParts = domain.split('.');
+        if (domainParts.length < 2) return email;
+        
+        const domainName = domainParts.slice(0, -1).join('.');
+        const extension = domainParts[domainParts.length - 1];
+        
+        // Formato truncado
+        const truncatedUsername = username.charAt(0) + "...";
+        const truncatedDomain = domainName.charAt(0) + "..." + "." + extension;
+        
+        return truncatedUsername + "@" + truncatedDomain;
     };
 
     // Filtrar rangers según el estado seleccionado
@@ -81,6 +97,12 @@ export const Rangers = () => {
                 <p className="rangers-subtitle">
                     Conoce a nuestro equipo de guías expertos que te acompañarán en tus aventuras
                 </p>
+
+                {error && (
+                    <div className="alert alert-danger" role="alert">
+                        {error}
+                    </div>
+                )}
 
                 {/* Filtros */}
                 <div className="rangers-filters">
@@ -104,12 +126,6 @@ export const Rangers = () => {
                     </button>
                 </div>
             </div>
-
-            {error && (
-                <div className="alert alert-danger" role="alert">
-                    {error}
-                </div>
-            )}
 
             {isLoading ? (
                 <div className="text-center py-5">
@@ -138,7 +154,7 @@ export const Rangers = () => {
             {/* Modal de detalles del Ranger */}
             {showModal && selectedRanger && (
                 <div className="modal-overlay">
-                    <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+                    <div className="modal-dialog modal-dialog-centered modal-lg">
                         <div className="modal-content ranger-modal">
                             <div className="modal-header">
                                 <h5 className="modal-title">Detalles del Ranger</h5>
@@ -154,11 +170,11 @@ export const Rangers = () => {
                                     <div className="col-md-4">
                                         <div className="ranger-detail-photo">
                                             <img 
-                                                src={selectedRanger.photo} 
+                                                src={selectedRanger.photo || "https://randomuser.me/api/portraits/men/1.jpg"} 
                                                 alt={selectedRanger.name} 
                                                 onError={(e) => {
                                                     e.target.onerror = null;
-                                                    e.target.src = "https://via.placeholder.com/300x400?text=Ranger";
+                                                    e.target.src = "https://randomuser.me/api/portraits/men/1.jpg";
                                                 }}
                                             />
                                             <div className={`status-indicator ${selectedRanger.isAvailable ? 'available' : 'unavailable'}`}>
@@ -167,13 +183,16 @@ export const Rangers = () => {
                                         </div>
                                         <div className="ranger-detail-contact">
                                             <h6>Información de Contacto</h6>
-                                            <p>
-                                                <i className="bi bi-envelope"></i> {selectedRanger.email}
+                                            <p className="contact-item">
+                                                <i className="bi bi-envelope"></i>
+                                                <span className="email-text" title={selectedRanger.email}>
+                                                    {getTruncatedEmail(selectedRanger.email)}
+                                                </span>
                                             </p>
-                                            <p>
-                                                <i className="bi bi-telephone"></i> {selectedRanger.phone}
+                                            <p className="contact-item">
+                                                <i className="bi bi-telephone"></i> {selectedRanger.phone || "No disponible"}
                                             </p>
-                                            <p>
+                                            <p className="contact-item">
                                                 <i className="bi bi-geo-alt"></i> {selectedRanger.location}
                                             </p>
                                         </div>
@@ -189,7 +208,7 @@ export const Rangers = () => {
                                         </div>
                                         <div className="ranger-detail-bio">
                                             <h6>Biografía</h6>
-                                            <p>{selectedRanger.bio}</p>
+                                            <p>{selectedRanger.bio || "Información no disponible"}</p>
                                         </div>
                                         <div className="ranger-detail-specs">
                                             {selectedRanger.specialties && selectedRanger.specialties.length > 0 && (

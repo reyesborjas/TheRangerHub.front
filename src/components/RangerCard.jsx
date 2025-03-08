@@ -9,12 +9,12 @@ const RangerCard = ({ ranger, onClick }) => {
         <div className="ranger-card">
             <div className="ranger-photo-container" onClick={() => onClick(ranger)}>
                 <img
-                    src={ranger.photo}
+                    src={ranger.photo || "https://randomuser.me/api/portraits/men/1.jpg"}
                     alt={`${ranger.name}`}
                     className="ranger-photo"
                     onError={(e) => {
                         e.target.onerror = null;
-                        e.target.src = "https://via.placeholder.com/150?text=Ranger";
+                        e.target.src = "https://randomuser.me/api/portraits/men/1.jpg";
                     }}
                 />
                 <div className="view-details-overlay">

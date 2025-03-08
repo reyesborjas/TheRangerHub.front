@@ -261,3 +261,77 @@
         margin: 0 auto 1rem;
     }
 }
+
+/* Añade estos estilos en tu archivo Rangers.css */
+
+/* Estilo para los elementos de contacto */
+.contact-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.contact-item i {
+    width: 1.5rem;
+    text-align: center;
+    margin-right: 0.5rem;
+    color: #2a9d8f;
+}
+
+/* Estilo para el texto del email */
+.email-text {
+    cursor: pointer;
+    position: relative;
+}
+
+/* Tooltip al pasar el cursor sobre el email truncado */
+.email-text:hover::after {
+    content: attr(title);
+    position: absolute;
+    left: 0;
+    top: 100%;
+    background-color: #333;
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    z-index: 10;
+    margin-top: 5px;
+}
+
+/* Flecha del tooltip */
+.email-text:hover::before {
+    content: "";
+    position: absolute;
+    left: 10px;
+    top: 100%;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent #333 transparent;
+    z-index: 10;
+}
+
+/* Estilo de la sección de contacto */
+.ranger-detail-contact {
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-top: 1rem;
+}
+
+/* Estilo para el encabezado de la sección */
+.ranger-detail-contact h6 {
+    margin-bottom: 0.75rem;
+    color: #2a9d8f;
+    font-weight: 600;
+}
+
+/* Ajuste para dispositivos móviles */
+@media (max-width: 576px) {
+    .email-text:hover::after {
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
