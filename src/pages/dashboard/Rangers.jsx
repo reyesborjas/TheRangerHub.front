@@ -204,7 +204,7 @@ export const Rangers = () => {
             {/* Modal de detalles del Ranger */}
             {showModal && selectedRanger && (
                 <div className="modal-overlay">
-                    <div className="modal-dialog modal-dialog-centered modal-lg">
+                    <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
                         <div className="modal-content ranger-modal">
                             <div className="modal-header">
                                 <h5 className="modal-title">Detalles del Ranger</h5>

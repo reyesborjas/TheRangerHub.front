@@ -21,7 +21,7 @@ const Blog = () => {
           <p>La combinación de desafío físico, exposición a la naturaleza y superación personal hace de los deportes de aventura una opción ideal para quienes buscan mejorar su salud de manera integral.</p>
         </>
       ),
-      imagen: "/api/placeholder/800/450",
+      imagen: "https://images.ecestaticos.com/37BtC2qV7E7188eeiimvgqmNdrc=/0x139:2710x1667/1600x900/filters:fill(white):format(jpg)/f.elconfidencial.com%2Foriginal%2F251%2Fa33%2Ffa4%2F251a33fa465096ed19fe8ba0d7719a77.jpg",
       alt: "Personas practicando senderismo en montañas"
     },
     {
@@ -41,7 +41,7 @@ const Blog = () => {
           <p>El próximo campeonato mundial se celebrará en 2027 en Nueva Zelanda, y los clasificatorios comenzarán a finales de este año.</p>
         </>
       ),
-      imagen: "/api/placeholder/800/450",
+      imagen: "https://triatletasenred.sport.es/wp-content/uploads/BTT-1280x720.jpg",
       alt: "Competidor de mountainbike en descenso"
     },
     {
@@ -70,7 +70,7 @@ const Blog = () => {
           <p>El desierto más árido del mundo es escenario para sandboarding en dunas gigantes, mountain bike en terrenos lunares y parapente. Las nuevas rutas nocturnas para mountain bike, que aprovechan el cielo estrellado del desierto, han incrementado su popularidad entre los aficionados a deportes extremos.</p>
         </>
       ),
-      imagen: "/api/placeholder/800/450",
+      imagen: "https://storage.googleapis.com/chile-travel-cdn/2021/03/volcan-villarrica-shutterstock_1420079189.jpg",
       alt: "Volcán Villarrica en Pucón, Chile"
     }
   ];
