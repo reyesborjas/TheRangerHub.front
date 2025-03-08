@@ -7,7 +7,7 @@ import { faInbox } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from "react-router-dom";
 import {
   faHome, faSuitcase, faMap, faBicycle, faBook,
-  faCloudSun, faCog, faQuestionCircle, faSignOutAlt,faUser
+  faCloudSun, faCog, faQuestionCircle, faSignOutAlt,faUser,faComment 
 } from "@fortawesome/free-solid-svg-icons";
 
 const SideBarDashboard = () => {
@@ -128,6 +128,12 @@ const SideBarDashboard = () => {
               className="nav-link"
           >
             <FontAwesomeIcon icon={faBook} /> Recursos
+          </Link>
+          <Link
+              to={`/secured/${username}/dashboard/comentarios`}
+              className="nav-link"
+          >
+            <FontAwesomeIcon icon={faComment} /> Comentarios
           </Link>
         </nav>
 

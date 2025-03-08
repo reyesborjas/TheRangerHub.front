@@ -18,6 +18,7 @@ import { MyTrips } from "./pages/dashboard/MyTrips.jsx";
 import {Settings} from "./pages/dashboard/Settings.jsx";
 import Rangers from "./pages/dashboard/Rangers.jsx";
 import Blog from "./pages/dashboard/Blog.jsx";
+import Comentarios from "./pages/dashboard/Comentarios.jsx";
 
 
 function App() {
@@ -44,6 +45,7 @@ function App() {
             <Route path="rangers" element={<Rangers />} />
             <Route path="configuracion" element={<Settings />} />
             <Route path="blog" element={<Blog />} />
+            <Route path="comentarios" element={<Comentarios />} />
           </Route>
 
           <Route path="/createactivity" element={<CreateActivity />} />
