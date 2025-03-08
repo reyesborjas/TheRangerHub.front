@@ -5,6 +5,7 @@ import SignUp from "./components/SignUp";
 import Home from "./pages/Home.jsx";
 import AboutUs from "./pages/AboutUs";
 import ContactUs from "./pages/ContactUs";
+import BlogHome from "./pages/BlogHome.jsx";
 import CreateTrip from "./components/CreateTrip.jsx";
 import { HomeDashboard } from "./pages/dashboard/HomeDashboard.jsx";
 import { Dashboard } from "./pages/Dashboard.jsx"; // Asegúrate que este componente renderice <Outlet />
@@ -18,6 +19,7 @@ import {Settings} from "./pages/dashboard/Settings.jsx";
 import Rangers from "./pages/dashboard/Rangers.jsx";
 import Blog from "./pages/dashboard/Blog.jsx";
 
+
 function App() {
   return (
     <Router>
@@ -26,6 +28,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/about-us" element={<AboutUs />} />
           <Route path="/contact-us" element={<ContactUs />} />
+          <Route path="/blog-home" element={<BlogHome />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
           

@@ -53,6 +53,11 @@ const MyNavbar = () => {
                                 Contáctanos
                             </Link>
                         </li>
+                        <li className="nav-item">
+                            <Link className="nav-link" to="/blog-home">
+                                Blog
+                            </Link>
+                        </li>
                     </ul>
 
                     <ul className="navbar-nav ms-auto d-flex align-items-center">

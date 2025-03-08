@@ -83,9 +83,12 @@ const Blog = () => {
     container: {
       fontFamily: "'Roboto', 'Segoe UI', Arial, sans-serif",
       maxWidth: "1000px",
-      margin: "0 auto",
+      marginTop: "30px",
+      marginLeft: "auto",
+      marginRight: "auto",
+      marginBottom: "20px",
       padding: "20px",
-      backgroundColor: "#f9f9f9",
+      backgroundColor: "#ffffff",
       borderRadius: "8px",
       boxShadow: "0 2px 10px rgba(0,0,0,0.1)"
     },
