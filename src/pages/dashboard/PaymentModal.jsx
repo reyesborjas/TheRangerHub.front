@@ -103,7 +103,7 @@ const PaymentModal = ({ show, onClose, trip, userId }) => {
                 <Form onSubmit={handleSubmitPayment}>
                     <Form.Group className="mb-3">
                         <Form.Label>Monto a Pagar</Form.Label>
-                        <div className="form-control bg-light" style={{cursor: 'default'}}>
+                        <div className="form-control bg-light" style={{cursor: 'default', height: "45px"}}>
                             ${totalCost}
                         </div>
                     </Form.Group>
