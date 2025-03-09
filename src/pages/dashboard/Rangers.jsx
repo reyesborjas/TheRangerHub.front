@@ -5,7 +5,9 @@ import "../../styles/Rangers.css";
 export const Rangers = () => {
     const [rangers, setRangers] = useState([]);
     const [selectedRanger, setSelectedRanger] = useState(null);
+    const [rangerCertifications, setRangerCertifications] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [isLoadingCertifications, setIsLoadingCertifications] = useState(false);
     const [error, setError] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const [filterStatus, setFilterStatus] = useState("all"); // "all", "available", "unavailable"
@@ -17,7 +19,7 @@ export const Rangers = () => {
             setError(null);
             
             try {
-                // Obtener datos de la API
+                // Obtener datos de la API existente
                 const response = await fetch('https://rangerhub-back.vercel.app/rangers');
                 
                 if (!response.ok) {
@@ -44,21 +46,51 @@ export const Rangers = () => {
         fetchRangers();
     }, []);
 
-    const handleRangerClick = (ranger) => {
-        // Usar directamente los datos del ranger sin hacer petición adicional
+    // Función para obtener las certificaciones de un ranger
+    const fetchRangerCertifications = async (rangerId) => {
+        setIsLoadingCertifications(true);
+        setRangerCertifications([]);
+        
+        try {
+            // Usar la nueva ruta para certificaciones
+            const response = await fetch(`https://rangerhub-back.vercel.app/api/guide-certifications/${rangerId}`);
+            
+            if (!response.ok) {
+                throw new Error(`Error al obtener certificaciones: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            
+            if (data.certifications && Array.isArray(data.certifications)) {
+                setRangerCertifications(data.certifications);
+            }
+        } catch (err) {
+            console.error("Error al cargar certificaciones:", err);
+            // No mostramos error, simplemente dejamos la lista vacía
+        } finally {
+            setIsLoadingCertifications(false);
+        }
+    };
+
+    const handleRangerClick = async (ranger) => {
+        // Guardar los datos básicos del ranger
         setSelectedRanger(ranger);
         setShowModal(true);
+        
+        // Obtener certificaciones
+        fetchRangerCertifications(ranger.id);
     };
 
     const handleCloseModal = () => {
         setShowModal(false);
+        setRangerCertifications([]);
     };
 
     const handleFilterChange = (status) => {
         setFilterStatus(status);
     };
 
-    // Función para truncar el email en formato "d...@g...com"
+    // Función para truncar el email
     const getTruncatedEmail = (email) => {
         if (!email) return "No disponible";
         
@@ -233,16 +265,31 @@ export const Rangers = () => {
                                                 </div>
                                             )}
                                             
-                                            {selectedRanger.certifications && selectedRanger.certifications.length > 0 && (
-                                                <div className="spec-section">
-                                                    <h6>Certificaciones</h6>
+                                            {/* Sección de certificaciones */}
+                                            <div className="spec-section">
+                                                <h6>Certificaciones</h6>
+                                                {isLoadingCertifications ? (
+                                                    <div className="text-center py-2">
+                                                        <div className="spinner-border spinner-border-sm" role="status">
+                                                            <span className="visually-hidden">Cargando...</span>
+                                                        </div>
+                                                    </div>
+                                                ) : rangerCertifications.length > 0 ? (
                                                     <div className="spec-tags">
-                                                        {selectedRanger.certifications.map((cert, index) => (
-                                                            <span key={index} className="spec-tag">{cert}</span>
+                                                        {rangerCertifications.map((cert, index) => (
+                                                            <span 
+                                                                key={index} 
+                                                                className="spec-tag" 
+                                                                title={`${cert.title} - Emitido por: ${cert.issued_by || 'No especificado'}`}
+                                                            >
+                                                                {cert.title}
+                                                            </span>
                                                         ))}
                                                     </div>
-                                                </div>
-                                            )}
+                                                ) : (
+                                                    <p className="text-muted small">No hay certificaciones disponibles</p>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

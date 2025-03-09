@@ -13,8 +13,7 @@ export const Settings = () => {
         country: "",
         region: "",
         postcode: "",
-        languages: [],
-        specialties: []
+        languages: []
     });
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
@@ -25,14 +24,6 @@ export const Settings = () => {
     const availableLanguages = [
         "Español", "Inglés", "Portugués", "Francés", "Alemán", 
         "Italiano", "Chino", "Japonés", "Ruso", "Árabe"
-    ];
-    
-    // Lista de especialidades disponibles
-    const availablespecialties = [
-        "Scuba Diving", "Snorkeling", "Hiking", "Trekking",
-        "Camping", "Kayaking", "Rock Climbing", "Mountaineering",
-        "Wildlife Photography", "Bird Watching", "Ski", "Snowboard",
-        "Canyoning", "Rafting", "Sandboard", "Cycling", "Rappel"
     ];
     
     // Regiones según el país seleccionado
@@ -48,58 +39,37 @@ export const Settings = () => {
         return regionMap[country] || ["Otra"];
     };
 
+    // Fetch user profile data on component mount
     useEffect(() => {
         const fetchUserProfile = async () => {
             try {
                 setIsLoading(true);
-                const userToFetch = username || "current";
-                const API_BASE_URL = "https://rangerhub-back.vercel.app";
+                // Use the current user's username from URL params or get from auth context
+                const userToFetch = username || "current"; // You might want to implement a route for "current" user
                 
-                const response = await fetch(`${API_BASE_URL}/api/user-profile/${userToFetch}`, {
-                method: "GET", 
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            });
+                const API_BASE_URL = "https://rangerhub-back.vercel.app";
+                const response = await fetch(`${API_BASE_URL}/api/user-profile/${userToFetch}`);
+                
                 if (!response.ok) {
                     const text = await response.text();
                     console.error("API response:", text);
                     throw new Error(`Failed to fetch profile: ${response.status} ${response.statusText}`);
                 }
-    
-                const userData = await response.json();
-                console.log("Datos del usuario cargados:", JSON.stringify(userData, null, 2));
                 
-                // Extraer idiomas desde biography_extend si están disponibles
-                let languages = [];
-                if (userData.biography_extend) {
-                    try {
-                        let bioExtend = userData.biography_extend;
-                        if (typeof bioExtend === 'string') {
-                            bioExtend = JSON.parse(bioExtend);
-                        }
-                        if (bioExtend.languages && Array.isArray(bioExtend.languages)) {
-                            languages = bioExtend.languages;
-                        }
-                        console.log("Idiomas extraídos de biography_extend:", languages);
-                    } catch (e) {
-                        console.error("Error al procesar biography_extend:", e);
-                    }
-                }
-    
-                // Asegúrate de que setProfileData se llame correctamente
+                const userData = await response.json();
+                console.log("Profile data loaded:", userData);
+                
+                // Map the API response to our form state
                 setProfileData({
-                    displayName: userData.displayName || `${userData.firstName || ''} ${userData.lastName || ''}`.trim(),
+                    displayName: userData.displayName || `${userData.firstName} ${userData.lastName}`,
                     email: userData.email || "",
-                    nationality: userData.nationality || "",
-                    country: userData.country || "",
-                    region: userData.region || "",
+                    nationality: userData.nationality || "Chile",
+                    country: userData.country || "Chile",
+                    region: userData.region || "Santiago",
                     postcode: userData.postcode || "",
-                    languages: languages.length > 0 ? languages : (userData.languages || []),
-                    specialties: userData.specialties || []
+                    languages: userData.languages || []
                 });
-    
-                console.log("Estado del perfil actualizado:", profileData);
+                
                 setIsLoading(false);
             } catch (err) {
                 console.error("Error fetching user profile:", err);
@@ -107,11 +77,9 @@ export const Settings = () => {
                 setIsLoading(false);
             }
         };
-    
+
         fetchUserProfile();
     }, [username]);
-    
-    
 
     // Auto-hide success message after 5 seconds
     useEffect(() => {
@@ -150,92 +118,42 @@ export const Settings = () => {
             });
         }
     };
-    
-    // Manejar cambios en los checkboxes de especialidades
-    const handlespecialtiesyChange = (e) => {
-        const { value, checked } = e.target;
-    
-        if (checked) {
-            setProfileData({
-                ...profileData,
-                specialties: [...profileData.specialties, value]
-            });
-        } else {
-            setProfileData({
-                ...profileData,
-                specialties: profileData.specialties.filter(spec => spec !== value)
-            });
-        }
-    };
-    
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSaving(true);
         setError(null);
-    
+        
         try {
-            // Verifica que profileData tenga todos los campos necesarios
-            console.log("Datos a enviar:", profileData);
-            
-            // MODIFICADO: Preparar datos para enviar con idiomas en biography_extend
-            const biographyExtend = {
-                languages: profileData.languages
-            };
-            
-            const dataToSend = {
-                email: profileData.email,
-                nationality: profileData.nationality,
-                country: profileData.country,
-                region: profileData.region,
-                postcode: profileData.postcode,
-                specialties: profileData.specialties,
-                biography_extend: biographyExtend
-            };
-            
-            console.log("Datos a enviar con biography_extend:", dataToSend);
-    
             const API_BASE_URL = "https://rangerhub-back.vercel.app";
             const response = await fetch(`${API_BASE_URL}/api/user-profile/${username || "current"}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify(dataToSend) // Usar formato modificado con biography_extend
+                body: JSON.stringify(profileData)
             });
-    
+            
             if (!response.ok) {
                 let errorMessage = "Error al guardar los cambios";
                 try {
                     const errorData = await response.json();
                     errorMessage = errorData.error || errorMessage;
                 } catch (e) {
+                    // Si no podemos parsear JSON, intentamos obtener el texto
                     const errorText = await response.text();
                     console.error("API error response:", errorText);
                     errorMessage = `Error ${response.status}: ${response.statusText}`;
                 }
                 throw new Error(errorMessage);
             }
-    
+            
             setSuccess("Cambios guardados correctamente");
         } catch (err) {
             console.error("Error updating profile:", err);
             setError(err.message || "Error al guardar los cambios. Por favor, intenta más tarde.");
         } finally {
             setIsSaving(false);
-        }
-    };
-    
-    const handleFileUpload = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                // Here you would typically upload the file to your backend
-                // and update the profile picture URL
-                console.log("File selected:", file);
-                // Example: setProfileData({...profileData, profilePicture: reader.result});
-            };
-            reader.readAsDataURL(file);
         }
     };
 
@@ -250,12 +168,6 @@ export const Settings = () => {
                     onClick={() => setActiveTab("basics")}
                 >
                     Información Básica
-                </button>
-                <button
-                    className={`tab-button ${activeTab === "professional" ? "active" : ""}`}
-                    onClick={() => setActiveTab("professional")}
-                >
-                    Perfil Profesional
                 </button>
                 <button
                     className={`tab-button ${activeTab === "account" ? "active" : ""}`}
@@ -307,17 +219,9 @@ export const Settings = () => {
                                         <div className="profile-picture">
                                             <img src={profilePlaceholder} alt="Foto de perfil" />
                                         </div>
-                                        <input
-                                            type="file"
-                                            id="profilePicture"
-                                            name="profilePicture"
-                                            accept="image/*"
-                                            style={{ display: 'none' }}
-                                            onChange={handleFileUpload}
-                                        />
-                                        <label htmlFor="profilePicture" className="upload-photo-btn">
+                                        <button type="button" className="upload-photo-btn">
                                             Subir foto
-                                        </label>
+                                        </button>
                                     </div>
                                 </div>
 
@@ -403,30 +307,7 @@ export const Settings = () => {
                                         onChange={handleChange}
                                     />
                                 </div>
-
-                                {/* Botón de guardar */}
-                                <div className="form-group">
-                                    <button
-                                        type="submit"
-                                        className="save-btn"
-                                        disabled={isSaving}
-                                    >
-                                        {isSaving ? 'Guardando...' : 'Guardar'}
-                                    </button>
-                                </div>
-                            </form>
-                        )}
-                    </div>
-                )}
-
-                {activeTab === "professional" && (
-                    <div className="professional-profile">
-                        <h3>Perfil Profesional</h3>
-
-                        {isLoading ? (
-                            <div className="loading-indicator">Cargando información del perfil...</div>
-                        ) : (
-                            <form onSubmit={handleSubmit}>
+                                
                                 {/* Idiomas (checkboxes múltiples) */}
                                 <div className="form-group">
                                     <label>Idiomas que hablas</label>
@@ -441,25 +322,6 @@ export const Settings = () => {
                                                     onChange={handleLanguageChange}
                                                 />
                                                 <label htmlFor={`lang-${language}`}>{language}</label>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                                
-                                {/* Especialidades (checkboxes múltiples) */}
-                                <div className="form-group">
-                                    <label>Especialidades</label>
-                                    <div className="specialtiesy-options">
-                                        {availablespecialties.map(specialtiesy => (
-                                            <div key={specialtiesy} className="specialtiesy-option">
-                                                <input
-                                                    type="checkbox"
-                                                    id={`spec-${specialtiesy}`}
-                                                    value={specialtiesy}
-                                                    checked={profileData.specialties.includes(specialtiesy)}
-                                                    onChange={handlespecialtiesyChange}
-                                                />
-                                                <label htmlFor={`spec-${specialtiesy}`}>{specialtiesy}</label>
                                             </div>
                                         ))}
                                     </div>
@@ -504,9 +366,6 @@ export const Settings = () => {
                     </div>
                 )}
             </div>
-
-            
-            
         </div>
     );
 };
