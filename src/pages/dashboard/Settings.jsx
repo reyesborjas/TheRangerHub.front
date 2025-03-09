@@ -13,9 +13,20 @@ export const Settings = () => {
         country: "",
         region: "",
         postcode: "",
+        title: "", // Título profesional
         languages: [],
-        specialties: []
+        specialties: [],
+        profilePicture: ""
     });
+    
+    // Estado para cambio de contraseña
+    const [passwordData, setPasswordData] = useState({
+        current_password: "",
+        new_password: "",
+        confirm_password: ""
+    });
+    const [isChangingPassword, setIsChangingPassword] = useState(false);
+    
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
     const [success, setSuccess] = useState(null);
@@ -48,71 +59,89 @@ export const Settings = () => {
         return regionMap[country] || ["Otra"];
     };
 
-    useEffect(() => {
-        const fetchUserProfile = async () => {
-            try {
-                setIsLoading(true);
-                const userToFetch = username || "current";
-                const API_BASE_URL = "https://rangerhub-back.vercel.app";
-                
-                const response = await fetch(`${API_BASE_URL}/api/user-profile/${userToFetch}`, {
-                method: "GET", 
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            });
-                if (!response.ok) {
-                    const text = await response.text();
-                    console.error("API response:", text);
-                    throw new Error(`Failed to fetch profile: ${response.status} ${response.statusText}`);
-                }
-    
-                const userData = await response.json();
-                console.log("Datos del usuario cargados:", JSON.stringify(userData, null, 2));
-                
-                // Extraer idiomas desde biography_extend si están disponibles
-                let languages = [];
-                if (userData.biography_extend) {
-                    try {
-                        let bioExtend = userData.biography_extend;
-                        if (typeof bioExtend === 'string') {
-                            bioExtend = JSON.parse(bioExtend);
+   
+        useEffect(() => {
+            const fetchUserProfile = async () => {
+                try {
+                    setIsLoading(true);
+                    const userToFetch = username || "current";
+                    const API_BASE_URL = "https://rangerhub-back.vercel.app";
+                    
+                    const response = await fetch(`${API_BASE_URL}/api/user-profile/${userToFetch}`, {
+                        method: "GET", 
+                        headers: {
+                            "Content-Type": "application/json"
                         }
-                        if (bioExtend.languages && Array.isArray(bioExtend.languages)) {
-                            languages = bioExtend.languages;
-                        }
-                        console.log("Idiomas extraídos de biography_extend:", languages);
-                    } catch (e) {
-                        console.error("Error al procesar biography_extend:", e);
+                    });
+        
+                    if (!response.ok) {
+                        const text = await response.text();
+                        console.error("API response:", text);
+                        throw new Error(`Failed to fetch profile: ${response.status} ${response.statusText}`);
                     }
+        
+                    const userData = await response.json();
+                    console.log("Datos del usuario cargados:", JSON.stringify(userData, null, 2));
+        
+                    // Extraer datos desde biography_extend si están disponibles
+                    let languages = [];
+                    let title = "";
+                    let specialties = [];
+                    
+                    if (userData.biography_extend) {
+                        try {
+                            let bioExtend = userData.biography_extend;
+                            if (typeof bioExtend === 'string') {
+                                bioExtend = JSON.parse(bioExtend);
+                            }
+                            
+                            // Extraer título profesional
+                            if (bioExtend.title) {
+                                title = bioExtend.title;
+                            }
+                            
+                            // Extraer idiomas
+                            if (bioExtend.languages && Array.isArray(bioExtend.languages)) {
+                                languages = bioExtend.languages;
+                            }
+                            
+                            // Extraer especialidades
+                            if (bioExtend.specialties && Array.isArray(bioExtend.specialties)) {
+                                specialties = bioExtend.specialties;
+                            }
+                            
+                            console.log("Datos extraídos de biography_extend:", { title, languages, specialties });
+                        } catch (e) {
+                            console.error("Error al procesar biography_extend:", e);
+                        }
+                    }
+        
+                    // Asegúrate de que setProfileData se llame correctamente
+                    setProfileData({
+                        displayName: userData.displayName || `${userData.firstName || ''} ${userData.lastName || ''}`.trim(),
+                        email: userData.email || "",
+                        nationality: userData.nationality || "", // Nacionalidad
+                        country: userData.country || "", // País
+                        region: userData.region || "",
+                        postcode: userData.postcode || "",
+                        title: title, // Título profesional extraído de biography_extend
+                        languages: languages.length > 0 ? languages : (userData.languages || []),
+                        specialties: specialties.length > 0 ? specialties : (userData.specialties || []),
+                        profilePicture: userData.profilePicture || userData.profile_picture_url || ""
+                    });
+        
+                    console.log("Estado del perfil actualizado:", profileData);
+                    setIsLoading(false);
+                } catch (err) {
+                    console.error("Error fetching user profile:", err);
+                    setError("No se pudo cargar la información del perfil. Por favor, intenta más tarde.");
+                    setIsLoading(false);
                 }
+            };
+        
+            fetchUserProfile();
+        }, [username]);
     
-                // Asegúrate de que setProfileData se llame correctamente
-                setProfileData({
-                    displayName: userData.displayName || `${userData.firstName || ''} ${userData.lastName || ''}`.trim(),
-                    email: userData.email || "",
-                    nationality: userData.nationality || "",
-                    country: userData.country || "",
-                    region: userData.region || "",
-                    postcode: userData.postcode || "",
-                    languages: languages.length > 0 ? languages : (userData.languages || []),
-                    specialties: userData.specialties || []
-                });
-    
-                console.log("Estado del perfil actualizado:", profileData);
-                setIsLoading(false);
-            } catch (err) {
-                console.error("Error fetching user profile:", err);
-                setError("No se pudo cargar la información del perfil. Por favor, intenta más tarde.");
-                setIsLoading(false);
-            }
-        };
-    
-        fetchUserProfile();
-    }, [username]);
-    
-    
-
     // Auto-hide success message after 5 seconds
     useEffect(() => {
         if (success) {
@@ -128,6 +157,16 @@ export const Settings = () => {
         
         setProfileData({
             ...profileData,
+            [name]: value
+        });
+    };
+    
+    // Manejar cambios en el formulario de contraseña
+    const handlePasswordChange = (e) => {
+        const { name, value } = e.target;
+        
+        setPasswordData({
+            ...passwordData,
             [name]: value
         });
     };
@@ -177,9 +216,11 @@ export const Settings = () => {
             // Verifica que profileData tenga todos los campos necesarios
             console.log("Datos a enviar:", profileData);
             
-            // MODIFICADO: Preparar datos para enviar con idiomas en biography_extend
+            // Preparar datos para enviar con idiomas y título en biography_extend
             const biographyExtend = {
-                languages: profileData.languages
+                languages: profileData.languages,
+                title: profileData.title, // Incluir título profesional en biography_extend
+                specialties: profileData.specialties // Incluir especialidades en biography_extend
             };
             
             const dataToSend = {
@@ -188,7 +229,7 @@ export const Settings = () => {
                 country: profileData.country,
                 region: profileData.region,
                 postcode: profileData.postcode,
-                specialties: profileData.specialties,
+                profile_picture_url: profileData.profilePicture,
                 biography_extend: biographyExtend
             };
             
@@ -222,6 +263,69 @@ export const Settings = () => {
             setError(err.message || "Error al guardar los cambios. Por favor, intenta más tarde.");
         } finally {
             setIsSaving(false);
+        }
+    };
+    
+    // Función para cambiar la contraseña
+    const handleChangePassword = async (e) => {
+        e.preventDefault();
+        setIsChangingPassword(true);
+        setError(null);
+        setSuccess(null);
+        
+        try {
+            // Validar que la nueva contraseña y la confirmación coincidan
+            if (passwordData.new_password !== passwordData.confirm_password) {
+                throw new Error("La nueva contraseña y su confirmación no coinciden");
+            }
+            
+            // Validar longitud mínima
+            if (passwordData.new_password.length < 8) {
+                throw new Error("La nueva contraseña debe tener al menos 8 caracteres");
+            }
+            
+            // Preparar datos para enviar
+            const dataToSend = {
+                username: username,
+                current_password: passwordData.current_password,
+                new_password: passwordData.new_password
+            };
+            
+            const API_BASE_URL = "https://rangerhub-back.vercel.app";
+            const response = await fetch(`${API_BASE_URL}/api/change-password`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(dataToSend)
+            });
+            
+            if (!response.ok) {
+                let errorMessage = "Error al cambiar la contraseña";
+                try {
+                    const errorData = await response.json();
+                    errorMessage = errorData.error || errorMessage;
+                } catch (e) {
+                    const errorText = await response.text();
+                    console.error("API error response:", errorText);
+                    errorMessage = `Error ${response.status}: ${response.statusText}`;
+                }
+                throw new Error(errorMessage);
+            }
+            
+            // Limpiar el formulario tras el éxito
+            setPasswordData({
+                current_password: "",
+                new_password: "",
+                confirm_password: ""
+            });
+            
+            setSuccess("Contraseña actualizada correctamente");
+        } catch (err) {
+            console.error("Error changing password:", err);
+            setError(err.message || "Error al cambiar la contraseña. Por favor, intenta más tarde.");
+        } finally {
+            setIsChangingPassword(false);
         }
     };
     
@@ -302,24 +406,32 @@ export const Settings = () => {
                             <form onSubmit={handleSubmit}>
                                 {/* Foto de perfil */}
                                 <div className="profile-section">
-                                    <h4>Perfil</h4>
-                                    <div className="profile-picture-container">
-                                        <div className="profile-picture">
-                                            <img src={profilePlaceholder} alt="Foto de perfil" />
-                                        </div>
+                                <h4>Perfil</h4>
+                                <div className="profile-picture-container">
+                                    <div className="profile-picture">
+                                        <img 
+                                            src={profileData.profilePicture || profilePlaceholder} 
+                                            alt="Foto de perfil" 
+                                            onError={(e) => {
+                                                e.target.src = profilePlaceholder;
+                                            }}
+                                        />
+                                    </div>
+                                    {/* Nuevo campo para la URL de la foto */}
+                                    <div className="form-group">
+                                        <label htmlFor="profilePicture">URL Foto de Perfil</label>
                                         <input
-                                            type="file"
+                                            type="text"
                                             id="profilePicture"
                                             name="profilePicture"
-                                            accept="image/*"
-                                            style={{ display: 'none' }}
-                                            onChange={handleFileUpload}
+                                            className="form-control"
+                                            value={profileData.profilePicture}
+                                            onChange={handleChange}
+                                            placeholder="Ingresa la URL de tu foto de perfil"
                                         />
-                                        <label htmlFor="profilePicture" className="upload-photo-btn">
-                                            Subir foto
-                                        </label>
                                     </div>
                                 </div>
+                            </div>
 
                                 {/* Nombre para mostrar */}
                                 <div className="form-group">
@@ -427,6 +539,20 @@ export const Settings = () => {
                             <div className="loading-indicator">Cargando información del perfil...</div>
                         ) : (
                             <form onSubmit={handleSubmit}>
+                                {/* Título Profesional - Nuevo campo */}
+                                <div className="form-group">
+                                    <label htmlFor="title">Título Profesional</label>
+                                    <input
+                                        type="text"
+                                        id="title"
+                                        name="title"
+                                        className="form-control"
+                                        value={profileData.title}
+                                        onChange={handleChange}
+                                        placeholder="Ej: Instructor Deportivo, Guía de Montaña, etc."
+                                    />
+                                </div>
+                                
                                 {/* Idiomas (checkboxes múltiples) */}
                                 <div className="form-group">
                                     <label>Idiomas que hablas</label>
@@ -483,8 +609,80 @@ export const Settings = () => {
                 {activeTab === "account" && (
                     <div className="account-settings">
                         <h3>Configuración de la Cuenta</h3>
-                        <p>Aquí podrás gestionar los ajustes de tu cuenta, como cambio de contraseña y preferencias de seguridad.</p>
-                        {/* Contenido de ajustes de cuenta (estático por ahora) */}
+                        
+                        {isLoading ? (
+                            <div className="loading-indicator">Cargando información de la cuenta...</div>
+                        ) : (
+                            <div className="account-sections">
+                                {/* Sección de cambio de contraseña */}
+                                <div className="password-section">
+                                    <h4>Cambiar Contraseña</h4>
+                                    <form onSubmit={handleChangePassword}>
+                                        <div className="form-group">
+                                            <label htmlFor="current_password">Contraseña Actual</label>
+                                            <input
+                                                type="password"
+                                                id="current_password"
+                                                name="current_password"
+                                                className="form-control"
+                                                value={passwordData.current_password}
+                                                onChange={handlePasswordChange}
+                                                required
+                                            />
+                                        </div>
+                                        
+                                        <div className="form-group">
+                                            <label htmlFor="new_password">Nueva Contraseña</label>
+                                            <input
+                                                type="password"
+                                                id="new_password"
+                                                name="new_password"
+                                                className="form-control"
+                                                value={passwordData.new_password}
+                                                onChange={handlePasswordChange}
+                                                required
+                                                minLength={8}
+                                            />
+                                            <small className="form-text text-muted">
+                                                La contraseña debe tener al menos 8 caracteres.
+                                            </small>
+                                        </div>
+                                        
+                                        <div className="form-group">
+                                            <label htmlFor="confirm_password">Confirmar Nueva Contraseña</label>
+                                            <input
+                                                type="password"
+                                                id="confirm_password"
+                                                name="confirm_password"
+                                                className="form-control"
+                                                value={passwordData.confirm_password}
+                                                onChange={handlePasswordChange}
+                                                required
+                                            />
+                                        </div>
+                                        
+                                        <button
+                                            type="submit"
+                                            className="change-password-btn"
+                                            disabled={isChangingPassword}
+                                        >
+                                            {isChangingPassword ? 'Cambiando...' : 'Cambiar Contraseña'}
+                                        </button>
+                                    </form>
+                                </div>
+                                
+                                {/* Aquí puedes agregar otras secciones relacionadas con la cuenta si es necesario */}
+                                <div className="account-security">
+                                    <h4>Seguridad de la Cuenta</h4>
+                                    <p>Mantén tu cuenta segura siguiendo estas recomendaciones:</p>
+                                    <ul className="security-tips">
+                                        <li>Usa contraseñas únicas para cada sitio web.</li>
+                                        S<li>No compartas tus credenciales con nadie.</li>
+                                        <li>Actualiza tu contraseña regularmente.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 )}
 
@@ -504,9 +702,6 @@ export const Settings = () => {
                     </div>
                 )}
             </div>
-
-            
-            
         </div>
     );
 };
