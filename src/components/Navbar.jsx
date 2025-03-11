@@ -20,9 +20,9 @@ const MyNavbar = () => {
 
     return (
         <nav className="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
-            <div className="container">
+            <div className="container-fluid">
                 <Link className="navbar-brand d-flex align-items-center" to="/">
-                    <img src={logo} alt="Logo" className="navbar-logo me-2" />
+                    <img src={logo} alt="The Ranger Hub" className="navbar-logo img-fluid me-2" />
                 </Link>
                 <button
                     className="navbar-toggler"

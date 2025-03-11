@@ -7,6 +7,7 @@ import CtaSection from "../components/CtaSection.jsx";
 import Footer from "../components/Footer.jsx";
 import MyNavbar from "../components/Navbar.jsx";
 import { useNavigate } from "react-router-dom";
+import "../styles/index.css"
 
 const HeroSection = () => {
     const [backgroundImage, setBackgroundImage] = useState("/Torres.jpeg");
