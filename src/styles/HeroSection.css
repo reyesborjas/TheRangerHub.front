@@ -33,30 +33,35 @@
 }
 
 .hero-content h1 {
-    font-size: 4.5rem;
+    font-size: 3rem; /* Tamaño base para móviles */
     line-height: 1.1;
     font-weight: bold;
-    margin-bottom: 3rem;
+    margin-bottom: 2rem; /* Reduce el margen para móviles */
 }
 
 .hero-content p {
-    font-size: 1.5rem;
-    margin-bottom: 5rem;
+    font-size: 1.2rem; /* Tamaño base para móviles */
+    margin-bottom: 3rem; /* Reduce el margen para móviles */
 }
 
 .hero-buttons {
     display: flex;
-    gap: 2rem;
+    flex-direction: column; /* Apila botones en móviles */
+    gap: 1rem; /* Reduce el espacio entre botones en móviles */
     justify-content: center;
+}
+
+.btn-ranger,
+.btn-explorer {
+    padding: 12px 28px; /* Reduce el padding para móviles */
+    font-size: 1rem; /* Reduce el tamaño de la fuente para móviles */
+    font-weight: 600; /* Ajusta el peso de la fuente para móviles */
 }
 
 .btn-ranger {
     background-color: #e63946;
     color: #fff;
     border: none;
-    padding: 16px 36px;
-    font-size: 1.3rem;
-    font-weight: 700;
     cursor: pointer;
     transition: 0.3s;
 }
@@ -69,13 +74,58 @@
     background-color: #2a9d8f;
     color: #fff;
     border: none;
-    padding: 16px 36px;
-    font-size: 1.3rem;
-    font-weight: 700;
     cursor: pointer;
     transition: 0.3s;
 }
 
 .btn-explorer:hover {
     background-color: #21867b;
+}
+
+/* Media query para tablets (768px y más) */
+@media (min-width: 768px) {
+    .hero-content h1 {
+        font-size: 4rem;
+        margin-bottom: 2.5rem;
+    }
+
+    .hero-content p {
+        font-size: 1.4rem;
+        margin-bottom: 4rem;
+    }
+
+    .hero-buttons {
+        flex-direction: row; /* Coloca los botones en fila en tablets */
+        gap: 1.5rem; /* Aumenta el espacio entre botones en tablets */
+    }
+
+    .btn-ranger,
+    .btn-explorer {
+        padding: 14px 32px;
+        font-size: 1.2rem;
+        font-weight: 700;
+    }
+}
+
+/* Media query para escritorios (1024px y más) */
+@media (min-width: 1024px) {
+    .hero-content h1 {
+        font-size: 4.5rem;
+        margin-bottom: 3rem;
+    }
+
+    .hero-content p {
+        font-size: 1.5rem;
+        margin-bottom: 5rem;
+    }
+
+    .hero-buttons {
+        gap: 2rem; /* Aumenta el espacio entre botones en escritorios */
+    }
+
+    .btn-ranger,
+    .btn-explorer {
+        padding: 16px 36px;
+        font-size: 1.3rem;
+    }
 }

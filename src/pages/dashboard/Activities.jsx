@@ -2,16 +2,12 @@ import { useEffect, useState } from "react";
 import "../../styles/Activities.css";
 import EditActivityModal from "./EditActivityModal";
 
-
 export const Activities = () => {
     const [activities, setActivities] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
-
     const currentUser = JSON.parse(localStorage.getItem("currentUser")) || null;
-
-    // Estado para el modal de edición
     const [showEditModal, setShowEditModal] = useState(false);
     const [currentActivityToEdit, setCurrentActivityToEdit] = useState(null);
 
@@ -67,8 +63,7 @@ export const Activities = () => {
             console.error("No se encontró la actividad con ID:", activityId);
         }
     };
-    
-    // Definir la función handleActivityUpdate
+
     const handleActivityUpdate = (updatedActivity) => {
         fetch(`https://rangerhub-back.vercel.app/activities/${updatedActivity.id}`, {
             method: 'PUT',
@@ -86,8 +81,7 @@ export const Activities = () => {
                 return response.json();
             })
             .then((data) => {
-                // Actualizar la lista de actividades
-                setActivities(activities.map(activity => 
+                setActivities(activities.map(activity =>
                     activity.id === updatedActivity.id ? data.activity || updatedActivity : activity
                 ));
                 setShowEditModal(false);
@@ -99,7 +93,7 @@ export const Activities = () => {
                 alert(error.message || "Hubo un error al actualizar la actividad");
             });
     };
-    
+
     const handleDelete = (activityId) => {
         if (window.confirm("¿Estás seguro de que deseas eliminar esta actividad?")) {
             fetch(`https://rangerhub-back.vercel.app/activities/${activityId}`, {
@@ -123,11 +117,12 @@ export const Activities = () => {
                 });
         }
     };
+
     return (
-        <div className="my-trips-container container">
+        <div className="activities-container container">
             <h1 className="text-center my-4">Actividades que Tenemos para Ofrecer</h1>
-            <div className="col-md-6">
-                <div className="input-group" style={{marginLeft:"290px", marginBottom:"40px"}} >
+            <div className="search-container">
+                <div className="input-group">
                     <input
                         type="text"
                         className="form-control"
@@ -139,81 +134,63 @@ export const Activities = () => {
                 </div>
             </div>
             {error && <div className="alert alert-danger text-center" role="alert">{error}</div>}
-            {
-                isLoading ? (
-                    <div className="d-flex justify-content-center my-5">
-                        <div className="spinner-border text-primary" role="status">
-                            <span className="visually-hidden">Cargando...</span>
-                        </div>
+            {isLoading ? (
+                <div className="d-flex justify-content-center my-5">
+                    <div className="spinner-border text-primary" role="status">
+                        <span className="visually-hidden">Cargando...</span>
                     </div>
-                ) : filteredActivities.length > 0 ? (
-                    <div className="row row-cols-1 row-cols-md-3 g-4">
-                        {filteredActivities.map((activity, index) => (
-                            <div className="col" key={activity.id || index}>
-                                <div className="activity-card new-layout">
-                                    <div className="activity-image-container">
-                                        {activity.activity_image_url ? (
-                                            <img
-                                                src={activity.activity_image_url}
-                                                alt={activity.name}
-                                                className="img-fluid cover-img"
-                                            />
-                                        ) : (
-                                            <div className="no-image">Sin imagen</div>
-                                        )}
-                                    </div>
-
-                                    {/* Botones de edición y eliminación, visibles para Rangers */}
+                </div>
+            ) : filteredActivities.length > 0 ? (
+                <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                    {filteredActivities.map((activity, index) => (
+                        <div className="col" key={activity.id || index}>
+                            {/* ... (resto del código de la tarjeta de actividad) */}
+                            <div className="activity-card">
+                                <div className="activity-image-container">
+                                    {activity.activity_image_url ? (
+                                        <img src={activity.activity_image_url} alt={activity.name} className="img-fluid cover-img" />
+                                    ) : (
+                                        <div className="no-image">Sin imagen</div>
+                                    )}
                                     {currentUser && currentUser.role_name === "Ranger" && (
-                                        <>
-                                            <button
-                                                className="edit-btn"
-                                                onClick={() => handleEdit(activity.id)}
-                                                title="Editar actividad"
-                                            >
+                                        <div className="activity-actions">
+                                            <button className="edit-btn" onClick={() => handleEdit(activity.id)} title="Editar actividad">
                                                 <i className="fas fa-pencil-alt"></i>
                                             </button>
-                                            <button
-                                                className="delete-btn"
-                                                onClick={() => handleDelete(activity.id)}
-                                                title="Eliminar actividad"
-                                            >
+                                            <button className="delete-btn" onClick={() => handleDelete(activity.id)} title="Eliminar actividad">
                                                 <i className="fas fa-trash-alt"></i>
                                             </button>
-                                        </>
+                                        </div>
                                     )}
-
-
-                                    <div className="activity-content">
-                                        <div className="activity-header">
-                                            <h3 className="activity-title">{activity.name}</h3>
+                                </div>
+                                <div className="activity-content">
+                                    <div className="activity-header">
+                                        <h3 className="activity-title">{activity.name}</h3>
+                                    </div>
+                                    <div className="activity-details">
+                                        <div className="difficulty-section">
+                                            <span className={`activity-difficulty ${getDifficultyClass(activity.difficulty)}`}>
+                                                Dificultad: {activity.difficulty || "N/A"}
+                                            </span>
                                         </div>
-                                        <div className="activity-details">
-                                            <div className="difficulty-section">
-                                                <span className={`activity-difficulty ${getDifficultyClass(activity.difficulty)}`}>
-                                                    Dificultad: {activity.difficulty || "N/A"}
-                                                </span>
-                                            </div>
-                                            <div className="cost-section">
-                                                <span className="activity-cost">Costo: ${activity.cost || "0"}</span>
-                                            </div>
+                                        <div className="cost-section">
+                                            <span className="activity-cost">Costo: ${activity.cost || "0"}</span>
                                         </div>
-                                        <hr className="divider" />
-                                        <div className="description-section">
-                                            <p className="activity-description">{activity.description}</p>
-                                        </div>
+                                    </div>
+                                    <hr className="divider" />
+                                    <div className="description-section">
+                                        <p className="activity-description">{activity.description}</p>
                                     </div>
                                 </div>
                             </div>
-                        ))}
-                    </div>
-                ) : (
-                    <div className="text-center my-5">
-                        <h3>No se encontraron actividades con ese criterio de búsqueda.</h3>
-                    </div>
-                )
-            }
-            {/* Modal de edición */}
+                        </div>
+                    ))}
+                </div>
+            ) : (
+                <div className="text-center my-5">
+                    <h3>No se encontraron actividades con ese criterio de búsqueda.</h3>
+                </div>
+            )}
             {showEditModal && (
                 <EditActivityModal
                     activity={currentActivityToEdit}
@@ -225,6 +202,6 @@ export const Activities = () => {
                     onSave={handleActivityUpdate}
                 />
             )}
-        </div >
+        </div>
     );
 };
