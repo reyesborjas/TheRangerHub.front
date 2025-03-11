@@ -1,123 +1,607 @@
 import React, { useState, useEffect } from 'react';
-import TripDetailsModal from './TripDetailsModal';
 
-function TripManagementPage() {
-  const [trips, setTrips] = useState([]);
-  const [selectedTrip, setSelectedTrip] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+const TripDetailsModal = ({ trip, show, onClose }) => {
+  const [explorers, setExplorers] = useState([]);
+  const [activities, setActivities] = useState([]);
+  const [isLoading, setIsLoading] = useState({
+    explorers: false,
+    activities: false,
+    payments: false
+  });
+  const [error, setError] = useState({
+    explorers: null,
+    activities: null,
+    payments: null
+  });
+  const [debugInfo, setDebugInfo] = useState(null);
+  
+  // State for trip, explorer, and payment statuses
+  const [tripStatus, setTripStatus] = useState(trip?.trip_status || trip?.status || 'Pendiente');
+  const [explorerStatuses, setExplorerStatuses] = useState({});
+  const [paymentStatuses, setPaymentStatuses] = useState({});
 
-  // Function to update trip status
-  const updateTripStatus = async (tripId, newStatus) => {
-    try {
-      const response = await fetch('/trips', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          id: tripId,
-          trip_status: newStatus
-        })
+  // Status configurations
+  const tripStatusOptions = [
+    { label: 'Pendiente', className: 'text-warning' },
+    { label: 'Confirmado', className: 'text-success' },
+    { label: 'Cancelado', className: 'text-danger' }
+  ];
+
+  const paymentStatusOptions = ['Pendiente', 'Confirmado', 'Rechazado'];
+  const paymentStatusClasses = {
+    'Pendiente': 'bg-warning',
+    'Confirmado': 'bg-success', 
+    'Rechazado': 'bg-danger'
+  };
+
+  // Dropdown for Trip Status
+  const TripStatusDropdown = () => {
+    const [isOpen, setIsOpen] = useState(false);
+
+    return (
+      <div className="dropdown">
+        <button 
+          className={`btn dropdown-toggle ${
+            tripStatusOptions.find(opt => opt.label === tripStatus)?.className || 'text-secondary'
+          }`}
+          type="button"
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          {tripStatus}
+        </button>
+        {isOpen && (
+          <div className={`dropdown-menu ${isOpen ? 'show' : ''}`}>
+            {tripStatusOptions.map((option) => (
+              <button
+                key={option.label}
+                className={`dropdown-item ${option.className}`}
+                onClick={() => {
+                  setTripStatus(option.label);
+                  setIsOpen(false);
+                }}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // Button to toggle Explorer Status
+  const ExplorerStatusButton = ({ explorer }) => {
+    const statusOptions = ['Pendiente', 'Confirmado', 'Cancelado'];
+    const statusClasses = {
+      'Pendiente': 'bg-warning',
+      'Confirmado': 'bg-success', 
+      'Cancelado': 'bg-danger'
+    };
+
+    const getCurrentStatus = () => {
+      return explorerStatuses[explorer.id] || explorer.status || 'Pendiente';
+    };
+
+    const handleStatusChange = () => {
+      const currentStatusIndex = statusOptions.indexOf(getCurrentStatus());
+      const nextStatusIndex = (currentStatusIndex + 1) % statusOptions.length;
+      const nextStatus = statusOptions[nextStatusIndex];
+
+      setExplorerStatuses(prev => ({
+        ...prev,
+        [explorer.id]: nextStatus
+      }));
+    };
+
+    const currentStatus = getCurrentStatus();
+
+    return (
+      <button
+        onClick={handleStatusChange}
+        className={`badge ${statusClasses[currentStatus]} text-white`}
+      >
+        {currentStatus}
+      </button>
+    );
+  };
+
+  // New button to toggle Payment Status
+  const PaymentStatusButton = ({ explorer }) => {
+    const getCurrentStatus = () => {
+      return paymentStatuses[explorer.id] || explorer.payment_status || 'Pendiente';
+    };
+
+    const handleStatusChange = () => {
+      const currentStatusIndex = paymentStatusOptions.indexOf(getCurrentStatus());
+      const nextStatusIndex = (currentStatusIndex + 1) % paymentStatusOptions.length;
+      const nextStatus = paymentStatusOptions[nextStatusIndex];
+
+      setPaymentStatuses(prev => ({
+        ...prev,
+        [explorer.id]: nextStatus
+      }));
+    };
+
+    const currentStatus = getCurrentStatus();
+
+    return (
+      <button
+        onClick={handleStatusChange}
+        className={`badge ${paymentStatusClasses[currentStatus]} text-white`}
+      >
+        {currentStatus}
+      </button>
+    );
+  };
+
+  useEffect(() => {
+    if (show && trip) {
+      fetchExplorers();
+      fetchActivities();
+      // We'll fetch payment information after explorers are loaded
+    } else {
+      // Clear data when modal is closed
+      setExplorers([]);
+      setActivities([]);
+      setError({
+        explorers: null,
+        activities: null,
+        payments: null
       });
+      setDebugInfo(null);
+    }
+  }, [show, trip]);
+
+  // After explorers are loaded, fetch their payment information
+  useEffect(() => {
+    if (explorers.length > 0 && trip?.id) {
+      fetchPaymentStatuses();
+    }
+  }, [explorers, trip?.id]);
+
+  const fetchExplorers = async () => {
+    if (!trip || !trip.id) return;
+    
+    setIsLoading(prev => ({ ...prev, explorers: true }));
+    setError(prev => ({ ...prev, explorers: null }));
+    
+    try {
+      console.log(`Fetching explorers for trip ID: ${trip.id}`);
       
-      const data = await response.json();
+      const response = await fetch(`https://rangerhub-back.vercel.app/reservations/trip/${trip.id}/explorers`);
+      
+      console.log(`Explorers response status: ${response.status}`);
       
       if (!response.ok) {
-        // Handle error (show message, etc.)
-        throw new Error(data.message || 'Error actualizando estado');
+        throw new Error(`Error ${response.status}: No se pudieron obtener los exploradores`);
       }
       
-      // Update the local state to reflect the new status
-      setTrips(prevTrips => 
-        prevTrips.map(trip => 
-          trip.id === tripId 
-            ? { ...trip, trip_status: newStatus } 
-            : trip
-        )
-      );
-
-      // If the selected trip is the one being updated
-      if (selectedTrip && selectedTrip.id === tripId) {
-        setSelectedTrip(prev => ({ ...prev, trip_status: newStatus }));
+      const responseText = await response.text();
+      
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error("Error parsing JSON:", parseError);
+        throw new Error(`Error al procesar la respuesta: ${parseError.message}`);
       }
-
-      // Optional: Show success notification
-      console.log(data.message);
+      
+      console.log("Parsed explorers data:", data);
+      
+      if (data && data.explorers) {
+        if (Array.isArray(data.explorers)) {
+          const normalizedExplorers = data.explorers.map(explorer => {
+            if (Array.isArray(explorer)) {
+              return {
+                id: explorer[0] || `temp-id-${Math.random()}`,
+                name: explorer[1] || 'N/A',
+                email: explorer[2] || 'N/A',
+                phone: explorer[3] || 'N/A',
+                status: explorer[4] || 'pending'
+              };
+            }
+            
+            return {
+              id: explorer.id || `temp-id-${Math.random()}`,
+              name: explorer.name || 'N/A',
+              email: explorer.email || 'N/A',
+              phone: explorer.phone || explorer.phone_number || 'N/A',
+              status: explorer.status || 'pending'
+            };
+          });
+          
+          setExplorers(normalizedExplorers);
+        } else {
+          console.error("data.explorers no es un array:", data.explorers);
+          setDebugInfo(`data.explorers no es un array: ${JSON.stringify(data.explorers)}`);
+          setExplorers([]);
+        }
+      } else {
+        console.warn("Respuesta sin datos de exploradores:", data);
+        setExplorers([]);
+      }
+      
     } catch (error) {
-      console.error('Error updating trip status:', error);
-      // Optional: Show error notification to user
-      // For example:
-      // toast.error(error.message);
+      console.error("Error al obtener exploradores:", error);
+      setError(prev => ({ ...prev, explorers: `Error: ${error.message}` }));
+    } finally {
+      setIsLoading(prev => ({ ...prev, explorers: false }));
     }
   };
 
-  // Fetch trips or handle trip selection
-  const handleTripSelect = (trip) => {
-    setSelectedTrip(trip);
-    setIsModalOpen(true);
+  // New function to fetch payment statuses for all explorers
+  const fetchPaymentStatuses = async () => {
+    if (!trip || !trip.id || explorers.length === 0) return;
+    
+    setIsLoading(prev => ({ ...prev, payments: true }));
+    setError(prev => ({ ...prev, payments: null }));
+    
+    try {
+      console.log(`Fetching payment statuses for trip ID: ${trip.id}`);
+      
+      // Create a new object to store payment statuses
+      const statusesObj = {};
+      
+      // Fetch payment info for each explorer
+      const paymentPromises = explorers.map(async (explorer) => {
+        try {
+          const response = await fetch(`https://rangerhub-back.vercel.app/payments/user/${explorer.id}/trip/${trip.id}`);
+          
+          if (!response.ok) {
+            console.warn(`No payment info found for explorer ${explorer.id}`);
+            return { userId: explorer.id, status: 'Pendiente' };
+          }
+          
+          const data = await response.json();
+          return { 
+            userId: explorer.id, 
+            status: data.payment_status || 'Pendiente',
+            paymentInfo: data 
+          };
+        } catch (err) {
+          console.warn(`Error fetching payment for explorer ${explorer.id}:`, err);
+          return { userId: explorer.id, status: 'Pendiente' };
+        }
+      });
+      
+      const results = await Promise.all(paymentPromises);
+      
+      // Update explorers with payment info and create payment statuses object
+      results.forEach(result => {
+        statusesObj[result.userId] = result.status;
+      });
+      
+      setPaymentStatuses(statusesObj);
+      
+      // Update the explorers with payment information
+      setExplorers(prev => prev.map(explorer => {
+        const paymentInfo = results.find(r => r.userId === explorer.id)?.paymentInfo;
+        return {
+          ...explorer,
+          payment_status: statusesObj[explorer.id],
+          payment_info: paymentInfo
+        };
+      }));
+      
+    } catch (error) {
+      console.error("Error al obtener estados de pago:", error);
+      setError(prev => ({ ...prev, payments: `Error: ${error.message}` }));
+    } finally {
+      setIsLoading(prev => ({ ...prev, payments: false }));
+    }
   };
 
-  // Fetch trips when component mounts
-  useEffect(() => {
-    const fetchTrips = async () => {
-      try {
-        const response = await fetch('/api/trips');
-        if (!response.ok) {
-          throw new Error('Error fetching trips');
-        }
-        const data = await response.json();
-        setTrips(data);
-      } catch (error) {
-        console.error('Error fetching trips:', error);
+  const fetchActivities = async () => {
+    if (!trip || !trip.id) return;
+    
+    setIsLoading(prev => ({ ...prev, activities: true }));
+    setError(prev => ({ ...prev, activities: null }));
+    
+    try {
+      console.log(`Fetching activities for trip ID: ${trip.id}`);
+      
+      const response = await fetch(`https://rangerhub-back.vercel.app/trips/${trip.id}/activities`);
+      
+      if (!response.ok) {
+        throw new Error(`Error ${response.status} al obtener actividades del viaje`);
       }
-    };
+      
+      const data = await response.json();
+      console.log("Trip activities data:", data);
+      
+      if (!data || !Array.isArray(data.activities)) {
+        console.warn("Formato inesperado en datos de actividades:", data);
+        setActivities([]);
+        return;
+      }
+      
+      setActivities(data.activities);
+      console.log(`Se encontraron ${data.activities.length} actividades para este viaje`);
+      
+    } catch (error) {
+      console.error("Error al obtener actividades:", error);
+      setError(prev => ({ ...prev, activities: `Error: ${error.message}` }));
+      setActivities([]);
+    } finally {
+      setIsLoading(prev => ({ ...prev, activities: false }));
+    }
+  };
 
-    fetchTrips();
-  }, []);
+  // Save changes handler
+  const handleSave = async () => {
+    try {
+      // Update trip status
+      const tripStatusUpdateResponse = await fetch(`https://rangerhub-back.vercel.app/trips/${trip.id}/status`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ status: tripStatus })
+      });
+
+      if (!tripStatusUpdateResponse.ok) {
+        const errorText = await tripStatusUpdateResponse.text();
+        throw new Error(`Error actualizando estado del viaje: ${errorText}`);
+      }
+
+      // Update explorer statuses
+      const explorerStatusPromises = Object.entries(explorerStatuses).map(async ([userId, status]) => {
+        const response = await fetch(`https://rangerhub-back.vercel.app/reservations/trip/${trip.id}/user/${userId}/status`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ status })
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Error actualizando estado de reserva: ${errorText}`);
+        }
+
+        return response;
+      });
+
+      // Update payment statuses
+      const paymentStatusPromises = Object.entries(paymentStatuses).map(async ([userId, status]) => {
+        const response = await fetch(`https://rangerhub-back.vercel.app/payments/trip/${trip.id}/user/${userId}/status`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ payment_status: status })
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Error actualizando estado de pago: ${errorText}`);
+        }
+
+        return response;
+      });
+
+      await Promise.all([...explorerStatusPromises, ...paymentStatusPromises]);
+
+      // Show success message
+      alert('Cambios guardados exitosamente');
+      
+      // Refresh data or close modal
+      onClose();
+    } catch (error) {
+      console.error('Error saving changes:', error);
+      alert(`Error al guardar los cambios: ${error.message}`);
+    }
+  };
+
+  // Format date function (from original component)
+  const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return dateString;
+      
+      return date.toLocaleDateString('es-ES', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      });
+    } catch (error) {
+      console.error("Error al formatear fecha:", error);
+      return dateString;
+    }
+  };
+
+  // Calculate duration function
+  const calculateDuration = () => {
+    if (!trip.start_date || !trip.end_date) return 'N/A';
+    
+    try {
+      const startDate = new Date(trip.start_date);
+      const endDate = new Date(trip.end_date);
+      
+      if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) return 'N/A';
+      
+      const diffTime = Math.abs(endDate - startDate);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      
+      return diffDays;
+    } catch (error) {
+      console.error("Error al calcular duración:", error);
+      return 'N/A';
+    }
+  };
+
+  // If show is false, return null (existing behavior)
+  if (!show) return null;
 
   return (
-    <div>
-      {/* Trip list or grid */}
-      <div className="row">
-        {trips.map(trip => (
-          <div 
-            key={trip.id} 
-            className="col-md-4 mb-3"
-            onClick={() => handleTripSelect(trip)}
-            style={{ cursor: 'pointer' }}
-          >
-            <div className="card">
-              <div className="card-body">
-                <h5 className="card-title">{trip.trip_name}</h5>
-                <p className="card-text">
-                  <span className={`badge ${
-                    trip.trip_status === 'Confirmado' ? 'bg-success' :
-                    trip.trip_status === 'Pendiente' ? 'bg-warning' :
-                    'bg-danger'
-                  }`}>
-                    {trip.trip_status}
-                  </span>
-                </p>
+    <div className="modal-backdrop" onClick={onClose}>
+      <div className="modal-content" onClick={e => e.stopPropagation()}>
+        <div className="modal-header">
+          <h3 className="modal-title">{trip?.trip_name || 'Detalles del Viaje'}</h3>
+          <button type="button" className="btn-close" onClick={onClose}></button>
+        </div>
+        <div className="modal-body">
+          {/* Trip Details Section */}
+          <div className="trip-details-section mb-4">
+            <h4>Información del Viaje</h4>
+            <div className="trip-info-grid">
+              <div className="trip-info-item">
+                <strong>Precio:</strong> ${trip?.total_cost || 'N/A'}
+              </div>
+              <div className="trip-info-item">
+                <strong>Estado:</strong> 
+                <TripStatusDropdown />
+              </div>
+              <div className="trip-info-item">
+                <strong>Fecha:</strong> {trip?.start_date ? formatDate(trip.start_date) : 'N/A'}
+                {trip?.end_date ? ` - ${formatDate(trip.end_date)}` : ''}
+              </div>
+              <div className="trip-info-item">
+                <strong>Duración:</strong> {calculateDuration()} días
+              </div>
+              <div className="trip-info-item col-span-2">
+                <strong>Descripción:</strong> {trip?.description || 'Sin descripción disponible'}
               </div>
             </div>
           </div>
-        ))}
-      </div>
 
-      {/* Trip Details Modal */}
-      {selectedTrip && (
-        <TripDetailsModal 
-          trip={selectedTrip}
-          show={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          onStatusUpdate={(newStatus) => {
-            console.log('Parent component receiving status update:', newStatus);
-            updateTripStatus(selectedTrip.id, newStatus);
-          }}
-        />
-      )}
+          {/* Existing Activities Section */}
+          <div className="activities-section mb-4">
+            <h4>Actividades del Viaje</h4>
+            
+            {isLoading.activities ? (
+              <div className="text-center my-3">
+                <div className="spinner-border text-primary"></div>
+              </div>
+            ) : error.activities ? (
+              <div className="alert alert-danger">
+                {error.activities}
+              </div>
+            ) : activities.length > 0 ? (
+              <div className="row">
+                {activities.map((activity, index) => (
+                  <div key={activity.id || `activity-${index}`} className="col-md-6 mb-3">
+                    <div className="card h-100">
+                      {activity.activity_image_url && (
+                        <img 
+                          src={activity.activity_image_url} 
+                          className="card-img-top" 
+                          alt={activity.name || 'Actividad'} 
+                          style={{ height: '120px', objectFit: 'cover' }}
+                          onError={(e) => { e.target.src = 'https://via.placeholder.com/300x120?text=Sin+imagen'; }}
+                        />
+                      )}
+                      <div className="card-body">
+                        <h5 className="card-title">{activity.name || 'Sin nombre'}</h5>
+                        <p className="card-text small">
+                          {activity.description?.substring(0, 100) || 'Sin descripción'}
+                          {activity.description?.length > 100 ? '...' : ''}
+                        </p>
+                        <div className="d-flex justify-content-between">
+                          <span className="badge bg-info">
+                            {activity.difficulty || 'Dificultad N/A'}
+                          </span>
+                          <span className="badge bg-secondary">
+                            ${activity.cost || '0'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="alert alert-info">
+                No hay actividades asociadas a este viaje.
+              </div>
+            )}
+          </div>
+
+          {/* Explorers Section with Payment Status */}
+          <div className="explorers-section">
+            <h4>Explorers Registrados</h4>
+            
+            {isLoading.explorers ? (
+              <div className="text-center my-3">
+                <div className="spinner-border text-primary"></div>
+              </div>
+            ) : error.explorers ? (
+              <div className="alert alert-danger">
+                {error.explorers}
+                {debugInfo && (
+                  <details className="mt-2">
+                    <summary>Información de depuración</summary>
+                    <pre className="small mt-2">{debugInfo}</pre>
+                  </details>
+                )}
+              </div>
+            ) : explorers.length > 0 ? (
+              <div className="table-responsive">
+                <table className="table">
+                  <thead>
+                    <tr>
+                      <th>Nombre</th>
+                      <th>Email</th>
+                      <th>Teléfono</th>
+                      <th>Estado</th>
+                      <th>Estado de Pago</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {explorers.map((explorer, index) => (
+                      <tr key={explorer.id || `explorer-${index}`}>
+                        <td>{explorer.name || 'N/A'}</td>
+                        <td>{explorer.email || 'N/A'}</td>
+                        <td>{explorer.phone || explorer.phone_number || 'N/A'}</td>
+                        <td>
+                          <ExplorerStatusButton explorer={explorer} />
+                        </td>
+                        <td>
+                          {isLoading.payments ? (
+                            <div className="spinner-border spinner-border-sm text-primary"></div>
+                          ) : (
+                            <PaymentStatusButton explorer={explorer} />
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="alert alert-info">
+                No hay exploradores registrados para este viaje.
+                {debugInfo && (
+                  <details className="mt-2">
+                    <summary>Información de depuración</summary>
+                    <pre className="small mt-2">{debugInfo}</pre>
+                  </details>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+        <div className="modal-footer">
+          <button 
+            type="button" 
+            className="btn btn-secondary me-2" 
+            onClick={onClose}
+          >
+            Cerrar
+          </button>
+          <button 
+            type="button" 
+            className="btn btn-primary" 
+            onClick={handleSave}
+          >
+            Guardar Cambios
+          </button>
+        </div>
+      </div>
     </div>
   );
-}
+};
 
-export default TripManagementPage;
+export default TripDetailsModal;

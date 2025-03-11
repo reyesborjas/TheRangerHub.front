@@ -12,7 +12,91 @@ const TripDetailsModal = ({ trip, show, onClose }) => {
     activities: null
   });
   const [debugInfo, setDebugInfo] = useState(null);
+  
+  // New state for trip and explorer statuses
+  const [tripStatus, setTripStatus] = useState(trip?.trip_status || trip?.status || 'Pendiente');
+  const [explorerStatuses, setExplorerStatuses] = useState({});
 
+  // Status configurations
+  const tripStatusOptions = [
+    { label: 'Pendiente', className: 'text-warning' },
+    { label: 'Confirmado', className: 'text-success' },
+    { label: 'Cancelado', className: 'text-danger' }
+  ];
+
+  // Dropdown for Trip Status
+  const TripStatusDropdown = () => {
+    const [isOpen, setIsOpen] = useState(false);
+
+    return (
+      <div className="dropdown">
+        <button 
+          className={`btn dropdown-toggle ${
+            tripStatusOptions.find(opt => opt.label === tripStatus)?.className || 'text-secondary'
+          }`}
+          type="button"
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          {tripStatus}
+        </button>
+        {isOpen && (
+          <div className={`dropdown-menu ${isOpen ? 'show' : ''}`}>
+            {tripStatusOptions.map((option) => (
+              <button
+                key={option.label}
+                className={`dropdown-item ${option.className}`}
+                onClick={() => {
+                  setTripStatus(option.label);
+                  setIsOpen(false);
+                }}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // Button to toggle Explorer Status
+  const ExplorerStatusButton = ({ explorer }) => {
+    const statusOptions = ['Pendiente', 'Confirmado', 'Cancelado'];
+    const statusClasses = {
+      'Pendiente': 'bg-warning',
+      'Confirmado': 'bg-success', 
+      'Cancelado': 'bg-danger'
+    };
+
+    const getCurrentStatus = () => {
+      return explorerStatuses[explorer.id] || explorer.status || 'Pendiente';
+    };
+
+    const handleStatusChange = () => {
+      const currentStatusIndex = statusOptions.indexOf(getCurrentStatus());
+      const nextStatusIndex = (currentStatusIndex + 1) % statusOptions.length;
+      const nextStatus = statusOptions[nextStatusIndex];
+
+      setExplorerStatuses(prev => ({
+        ...prev,
+        [explorer.id]: nextStatus
+      }));
+    };
+
+    const currentStatus = getCurrentStatus();
+
+    return (
+      <button
+        onClick={handleStatusChange}
+        className={`badge ${statusClasses[currentStatus]} text-white`}
+      >
+        {currentStatus}
+      </button>
+    );
+  };
+
+  // Existing methods (fetchExplorers, fetchActivities, etc.) remain the same...
+  // [All previous methods from the original component would be copied here]
   useEffect(() => {
     if (show && trip) {
       fetchExplorers();
@@ -40,7 +124,6 @@ const TripDetailsModal = ({ trip, show, onClose }) => {
       
       const response = await fetch(`https://rangerhub-back.vercel.app/reservations/trip/${trip.id}/explorers`);
       
-      // Registrar detalles de la respuesta para depuración
       console.log(`Explorers response status: ${response.status}`);
       
       if (!response.ok) {
@@ -61,9 +144,7 @@ const TripDetailsModal = ({ trip, show, onClose }) => {
       
       if (data && data.explorers) {
         if (Array.isArray(data.explorers)) {
-          // Normalizar datos para asegurar que todos sean objetos con las propiedades esperadas
           const normalizedExplorers = data.explorers.map(explorer => {
-            // Si el explorador es un array, convertirlo a objeto
             if (Array.isArray(explorer)) {
               return {
                 id: explorer[0] || `temp-id-${Math.random()}`,
@@ -74,7 +155,6 @@ const TripDetailsModal = ({ trip, show, onClose }) => {
               };
             }
             
-            // Si ya es un objeto, asegurar propiedades consistentes
             return {
               id: explorer.id || `temp-id-${Math.random()}`,
               name: explorer.name || 'N/A',
@@ -112,7 +192,6 @@ const TripDetailsModal = ({ trip, show, onClose }) => {
     try {
       console.log(`Fetching activities for trip ID: ${trip.id}`);
       
-      // Usar el nuevo endpoint para obtener las actividades específicas del viaje
       const response = await fetch(`https://rangerhub-back.vercel.app/trips/${trip.id}/activities`);
       
       if (!response.ok) {
@@ -128,7 +207,6 @@ const TripDetailsModal = ({ trip, show, onClose }) => {
         return;
       }
       
-      // Establecer las actividades recibidas directamente
       setActivities(data.activities);
       console.log(`Se encontraron ${data.activities.length} actividades para este viaje`);
       
@@ -141,14 +219,61 @@ const TripDetailsModal = ({ trip, show, onClose }) => {
     }
   };
 
-  // Función para formatear una fecha recibida en formato ISO o similar
+  // Save changes handler
+  const handleSave = async () => {
+    try {
+      // Update trip status
+      const tripStatusUpdateResponse = await fetch(`https://rangerhub-back.vercel.app/trips/${trip.id}/status`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ status: tripStatus })
+      });
+
+      if (!tripStatusUpdateResponse.ok) {
+        const errorText = await tripStatusUpdateResponse.text();
+        throw new Error(`Error actualizando estado del viaje: ${errorText}`);
+      }
+
+      // Update explorer statuses
+      const explorerStatusPromises = Object.entries(explorerStatuses).map(async ([userId, status]) => {
+        const response = await fetch(`https://rangerhub-back.vercel.app/reservations/trip/${trip.id}/user/${userId}/status`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ status })
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Error actualizando estado de reserva: ${errorText}`);
+        }
+
+        return response;
+      });
+
+      await Promise.all(explorerStatusPromises);
+
+      // Show success message
+      alert('Cambios guardados exitosamente');
+      
+      // Refresh data or close modal
+      onClose();
+    } catch (error) {
+      console.error('Error saving changes:', error);
+      alert(`Error al guardar los cambios: ${error.message}`);
+    }
+  };
+
+  // Format date function (from original component)
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
     
     try {
-      // Intentar crear un objeto Date y formatear a dd/mm/yyyy
       const date = new Date(dateString);
-      if (isNaN(date.getTime())) return dateString; // Si no es una fecha válida, devolver el string original
+      if (isNaN(date.getTime())) return dateString;
       
       return date.toLocaleDateString('es-ES', {
         day: '2-digit',
@@ -161,7 +286,7 @@ const TripDetailsModal = ({ trip, show, onClose }) => {
     }
   };
 
-  // Función para calcular la duración basada en fecha de inicio y fin
+  // Calculate duration function
   const calculateDuration = () => {
     if (!trip.start_date || !trip.end_date) return 'N/A';
     
@@ -171,7 +296,6 @@ const TripDetailsModal = ({ trip, show, onClose }) => {
       
       if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) return 'N/A';
       
-      // Calcular diferencia en días
       const diffTime = Math.abs(endDate - startDate);
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
       
@@ -182,10 +306,8 @@ const TripDetailsModal = ({ trip, show, onClose }) => {
     }
   };
 
+  // If show is false, return null (existing behavior)
   if (!show) return null;
-
-  // Registrar en la consola los datos del viaje para depuración
-  console.log("Trip data:", trip);
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
@@ -195,7 +317,7 @@ const TripDetailsModal = ({ trip, show, onClose }) => {
           <button type="button" className="btn-close" onClick={onClose}></button>
         </div>
         <div className="modal-body">
-          {/* Detalles del viaje */}
+          {/* Trip Details Section */}
           <div className="trip-details-section mb-4">
             <h4>Información del Viaje</h4>
             <div className="trip-info-grid">
@@ -203,7 +325,8 @@ const TripDetailsModal = ({ trip, show, onClose }) => {
                 <strong>Precio:</strong> ${trip?.total_cost || 'N/A'}
               </div>
               <div className="trip-info-item">
-                <strong>Estado:</strong> {trip?.trip_status || trip?.status || 'N/A'}
+                <strong>Estado:</strong> 
+                <TripStatusDropdown />
               </div>
               <div className="trip-info-item">
                 <strong>Fecha:</strong> {trip?.start_date ? formatDate(trip.start_date) : 'N/A'}
@@ -218,7 +341,7 @@ const TripDetailsModal = ({ trip, show, onClose }) => {
             </div>
           </div>
 
-          {/* Lista de Actividades */}
+          {/* Existing Activities Section */}
           <div className="activities-section mb-4">
             <h4>Actividades del Viaje</h4>
             
@@ -270,7 +393,7 @@ const TripDetailsModal = ({ trip, show, onClose }) => {
             )}
           </div>
 
-          {/* Lista de Explorers */}
+          {/* Explorers Section */}
           <div className="explorers-section">
             <h4>Explorers Registrados</h4>
             
@@ -306,9 +429,7 @@ const TripDetailsModal = ({ trip, show, onClose }) => {
                         <td>{explorer.email || 'N/A'}</td>
                         <td>{explorer.phone || explorer.phone_number || 'N/A'}</td>
                         <td>
-                          <span className={`badge ${explorer.status === 'paid' ? 'bg-success' : 'bg-warning'}`}>
-                            {explorer.status === 'paid' ? 'Pagado' : 'Pendiente'}
-                          </span>
+                          <ExplorerStatusButton explorer={explorer} />
                         </td>
                       </tr>
                     ))}
@@ -329,8 +450,19 @@ const TripDetailsModal = ({ trip, show, onClose }) => {
           </div>
         </div>
         <div className="modal-footer">
-          <button type="button" className="btn btn-secondary" onClick={onClose}>
+          <button 
+            type="button" 
+            className="btn btn-secondary me-2" 
+            onClick={onClose}
+          >
             Cerrar
+          </button>
+          <button 
+            type="button" 
+            className="btn btn-primary" 
+            onClick={handleSave}
+          >
+            Guardar Cambios
           </button>
         </div>
       </div>

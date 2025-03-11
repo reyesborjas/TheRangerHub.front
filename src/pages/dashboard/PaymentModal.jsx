@@ -13,18 +13,18 @@ const PaymentModal = ({ show, onClose, trip, userId }) => {
     const handleSubmitPayment = async (e) => {
         e.preventDefault();
         setError('');
-
+    
         // Validaciones iniciales
         if (!paymentMethod) {
             setError('Selecciona un método de pago');
             return;
         }
-
+    
         if (!paymentVoucherUrl) {
             setError('Ingresa la URL del comprobante de pago');
             return;
         }
-
+    
         // Validate URL format
         const urlPattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
             '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
@@ -37,30 +37,22 @@ const PaymentModal = ({ show, onClose, trip, userId }) => {
             setError('Por favor, ingresa una URL válida');
             return;
         }
-
+    
         try {
-            // Format the date as YYYY-MM-DD for PostgreSQL date type
+            // Formato de fecha para PostgreSQL
             const formattedPaymentDate = new Date().toISOString().split('T')[0];
-
+    
             const paymentData = {
                 user_id: userId,
                 trip_id: trip.id,
-                payment_amount: parseFloat(totalCost), // Ensure decimal with two places
+                payment_amount: parseFloat(totalCost), // Decimal con dos lugares
                 payment_method: paymentMethod,
                 payment_voucher_url: paymentVoucherUrl,
-                payment_date: formattedPaymentDate
+                payment_date: formattedPaymentDate // Incluir fecha
             };
-
-            console.log('Sending payment data:', paymentData);
-            console.log('Data types:', {
-                user_id: typeof userId,
-                trip_id: typeof trip.id,
-                payment_amount: typeof paymentData.payment_amount,
-                payment_method: typeof paymentMethod,
-                payment_voucher_url: typeof paymentVoucherUrl,
-                payment_date: typeof formattedPaymentDate
-            });
-
+    
+            console.log('Sending payment data:', JSON.stringify(paymentData, null, 2));
+    
             const response = await fetch('https://rangerhub-back.vercel.app/payments', {
                 method: 'POST',
                 headers: {
@@ -68,45 +60,28 @@ const PaymentModal = ({ show, onClose, trip, userId }) => {
                 },
                 body: JSON.stringify(paymentData)
             });
-
-            // Log the raw response for debugging
-            console.log('Response status:', response.status);
-            
+    
             const data = await response.json();
-            console.log('Response data:', data);
-
+    
             if (!response.ok) {
-                // Throw an error with the backend's error message
                 throw new Error(data.error || 'Error al procesar el pago');
             }
-
+    
             alert('Pago iniciado correctamente');
             onClose();
         } catch (error) {
-            console.error('Full error details:', error);
-            console.error('Error type:', typeof error);
-            console.error('Error object:', error);
-            console.error('Error properties:', Object.keys(error));
+            console.error('Error details:', error);
             
-            // Mapeo de errores comunes para mensajes más amigables
             const errorMessages = {
-                'Usuario no encontrado': 'No se encontró el usuario. Por favor, inicie sesión nuevamente.',
-                'Viaje no encontrado': 'El viaje seleccionado no existe o ha sido eliminado.',
+                'El comprobante de pago ya ha sido registrado': 'Este comprobante de pago ya ha sido utilizado.',
                 'Datos de pago incompletos': 'Por favor, complete todos los campos requeridos.',
-                'Monto de pago inválido': 'El monto del pago no es válido.',
-                'Ya existe un pago para esta reserva': 'Ya has realizado un pago para este viaje.',
-                'Error de base de datos': 'Hubo un problema con la base de datos. Intente nuevamente más tarde.'
+                'Usuario no encontrado': 'No se encontró el usuario.',
+                'Viaje no encontrado': 'El viaje no existe.'
             };
-
-            // Buscar un mensaje de error personalizado o usar el mensaje original
-            const friendlyErrorMessage = Object.keys(errorMessages).find(key => 
-                error.message.includes(key)
-            );
-
+    
             setError(
-                friendlyErrorMessage 
-                    ? errorMessages[friendlyErrorMessage] 
-                    : 'Ocurrió un error al procesar su pago. Por favor, intente nuevamente.'
+                errorMessages[error.message] || 
+                'Ocurrió un error al procesar su pago. Por favor, intente nuevamente.'
             );
         }
     };
