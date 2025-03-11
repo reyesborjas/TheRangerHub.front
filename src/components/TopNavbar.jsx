@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import "../styles/TopNavbar.css";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBars } from "@fortawesome/free-solid-svg-icons";
 
-const TopNavbar = () => {
+const TopNavbar = ({ toggleSidebar }) => {
     const { username } = useParams();
     const [userData, setUserData] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -124,8 +126,14 @@ const TopNavbar = () => {
 
     return (
         <nav className="top-navbar">
-            {/* Sección Izquierda */}
+            {/* Botón hamburguesa para móvil */}
             <div className="nav-left">
+                <button
+                    className="mobile-menu-toggle d-md-none"
+                    onClick={toggleSidebar}
+                >
+                    <FontAwesomeIcon icon={faBars} />
+                </button>
             </div>
 
             {/* Sección Derecha: Usuario */}

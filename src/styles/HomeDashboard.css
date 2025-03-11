@@ -1,6 +1,7 @@
 .dashboard-layout {
     display: flex;
     height: 100vh;
+    margin-top: 50px;
 }
 
 .dashboard-content {
@@ -15,10 +16,87 @@
     flex: 1;
 }
 
-/* 75% ancho para Main, 25% para RightPanel */
 .main-layout > :first-child {
     flex: 3;
 }
 .main-layout > :last-child {
     flex: 1;
+}/* Estilos base */
+.dashboard-layout {
+    display: flex;
+    height: 100vh;
+    overflow-x: hidden;
+}
+
+.dashboard-content {
+    flex-grow: 1;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.main-layout {
+    display: flex;
+    flex: 1;
+    overflow-y: auto;
+}
+
+@media (min-width: 992px) {
+    .main-layout > :first-child {
+        flex: 3;
+        padding: 20px;
+    }
+
+    .main-layout > :last-child {
+        flex: 1;
+        padding: 20px 15px;
+    }
+}
+
+
+@media (max-width: 991px) and (min-width: 768px) {
+    .main-layout {
+        flex-direction: column;
+    }
+
+    .main-layout > :first-child,
+    .main-layout > :last-child {
+        width: 100%;
+        padding: 15px;
+    }
+
+
+    .main-layout > :last-child {
+        max-height: 500px;
+        overflow-y: auto;
+    }
+}
+
+/* Estilos para móviles */
+@media (max-width: 767px) {
+    .dashboard-layout {
+        flex-direction: column;
+    }
+
+    .dashboard-layout > :first-child {
+        height: auto;
+        width: 100%;
+    }
+
+    .main-layout {
+        flex-direction: column;
+        padding: 10px;
+        overflow-y: auto;
+    }
+
+    .main-layout > :first-child,
+    .main-layout > :last-child {
+        width: 100%;
+        margin-bottom: 15px;
+    }
+
+    /* Ajustes adicionales para el calendario */
+    .main-layout > :last-child table {
+        font-size: 0.85rem;
+    }
 }

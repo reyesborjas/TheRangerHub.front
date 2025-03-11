@@ -3,14 +3,14 @@ import { Link, useParams } from "react-router-dom";
 import logo from "../assets/logo.svg";
 import "../styles/SideBarDashboard.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faInbox } from '@fortawesome/free-solid-svg-icons';
+import { faInbox, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from "react-router-dom";
 import {
   faHome, faSuitcase, faMap, faBicycle, faBook,
-  faCloudSun, faCog, faQuestionCircle, faSignOutAlt,faUser,faComment 
+  faCloudSun, faCog, faQuestionCircle, faSignOutAlt, faUser, faComment
 } from "@fortawesome/free-solid-svg-icons";
 
-const SideBarDashboard = () => {
+const SideBarDashboard = ({ isOpen, toggleSidebar }) => {
   const { username } = useParams();
   const [weather, setWeather] = useState(null);
   const [error, setError] = useState(null);
@@ -58,119 +58,132 @@ const SideBarDashboard = () => {
   }, []);
 
   return (
-      <div className="sidebar d-flex flex-column align-items-center">
-        {/* Logo */}
-        <div className="logo" onClick={() => navigate(`/secured/${username}/dashboard/home`)} style={{ cursor: "pointer" }}>
-          <img src={logo} alt="The Ranger Hub" />
-        </div>
+      <>
+        {/* Overlay para cerrar al hacer clic fuera (solo móvil) */}
+        <div
+            className={`sidebar-overlay ${isOpen ? 'show' : ''}`}
+            onClick={toggleSidebar}
+        ></div>
 
-        {/* Botones solo para Rangers */}
-        {userRole === "Ranger" && (
-            <>
-              {/* Botón de Nuevo Viaje */}
-              <Link
-                  to={`/secured/${username}/dashboard/createtrip`}
-                  className="new-trip-btn"
-              >
-                + Nuevo Viaje
-              </Link>
+        <div className={`sidebar d-flex flex-column align-items-center ${isOpen ? 'show' : ''}`}>
+          {/* Botón para cerrar el sidebar (solo móvil) */}
+          <button className="close-sidebar d-md-none" onClick={toggleSidebar}>
+            <FontAwesomeIcon icon={faTimes} />
+          </button>
 
-              {/* Botón de Nueva Actividad */}
-              <Link
-                  to={`/secured/${username}/dashboard/createactivity`}
-                  className="new-trip-btn"
-              >
-                + Nueva Actividad
-              </Link>
-            </>
-        )}
+          {/* Logo */}
+          <div className="logo" onClick={() => navigate(`/secured/${username}/dashboard/home`)} style={{ cursor: "pointer" }}>
+            <img src={logo} alt="The Ranger Hub" />
+          </div>
 
-        {/* Navegación principal */}
-        <nav className="nav flex-column w-100">
-          <Link
-              to={`/secured/${username}/dashboard/home`}
-              className="nav-link"
-          >
-            <FontAwesomeIcon icon={faHome} /> Inicio
-          </Link>
-          <Link
-              to={`/secured/${username}/dashboard/mytrips`}
-              className="nav-link"
-          >
-            <FontAwesomeIcon icon={faSuitcase} /> Mis Viajes
-          </Link>
-          <Link
-              to={`/secured/${username}/dashboard/trips`}
-              className="nav-link"
-          >
-            <FontAwesomeIcon icon={faMap} /> Viajes
-          </Link>
-          <Link
-              to={`/secured/${username}/dashboard/rangers`}
-              className="nav-link"
-          >
-            <FontAwesomeIcon icon={faUser} /> Rangers
-          </Link>
-          <Link
-              to={`/secured/${username}/dashboard/blog`}
-              className="nav-link"
-          >
-            <FontAwesomeIcon icon={faInbox} /> Blog
-          </Link>
-          <Link
-              to={`/secured/${username}/dashboard/activities`}
-              className="nav-link"
-          >
-            <FontAwesomeIcon icon={faBicycle} /> Actividades
-          </Link>
-          <Link
-              to={`/secured/${username}/dashboard/resources`}
-              className="nav-link"
-          >
-            <FontAwesomeIcon icon={faBook} /> Recursos
-          </Link>
-          <Link
-              to={`/secured/${username}/dashboard/comentarios`}
-              className="nav-link"
-          >
-            <FontAwesomeIcon icon={faComment} /> Comentarios
-          </Link>
-        </nav>
-
-        {/* Sección del clima */}
-        <div className="weather text-center">
-          {error ? (
-              <p>Error al cargar el clima</p>
-          ) : weather?.main ? (
+          {/* Botones solo para Rangers */}
+          {userRole === "Ranger" && (
               <>
-                <FontAwesomeIcon icon={faCloudSun} size="2x" />
-                <p>{weather.name}</p>
-                <h4>{Math.round(weather.main.temp)}°C</h4>
-                {weather.weather?.[0]?.description && (
-                    <small>{weather.weather[0].description}</small>
-                )}
-              </>
-          ) : (
-              <p>Cargando clima...</p>
-          )}
-        </div>
+                {/* Botón de Nuevo Viaje */}
+                <Link
+                    to={`/secured/${username}/dashboard/createtrip`}
+                    className="new-trip-btn"
+                >
+                  + Nuevo Viaje
+                </Link>
 
-        {/* Iconos inferiores */}
-        <div className="bottom-icons d-flex justify-content-center mt-3">
-          <Link to="/ayuda" className="sidebar-icon">
-            <FontAwesomeIcon icon={faQuestionCircle} size="lg" />
-          </Link>
-          <Link
-              to={`/secured/${username}/dashboard/configuracion`}
-              className="sidebar-icon"
-          >
-            <FontAwesomeIcon icon={faCog} size="lg" />
-          </Link>
-          <Link to="/" className="sidebar-icon">
-            <FontAwesomeIcon icon={faSignOutAlt} size="lg" />
-          </Link>
+                {/* Botón de Nueva Actividad */}
+                <Link
+                    to={`/secured/${username}/dashboard/createactivity`}
+                    className="new-trip-btn"
+                >
+                  + Nueva Actividad
+                </Link>
+              </>
+          )}
+
+          {/* Navegación principal */}
+          <nav className="nav flex-column w-100">
+            <Link
+                to={`/secured/${username}/dashboard/home`}
+                className="nav-link"
+            >
+              <FontAwesomeIcon icon={faHome} /> Inicio
+            </Link>
+            <Link
+                to={`/secured/${username}/dashboard/mytrips`}
+                className="nav-link"
+            >
+              <FontAwesomeIcon icon={faSuitcase} /> Mis Viajes
+            </Link>
+            <Link
+                to={`/secured/${username}/dashboard/trips`}
+                className="nav-link"
+            >
+              <FontAwesomeIcon icon={faMap} /> Viajes
+            </Link>
+            <Link
+                to={`/secured/${username}/dashboard/rangers`}
+                className="nav-link"
+            >
+              <FontAwesomeIcon icon={faUser} /> Rangers
+            </Link>
+            <Link
+                to={`/secured/${username}/dashboard/blog`}
+                className="nav-link"
+            >
+              <FontAwesomeIcon icon={faInbox} /> Blog
+            </Link>
+            <Link
+                to={`/secured/${username}/dashboard/activities`}
+                className="nav-link"
+            >
+              <FontAwesomeIcon icon={faBicycle} /> Actividades
+            </Link>
+            <Link
+                to={`/secured/${username}/dashboard/resources`}
+                className="nav-link"
+            >
+              <FontAwesomeIcon icon={faBook} /> Recursos
+            </Link>
+            <Link
+                to={`/secured/${username}/dashboard/comentarios`}
+                className="nav-link"
+            >
+              <FontAwesomeIcon icon={faComment} /> Comentarios
+            </Link>
+          </nav>
+
+          {/* Sección del clima */}
+          <div className="weather text-center">
+            {error ? (
+                <p>Error al cargar el clima</p>
+            ) : weather?.main ? (
+                <>
+                  <FontAwesomeIcon icon={faCloudSun} size="2x" />
+                  <p>{weather.name}</p>
+                  <h4>{Math.round(weather.main.temp)}°C</h4>
+                  {weather.weather?.[0]?.description && (
+                      <small>{weather.weather[0].description}</small>
+                  )}
+                </>
+            ) : (
+                <p>Cargando clima...</p>
+            )}
+          </div>
+
+          {/* Iconos inferiores */}
+          <div className="bottom-icons d-flex justify-content-center mt-3">
+            <Link to="/ayuda" className="sidebar-icon">
+              <FontAwesomeIcon icon={faQuestionCircle} size="lg" />
+            </Link>
+            <Link
+                to={`/secured/${username}/dashboard/configuracion`}
+                className="sidebar-icon"
+            >
+              <FontAwesomeIcon icon={faCog} size="lg" />
+            </Link>
+            <Link to="/" className="sidebar-icon">
+              <FontAwesomeIcon icon={faSignOutAlt} size="lg" />
+            </Link>
+          </div>
         </div>
-      </div>
+      </>
   );
 };
 

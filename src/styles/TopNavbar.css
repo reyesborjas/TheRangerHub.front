@@ -11,7 +11,8 @@
     top: 0;
     left: 250px;
     right: 0;
-    z-index: 1000;
+    z-index: 990; /* Menor que sidebar pero mayor que el contenido */
+    transition: left 0.3s ease, width 0.3s ease;
 }
 
 .nav-left, .nav-right {
@@ -96,14 +97,60 @@
     color: #777;
 }
 
-@media (max-width: 768px) {
+/* Botón hamburguesa para móvil */
+.mobile-menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #333;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.mobile-menu-toggle:hover {
+    color: #e63946;
+}
+
+/* Media queries para responsividad */
+@media (max-width: 991px) {
+    .top-navbar {
+        width: calc(100% - 220px);
+        left: 220px;
+    }
+}
+
+@media (max-width: 767px) {
     .top-navbar {
         width: 100%;
         left: 0;
-        padding-left: 70px;
+    }
+
+    .mobile-menu-toggle {
+        display: block;
     }
 
     .greeting {
         display: none;
+    }
+
+    .user-role {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .top-navbar {
+        padding: 10px;
+    }
+
+    .user-name {
+        font-size: 14px;
+    }
+
+    .user-initial {
+        width: 35px;
+        height: 35px;
+        font-size: 16px;
     }
 }
