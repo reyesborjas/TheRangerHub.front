@@ -9,13 +9,13 @@ const EditTripModal = ({ trip, show, onClose, onSave }) => {
     start_date: '',
     end_date: '',
     max_participants_number: 0,
-    trip_status: 'pending',
+    trip_status: 'Pendiente',
     estimated_weather_forecast: '',
     description: '',
     total_cost: 0,
     trip_image_url: ''
   });
-  
+
   const [rangers, setRangers] = useState([]);
   const [allActivities, setAllActivities] = useState([]);
   const [tripActivities, setTripActivities] = useState([]);
@@ -24,6 +24,40 @@ const EditTripModal = ({ trip, show, onClose, onSave }) => {
   const [isLoadingRangers, setIsLoadingRangers] = useState(false);
   const [isLoadingActivities, setIsLoadingActivities] = useState(false);
   const [error, setError] = useState(null);
+
+  // Función para obtener el token de autenticación
+  const getAuthToken = () => {
+    // Buscar en localStorage bajo diferentes nombres comunes
+    const token = localStorage.getItem('token') || 
+                  localStorage.getItem('authToken') || 
+                  localStorage.getItem('jwt') || 
+                  localStorage.getItem('access_token');
+    
+    if (token) return token;
+    
+    // Buscar en un objeto de usuario almacenado en localStorage
+    try {
+      const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
+      if (userInfo.token) return userInfo.token;
+      
+      // Algunos sistemas almacenan el token en campos con otros nombres
+      if (userInfo.authToken) return userInfo.authToken;
+      if (userInfo.jwt) return userInfo.jwt;
+      if (userInfo.accessToken) return userInfo.accessToken;
+    } catch (e) {
+      console.warn("Error al parsear userInfo de localStorage", e);
+    }
+    
+    // Revisar en sessionStorage también
+    const sessionToken = sessionStorage.getItem('token') || 
+                         sessionStorage.getItem('authToken') || 
+                         sessionStorage.getItem('jwt');
+    
+    if (sessionToken) return sessionToken;
+    
+    // Si llegamos aquí, no se encontró token
+    return null;
+  };
 
   // Cargar datos del viaje cuando se abre el modal
   useEffect(() => {
@@ -35,14 +69,20 @@ const EditTripModal = ({ trip, show, onClose, onSave }) => {
         return date.toISOString().split('T')[0];
       };
 
+      // Asegurarse de que trip_status tenga el formato correcto para el backend
+      let statusValue = trip.trip_status || 'Pendiente';
+      if (statusValue === 'pending') statusValue = 'Pendiente';
+      else if (statusValue === 'confirmed') statusValue = 'Confirmado';
+      else if (statusValue === 'cancelled' || statusValue === 'canceled') statusValue = 'Cancelado';
+
       setFormData({
-        id: trip.id, // Incluir el ID para indicar que es una actualización
+        id: trip.id,
         trip_name: trip.trip_name || '',
         lead_ranger: trip.lead_ranger || '',
         start_date: formatDate(trip.start_date),
         end_date: formatDate(trip.end_date),
         max_participants_number: trip.max_participants_number || 0,
-        trip_status: trip.trip_status || 'pending',
+        trip_status: statusValue,
         estimated_weather_forecast: trip.estimated_weather_forecast || '',
         description: trip.description || '',
         total_cost: trip.total_cost || 0,
@@ -108,8 +148,6 @@ const EditTripModal = ({ trip, show, onClose, onSave }) => {
       
       // Procesar cada actividad con su ubicación correspondiente
       const activitiesWithLocations = (data.activities || []).map(activity => {
-        console.log(`Procesando actividad ${activity.id}, location_id: ${activity.location_id || 'NINGUNO'}`);
-        
         // Si no hay location_id, devolver sin ubicación
         if (!activity.location_id) {
           return { ...activity, place_name: 'Sin ubicación' };
@@ -119,21 +157,18 @@ const EditTripModal = ({ trip, show, onClose, onSave }) => {
         const location = locationsMap.get(activity.location_id);
         
         if (location) {
-          console.log(`✅ Ubicación encontrada para actividad ${activity.id}: ${location.place_name}`);
           return {
             ...activity,
             place_name: location.place_name
           };
         } else {
-          console.warn(`❌ No se encontró ubicación para actividad ${activity.id} con location_id ${activity.location_id}`);
           return { 
             ...activity, 
-            place_name: `Ubicación no encontrada (ID: ${activity.location_id.substring(0, 8)}...)`
+            place_name: `Ubicación no encontrada`
           };
         }
       });
       
-      console.log("Actividades procesadas con ubicaciones:", activitiesWithLocations);
       setAllActivities(activitiesWithLocations);
     } catch (error) {
       console.error('Error al cargar actividades:', error);
@@ -180,36 +215,65 @@ const EditTripModal = ({ trip, show, onClose, onSave }) => {
     setError(null);
 
     try {
-      console.log('Enviando datos de actualización:', formData);
+      const token = getAuthToken();
       
-      const response = await fetch('https://rangerhub-back.vercel.app/trips', {
-        method: 'POST',
+      if (!token) {
+        throw new Error('No se encontró un token de autenticación. Por favor, inicie sesión nuevamente.');
+      }
+
+      // Validar que las fechas sean coherentes
+      const startDate = new Date(formData.start_date);
+      const endDate = new Date(formData.end_date);
+      
+      if (startDate > endDate) {
+        throw new Error('La fecha de inicio no puede ser posterior a la fecha de fin.');
+      }
+
+      // Preparar datos para enviar
+      const tripData = {
+        trip_name: formData.trip_name,
+        lead_ranger: formData.lead_ranger,
+        start_date: formData.start_date,
+        end_date: formData.end_date,
+        max_participants_number: formData.max_participants_number,
+        trip_status: formData.trip_status,
+        estimated_weather_forecast: formData.estimated_weather_forecast,
+        description: formData.description,
+        total_cost: formData.total_cost,
+        trip_image_url: formData.trip_image_url
+      };
+
+      const response = await fetch(`https://rangerhub-back.vercel.app/trips/${formData.id}`, {
+        method: 'PUT',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(tripData)
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Error al actualizar el viaje');
+        throw new Error(errorData.message || 'No se pudo actualizar el viaje');
       }
 
-      const data = await response.json();
-      console.log('Respuesta de actualización:', data);
+      const updatedTrip = await response.json();
       
-      // Crear objeto actualizado para pasar al componente padre
-      const updatedTrip = {
-        ...trip,
-        ...formData,
-        id: trip.id
-      };
+      // Llamar a la función onSave si está definida
+      if (onSave) {
+        onSave(updatedTrip);
+      }
+
+      // Mostrar toast de éxito
+      toast.success('Viaje actualizado exitosamente');
       
-      onSave(updatedTrip);
+      // Cerrar el modal
       onClose();
+
     } catch (error) {
       console.error('Error al guardar cambios:', error);
       setError(error.message);
+      toast.error(`Error: ${error.message}`);
     } finally {
       setIsLoading(false);
     }
@@ -239,19 +303,25 @@ const EditTripModal = ({ trip, show, onClose, onSave }) => {
       });
 
       if (!response.ok) {
-        throw new Error(`Error ${response.status}: No se pudo agregar la actividad`);
+        const responseData = await response.json();
+        // Si es error 409 de "la relación ya existe", lo manejamos como caso especial
+        if (response.status === 409 && responseData.message && responseData.message.includes('ya existe')) {
+          toast.info('Esta actividad ya está asociada al viaje');
+        } else {
+          throw new Error(responseData.message || 'No se pudo agregar la actividad');
+        }
+      } else {
+        // Agregar inmediatamente la actividad a la lista local
+        setTripActivities(prevActivities => [...prevActivities, selectedActivity]);
+        toast.success('Actividad agregada con éxito');
       }
-
-      // Agregar inmediatamente la actividad a la lista local
-      setTripActivities(prevActivities => [...prevActivities, selectedActivity]);
       
       // Limpiar selección
       setSelectedNewActivity('');
-      
-      toast.success('Actividad agregada con éxito');
     } catch (error) {
       console.error('Error al agregar actividad:', error);
       setError('No se pudo agregar la actividad. ' + error.message);
+      toast.error(`Error: ${error.message}`);
     } finally {
       setIsLoading(false);
     }
@@ -260,52 +330,40 @@ const EditTripModal = ({ trip, show, onClose, onSave }) => {
   const handleRemoveActivity = async (activityId) => {
     setIsLoading(true);
     try {
-      // Información detallada para debugging
-      console.log("Eliminando actividad:", activityId);
-      console.log("Del viaje:", trip.id);
-      console.log("Todas las actividades del viaje:", tripActivities);
+      console.log("Eliminando actividad:", activityId, "del viaje:", trip.id);
       
-      const url = `https://rangerhub-back.vercel.app/activity-trips/${trip.id}/${activityId}`;
-      console.log("URL DELETE:", url);
-      
-      const response = await fetch(url, {
+      const response = await fetch(`https://rangerhub-back.vercel.app/activity-trips/${trip.id}/${activityId}`, {
         method: 'DELETE'
       });
       
-      const responseData = await response.json();
-      console.log("Respuesta del servidor:", responseData);
-      
-      // Si recibimos un 404 con el mensaje específico, considerarlo un éxito
-      if (response.status === 404 && 
-          responseData.message && 
-          responseData.message.includes("No se encontró la relación")) {
-        // La relación ya no existe, lo consideramos un "éxito"
-        console.log("La relación ya no existe en la base de datos, continuando...");
-        // Seguimos con la eliminación de la UI
-      } else if (!response.ok) {
-        throw new Error(`Error ${response.status}: ${responseData.message}`);
-      }
-  
-      // Remover la actividad de la lista local
+      // Actualizar la UI independientemente de la respuesta
       setTripActivities(prevActivities => 
         prevActivities.filter(activity => activity.id !== activityId)
       );
       
-      toast.success('Actividad eliminada con éxito');
+      if (!response.ok) {
+        const responseData = await response.json();
+        // Si es error 404 de "no se encontró la relación", es probable que ya esté eliminada
+        if (response.status === 404 && responseData.message && responseData.message.includes('No se encontró')) {
+          console.log("La relación ya no existe en la base de datos");
+          toast.info('La actividad ya estaba desvinculada del viaje');
+        } else {
+          // No lanzar error para evitar confusión, ya que la UI se actualizó
+          console.warn("Error al eliminar actividad, pero la UI ya se actualizó:", responseData.message);
+          toast.warn('Se eliminó la actividad de la vista pero podría no haberse eliminado del servidor');
+        }
+      } else {
+        toast.success('Actividad eliminada con éxito');
+      }
     } catch (error) {
       console.error('Error al eliminar actividad:', error);
-      setError('No se pudo eliminar la actividad. ' + error.message);
-      
-      // Actualizar UI de todos modos
-      setTripActivities(prevActivities => 
-        prevActivities.filter(activity => activity.id !== activityId)
-      );
-      
-      toast.warn('Se eliminó la actividad de la vista pero podría no haberse eliminado del servidor.');
+      // No mostrar error al usuario, ya que la UI se actualizó
+      toast.warn('Se eliminó la actividad de la vista pero podría no haberse eliminado del servidor');
     } finally {
       setIsLoading(false);
     }
   };
+  
   // Filtrar actividades disponibles (que no están ya asignadas al viaje)
   const availableActivities = allActivities.filter(activity => 
     !tripActivities.some(tripActivity => tripActivity.id === activity.id)
@@ -359,7 +417,7 @@ const EditTripModal = ({ trip, show, onClose, onSave }) => {
                     <option value="">Seleccionar Ranger</option>
                     {rangers.map(ranger => (
                       <option key={ranger.id} value={ranger.id}>
-                        {ranger.full_name} ({ranger.username})
+                        {ranger.name || `${ranger.first_name || ''} ${ranger.last_name || ''}`}
                       </option>
                     ))}
                   </select>
@@ -429,11 +487,9 @@ const EditTripModal = ({ trip, show, onClose, onSave }) => {
                   value={formData.trip_status}
                   onChange={handleChange}
                 >
-                  <option value="pending">Pendiente</option>
-                  <option value="confirmed">Confirmado</option>
-                  <option value="in_progress">En Progreso</option>
-                  <option value="completed">Completado</option>
-                  <option value="cancelled">Cancelado</option>
+                  <option value="Pendiente">Pendiente</option>
+                  <option value="Confirmado">Confirmado</option>
+                  <option value="Cancelado">Cancelado</option>
                 </select>
               </div>
             </div>
@@ -562,6 +618,9 @@ const EditTripModal = ({ trip, show, onClose, onSave }) => {
                     alt="Vista previa de la imagen" 
                     className="img-thumbnail" 
                     style={{ maxHeight: '100px' }} 
+                    onError={(e) => {
+                      e.target.src = 'https://via.placeholder.com/400x300?text=Imagen+no+disponible';
+                    }}
                   />
                 </div>
               )}

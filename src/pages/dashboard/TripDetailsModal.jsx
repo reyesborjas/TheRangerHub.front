@@ -1,14 +1,14 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const TripDetailsModal = ({ trip, show, onClose }) => {
-  // Referencia al componente modal para evitar actualizaciones innecesarias
-  const modalRef = useRef(null);
-  
-  // Memoize trip data to prevent unnecessary re-renders
-  const tripData = useMemo(() => trip, [trip?.id]);
-  
+  // Estados principales
   const [explorers, setExplorers] = useState([]);
   const [activities, setActivities] = useState([]);
+  const [tripStatus, setTripStatus] = useState('');
+  const [explorerStatuses, setExplorerStatuses] = useState({});
+  const [paymentStatuses, setPaymentStatuses] = useState({});
+  
+  // Estados de carga y error
   const [isLoading, setIsLoading] = useState({
     explorers: false,
     activities: false,
@@ -20,65 +20,46 @@ const TripDetailsModal = ({ trip, show, onClose }) => {
     payments: null
   });
   const [debugInfo, setDebugInfo] = useState(null);
-  
-  // State for trip, explorer, and payment statuses
-  const [tripStatus, setTripStatus] = useState(trip?.trip_status || trip?.status || 'Pendiente');
-  const [explorerStatuses, setExplorerStatuses] = useState({});
-  const [paymentStatuses, setPaymentStatuses] = useState({});
-  
-  // Apply effect only when modal is shown or closed, not on every render
+
+  // Inicializar datos cuando se abre el modal
   useEffect(() => {
-    if (show && trip?.id) {
-      console.log("Modal abierto, inicializando estado del viaje:", trip);
-      setTripStatus(trip?.trip_status || trip?.status || 'Pendiente');
+    if (show && trip) {
+      console.log("Modal abierto con datos de viaje:", trip);
+      // Establecer estado del viaje
+      const initialStatus = trip?.trip_status || trip?.status || 'Pendiente';
+      console.log("Estado inicial del viaje:", initialStatus);
+      setTripStatus(initialStatus);
       
-      // Limpiar estados previos
+      // Limpiar estados anteriores
       setExplorerStatuses({});
       setPaymentStatuses({});
       
-      // Cargar datos frescos
-      fetchTripStatus();
+      // Cargar datos
       fetchExplorers();
       fetchActivities();
+    } else {
+      // Limpiar datos cuando se cierra el modal
+      setExplorers([]);
+      setActivities([]);
+      setExplorerStatuses({});
+      setPaymentStatuses({});
+      setError({
+        explorers: null,
+        activities: null,
+        payments: null
+      });
+      setDebugInfo(null);
     }
-  }, [show, trip?.id]);
-  
-  // Función para obtener el estado actual del viaje desde el backend
-  const fetchTripStatus = async () => {
-    if (!trip?.id) return;
-    
-    try {
-      console.log("Inicializando estado del viaje desde props:", trip);
-      
-      // Ya que GET /trips/:id no está permitido, usamos el valor del props
-      const currentStatus = trip.trip_status || trip.status || 'Pendiente';
-      console.log("Estado actual del viaje (desde props):", currentStatus);
-      setTripStatus(currentStatus);
-      
-      // Intentar obtener el estado desde las reservaciones (enfoque alternativo)
-      try {
-        const response = await fetch(`https://rangerhub-back.vercel.app/trips/${trip.id}/status`, {
-          method: 'GET'
-        });
-        
-        if (response.ok) {
-          const data = await response.json();
-          if (data && data.status) {
-            console.log("Estado del viaje obtenido desde API:", data.status);
-            setTripStatus(data.status);
-          }
-        } else {
-          console.log("No se pudo obtener el estado actual desde API, usando props");
-        }
-      } catch (err) {
-        console.log("Error al consultar estado API, usando props:", err.message);
-      }
-    } catch (error) {
-      console.error("Error al inicializar estado del viaje:", error);
-    }
-  };
+  }, [show, trip]);
 
-  // Status configurations
+  // Cargar información de pagos después de cargar exploradores
+  useEffect(() => {
+    if (explorers.length > 0 && trip?.id && show) {
+      fetchPaymentStatuses();
+    }
+  }, [explorers.length, trip?.id, show]);
+
+  // Configuraciones para estados
   const tripStatusOptions = [
     { label: 'Pendiente', className: 'text-warning' },
     { label: 'Confirmado', className: 'text-success' },
@@ -93,7 +74,14 @@ const TripDetailsModal = ({ trip, show, onClose }) => {
     'Rechazado': 'bg-danger'
   };
 
-  // Dropdown for Trip Status
+  const explorerStatusOptions = ['Pendiente', 'Confirmado', 'Cancelado'];
+  const explorerStatusClasses = {
+    'Pendiente': 'bg-warning',
+    'Confirmado': 'bg-success', 
+    'Cancelado': 'bg-danger'
+  };
+
+  // Componente de dropdown para estado del viaje
   const TripStatusDropdown = () => {
     const [isOpen, setIsOpen] = useState(false);
 
@@ -106,15 +94,16 @@ const TripDetailsModal = ({ trip, show, onClose }) => {
           type="button"
           onClick={() => setIsOpen(!isOpen)}
         >
-          {tripStatus}
+          {tripStatus || 'Seleccionar'}
         </button>
         {isOpen && (
-          <div className={`dropdown-menu ${isOpen ? 'show' : ''}`}>
+          <div className="dropdown-menu" style={{display: 'block', position: 'absolute'}}>
             {tripStatusOptions.map((option) => (
               <button
                 key={option.label}
                 className={`dropdown-item ${option.className}`}
                 onClick={() => {
+                  console.log("Cambiando estado de viaje a:", option.label);
                   setTripStatus(option.label);
                   setIsOpen(false);
                 }}
@@ -128,24 +117,21 @@ const TripDetailsModal = ({ trip, show, onClose }) => {
     );
   };
 
-  // Button to toggle Explorer Status
+  // Botón para cambiar estado del explorador
   const ExplorerStatusButton = ({ explorer }) => {
-    const statusOptions = ['Pendiente', 'Confirmado', 'Cancelado'];
-    const statusClasses = {
-      'Pendiente': 'bg-warning',
-      'Confirmado': 'bg-success', 
-      'Cancelado': 'bg-danger'
-    };
-
     const getCurrentStatus = () => {
       return explorerStatuses[explorer.id] || explorer.status || 'Pendiente';
     };
 
     const handleStatusChange = () => {
-      const currentStatusIndex = statusOptions.indexOf(getCurrentStatus());
-      const nextStatusIndex = (currentStatusIndex + 1) % statusOptions.length;
-      const nextStatus = statusOptions[nextStatusIndex];
-
+      const currentStatus = getCurrentStatus();
+      console.log(`Cambiando estado de explorador ${explorer.id} de ${currentStatus}`);
+      
+      const currentIndex = explorerStatusOptions.indexOf(currentStatus);
+      const nextIndex = (currentIndex + 1) % explorerStatusOptions.length;
+      const nextStatus = explorerStatusOptions[nextIndex];
+      
+      console.log(`Nuevo estado: ${nextStatus}`);
       setExplorerStatuses(prev => ({
         ...prev,
         [explorer.id]: nextStatus
@@ -157,24 +143,29 @@ const TripDetailsModal = ({ trip, show, onClose }) => {
     return (
       <button
         onClick={handleStatusChange}
-        className={`badge ${statusClasses[currentStatus]} text-white`}
+        type="button"
+        className={`badge ${explorerStatusClasses[currentStatus]} text-white`}
       >
         {currentStatus}
       </button>
     );
   };
 
-  // New button to toggle Payment Status
+  // Botón para cambiar estado de pago
   const PaymentStatusButton = ({ explorer }) => {
     const getCurrentStatus = () => {
-      return paymentStatuses[explorer.id] || explorer.payment_status || 'Pendiente';
+      return paymentStatuses[explorer.id] || explorer.payment_status || 'N/A';
     };
 
     const handleStatusChange = () => {
-      const currentStatusIndex = paymentStatusOptions.indexOf(getCurrentStatus());
-      const nextStatusIndex = (currentStatusIndex + 1) % paymentStatusOptions.length;
-      const nextStatus = paymentStatusOptions[nextStatusIndex];
-
+      const currentStatus = getCurrentStatus();
+      console.log(`Cambiando estado de pago para explorador ${explorer.id} de ${currentStatus}`);
+      
+      const currentIndex = paymentStatusOptions.indexOf(currentStatus);
+      const nextIndex = (currentIndex + 1) % paymentStatusOptions.length;
+      const nextStatus = paymentStatusOptions[nextIndex];
+      
+      console.log(`Nuevo estado de pago: ${nextStatus}`);
       setPaymentStatuses(prev => ({
         ...prev,
         [explorer.id]: nextStatus
@@ -186,6 +177,7 @@ const TripDetailsModal = ({ trip, show, onClose }) => {
     return (
       <button
         onClick={handleStatusChange}
+        type="button"
         className={`badge ${paymentStatusClasses[currentStatus]} text-white`}
       >
         {currentStatus}
@@ -193,31 +185,7 @@ const TripDetailsModal = ({ trip, show, onClose }) => {
     );
   };
 
-  useEffect(() => {
-    if (show && trip) {
-      fetchExplorers();
-      fetchActivities();
-      // We'll fetch payment information after explorers are loaded
-    } else {
-      // Clear data when modal is closed
-      setExplorers([]);
-      setActivities([]);
-      setError({
-        explorers: null,
-        activities: null,
-        payments: null
-      });
-      setDebugInfo(null);
-    }
-  }, [show, trip]);
-
-  // After explorers are loaded, fetch their payment information
-  useEffect(() => {
-    if (explorers.length > 0 && trip?.id && show) {
-      fetchPaymentStatuses();
-    }
-  }, [explorers.length, trip?.id, show]);
-
+  // Función para cargar exploradores
   const fetchExplorers = async () => {
     if (!trip || !trip.id) return;
     
@@ -225,11 +193,11 @@ const TripDetailsModal = ({ trip, show, onClose }) => {
     setError(prev => ({ ...prev, explorers: null }));
     
     try {
-      console.log(`Fetching explorers for trip ID: ${trip.id}`);
+      console.log(`Obteniendo explorers para viaje ID: ${trip.id}`);
       
       const response = await fetch(`https://rangerhub-back.vercel.app/reservations/trip/${trip.id}/explorers`);
       
-      console.log(`Explorers response status: ${response.status}`);
+      console.log(`Respuesta explorers: status ${response.status}`);
       
       if (!response.ok) {
         throw new Error(`Error ${response.status}: No se pudieron obtener los exploradores`);
@@ -245,7 +213,7 @@ const TripDetailsModal = ({ trip, show, onClose }) => {
         throw new Error(`Error al procesar la respuesta: ${parseError.message}`);
       }
       
-      console.log("Parsed explorers data:", data);
+      console.log("Datos de explorers:", data);
       
       if (data && data.explorers) {
         if (Array.isArray(data.explorers)) {
@@ -256,7 +224,7 @@ const TripDetailsModal = ({ trip, show, onClose }) => {
                 name: explorer[1] || 'N/A',
                 email: explorer[2] || 'N/A',
                 phone: explorer[3] || 'N/A',
-                status: explorer[4] || 'pending'
+                status: explorer[4] || 'Pendiente'
               };
             }
             
@@ -265,7 +233,7 @@ const TripDetailsModal = ({ trip, show, onClose }) => {
               name: explorer.name || 'N/A',
               email: explorer.email || 'N/A',
               phone: explorer.phone || explorer.phone_number || 'N/A',
-              status: explorer.status || 'pending'
+              status: explorer.status || 'Pendiente'
             };
           });
           
@@ -288,7 +256,44 @@ const TripDetailsModal = ({ trip, show, onClose }) => {
     }
   };
 
-  // New function to fetch payment statuses for all explorers
+  // Función para cargar actividades
+  const fetchActivities = async () => {
+    if (!trip || !trip.id) return;
+    
+    setIsLoading(prev => ({ ...prev, activities: true }));
+    setError(prev => ({ ...prev, activities: null }));
+    
+    try {
+      console.log(`Obteniendo actividades para viaje ID: ${trip.id}`);
+      
+      const response = await fetch(`https://rangerhub-back.vercel.app/trips/${trip.id}/activities`);
+      
+      if (!response.ok) {
+        throw new Error(`Error ${response.status} al obtener actividades`);
+      }
+      
+      const data = await response.json();
+      console.log("Datos de actividades:", data);
+      
+      if (!data || !Array.isArray(data.activities)) {
+        console.warn("Formato inesperado en datos de actividades:", data);
+        setActivities([]);
+        return;
+      }
+      
+      setActivities(data.activities);
+      console.log(`Se encontraron ${data.activities.length} actividades`);
+      
+    } catch (error) {
+      console.error("Error al obtener actividades:", error);
+      setError(prev => ({ ...prev, activities: `Error: ${error.message}` }));
+      setActivities([]);
+    } finally {
+      setIsLoading(prev => ({ ...prev, activities: false }));
+    }
+  };
+
+  // Función para cargar estados de pago
   const fetchPaymentStatuses = async () => {
     if (!trip || !trip.id || explorers.length === 0) return;
     
@@ -296,38 +301,34 @@ const TripDetailsModal = ({ trip, show, onClose }) => {
     setError(prev => ({ ...prev, payments: null }));
     
     try {
-      console.log(`Initializing payment statuses for trip ID: ${trip.id}`);
+      console.log(`Inicializando estados de pago para viaje ID: ${trip.id}`);
       
-      // First, let's initialize all payment statuses as 'N/A'
-      const initialStatusesObj = {};
+      // Inicializar estados como 'N/A'
+      const initialStatuses = {};
       explorers.forEach(explorer => {
-        initialStatusesObj[explorer.id] = 'N/A';
+        initialStatuses[explorer.id] = 'N/A';
       });
       
-      // Set initial statuses
-      setPaymentStatuses(initialStatusesObj);
+      setPaymentStatuses(initialStatuses);
       
-      // Try to get any existing payment info from the backend
+      // Intentar obtener información de pagos
       try {
-        // Hacemos una única solicitud para obtener todos los pagos del viaje
         const response = await fetch(`https://rangerhub-back.vercel.app/payments/trip/${trip.id}`);
         
         if (response.ok) {
           const payments = await response.json();
           console.log("Pagos encontrados:", payments);
           
-          // Para cada pago encontrado, actualizamos el estado correspondiente
-          const updatedStatuses = {...initialStatusesObj};
+          const updatedStatuses = {...initialStatuses};
           
           if (payments && Array.isArray(payments)) {
-            // Actualizamos los estados de pago
             payments.forEach(payment => {
               if (payment.user_id && payment.payment_status) {
                 updatedStatuses[payment.user_id] = payment.payment_status;
               }
             });
             
-            // Actualizamos los explorers con la información de pago
+            // Actualizar explorers con info de pago
             setExplorers(prev => prev.map(explorer => {
               const paymentInfo = payments.find(p => p.user_id === explorer.id);
               return {
@@ -340,13 +341,12 @@ const TripDetailsModal = ({ trip, show, onClose }) => {
           
           setPaymentStatuses(updatedStatuses);
         } else {
-          console.warn("No se pudieron obtener los pagos del viaje:", response.statusText);
+          console.warn("No se pudieron obtener los pagos:", response.statusText);
         }
       } catch (err) {
-        console.warn("Error al obtener pagos del viaje:", err);
+        console.warn("Error al obtener pagos:", err);
       }
       
-      // Simulamos una carga completada
       setTimeout(() => {
         setIsLoading(prev => ({ ...prev, payments: false }));
       }, 500);
@@ -358,164 +358,75 @@ const TripDetailsModal = ({ trip, show, onClose }) => {
     }
   };
 
-  const fetchActivities = async () => {
-    if (!trip || !trip.id) return;
-    
-    setIsLoading(prev => ({ ...prev, activities: true }));
-    setError(prev => ({ ...prev, activities: null }));
-    
-    try {
-      console.log(`Fetching activities for trip ID: ${trip.id}`);
-      
-      const response = await fetch(`https://rangerhub-back.vercel.app/trips/${trip.id}/activities`);
-      
-      if (!response.ok) {
-        throw new Error(`Error ${response.status} al obtener actividades del viaje`);
-      }
-      
-      const data = await response.json();
-      console.log("Trip activities data:", data);
-      
-      if (!data || !Array.isArray(data.activities)) {
-        console.warn("Formato inesperado en datos de actividades:", data);
-        setActivities([]);
-        return;
-      }
-      
-      setActivities(data.activities);
-      console.log(`Se encontraron ${data.activities.length} actividades para este viaje`);
-      
-    } catch (error) {
-      console.error("Error al obtener actividades:", error);
-      setError(prev => ({ ...prev, activities: `Error: ${error.message}` }));
-      setActivities([]);
-    } finally {
-      setIsLoading(prev => ({ ...prev, activities: false }));
-    }
-  };
-
-  // Save changes handler
+  // Función para guardar cambios
   const handleSave = async () => {
     try {
       console.log("Guardando cambios del viaje...");
       console.log("ID del viaje:", trip.id);
       console.log("Estado del viaje a guardar:", tripStatus);
       
-      // Probar diferentes cuerpos de solicitud para la actualización del estado del viaje
-      const posiblesCuerpos = [
-        { status: tripStatus },
-        { trip_status: tripStatus },
-        { tripStatus: tripStatus },
-        { new_status: tripStatus },
-        { value: tripStatus }
-      ];
-      
-      let tripUpdateSuccess = false;
-      let tripUpdateError = null;
-      
-      // Intentar cada formato posible hasta que uno funcione
-      for (const cuerpo of posiblesCuerpos) {
-        try {
-          console.log(`Intentando con cuerpo: ${JSON.stringify(cuerpo)}`);
-          const response = await fetch(`https://rangerhub-back.vercel.app/trips/${trip.id}/status`, {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(cuerpo)
-          });
-          
-          if (response.ok) {
-            console.log(`✅ Éxito con formato: ${JSON.stringify(cuerpo)}`);
-            tripUpdateSuccess = true;
-            break;
-          } else {
-            const errorText = await response.text();
-            console.warn(`❌ Falló con formato ${JSON.stringify(cuerpo)}: ${errorText}`);
-            tripUpdateError = errorText;
-          }
-        } catch (err) {
-          console.error(`Error en solicitud con formato ${JSON.stringify(cuerpo)}:`, err);
-          tripUpdateError = err.message;
-        }
-      }
-      
-      // Si ninguno funcionó, intentar una solicitud directa a un endpoint alternativo
-      if (!tripUpdateSuccess) {
-        try {
-          console.log("Intentando endpoint alternativo...");
-          const response = await fetch(`https://rangerhub-back.vercel.app/trips/${trip.id}`, {
-            method: 'PATCH',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ trip_status: tripStatus })
-          });
-          
-          if (response.ok) {
-            console.log("✅ Éxito con endpoint alternativo");
-            tripUpdateSuccess = true;
-          } else {
-            const errorText = await response.text();
-            console.warn(`❌ Falló endpoint alternativo: ${errorText}`);
-            tripUpdateError = errorText;
-          }
-        } catch (err) {
-          console.error("Error en solicitud con endpoint alternativo:", err);
-          tripUpdateError = err.message;
-        }
-      }
-      
-      // Verificar que el cambio realmente se guardó
-      if (tripUpdateSuccess) {
-        try {
-          // Ya que no podemos hacer GET al recurso, confiamos en que la actualización funcionó
-          // si la API devolvió una respuesta exitosa
-          console.log("La API reportó una actualización exitosa del estado del viaje");
-          console.log("Asumiendo que el estado del viaje se ha actualizado a:", tripStatus);
-          
-          // Si el componente padre necesita reflejar este cambio, puede ser necesario
-          // actualizar el estado a nivel de aplicación o refrescar los datos al volver a abrir
-        } catch (error) {
-          console.error("Error en verificación:", error);
-        }
-      }
-      
-      // Si seguimos sin éxito, registrar el problema pero continuar con las otras actualizaciones
-      if (!tripUpdateSuccess) {
-        console.error("No se pudo actualizar el estado del viaje después de varios intentos");
-        console.error("Último error:", tripUpdateError);
-        // No lanzamos error para permitir que las otras actualizaciones continúen
-      }
-
-      // Update explorer statuses
-      const explorerStatusPromises = Object.entries(explorerStatuses).map(async ([userId, status]) => {
-        console.log(`Actualizando estado de reserva para usuario ${userId}: ${status}`);
-        const response = await fetch(`https://rangerhub-back.vercel.app/reservations/trip/${trip.id}/user/${userId}/status`, {
+      // 1. Actualizar estado del viaje
+      try {
+        console.log(`Enviando actualización de estado a /trips/${trip.id}/status`);
+        console.log("Cuerpo de la solicitud:", JSON.stringify({ status: tripStatus }));
+        
+        const tripUpdateResponse = await fetch(`https://rangerhub-back.vercel.app/trips/${trip.id}/status`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ status })
+          body: JSON.stringify({ status: tripStatus })
         });
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error(`Error al actualizar estado de reserva para usuario ${userId}:`, errorText);
-          throw new Error(`Error actualizando estado de reserva: ${errorText}`);
+        
+        console.log("Respuesta de actualización de estado:", tripUpdateResponse.status);
+        
+        if (!tripUpdateResponse.ok) {
+          const errorText = await tripUpdateResponse.text();
+          console.error("Error al actualizar estado del viaje:", errorText);
+          alert(`Error al actualizar estado del viaje: ${errorText}`);
+        } else {
+          console.log("✅ Estado del viaje actualizado exitosamente");
         }
+      } catch (error) {
+        console.error("Error en solicitud de actualización de estado:", error);
+        alert(`Error en solicitud de actualización: ${error.message}`);
+      }
 
-        return response;
+      // 2. Actualizar estados de exploradores
+      const explorerPromises = Object.entries(explorerStatuses).map(async ([userId, status]) => {
+        console.log(`Actualizando estado de explorador ${userId} a ${status}`);
+        
+        try {
+          const response = await fetch(`https://rangerhub-back.vercel.app/reservations/trip/${trip.id}/user/${userId}/status`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ status })
+          });
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            console.error(`Error actualizando estado de reserva para usuario ${userId}:`, errorText);
+            return { userId, success: false, error: errorText };
+          }
+          
+          return { userId, success: true };
+        } catch (error) {
+          console.error(`Error en solicitud para usuario ${userId}:`, error);
+          return { userId, success: false, error: error.message };
+        }
       });
 
-      // Update payment statuses
-      const paymentStatusPromises = Object.entries(paymentStatuses).map(async ([userId, status]) => {
-        // Skip N/A status or create a payment with status Pendiente if user decides to change from N/A
+      // 3. Actualizar estados de pago
+      const paymentPromises = Object.entries(paymentStatuses).map(async ([userId, status]) => {
+        // Omitir estado N/A
         if (status === 'N/A') {
-          return Promise.resolve();
+          return { userId, success: true, skipped: true };
         }
         
-        console.log(`Actualizando estado de pago para usuario ${userId}: ${status}`);
+        console.log(`Actualizando estado de pago para usuario ${userId} a ${status}`);
+        
         try {
           const response = await fetch(`https://rangerhub-back.vercel.app/payments/trip/${trip.id}/user/${userId}/status`, {
             method: 'PUT',
@@ -527,36 +438,49 @@ const TripDetailsModal = ({ trip, show, onClose }) => {
   
           if (!response.ok) {
             const errorText = await response.text();
-            console.error(`Error actualizando estado de pago para usuario ${userId}: ${errorText}`);
-            // No interrumpimos el proceso si falla un pago
+            console.error(`Error actualizando pago para usuario ${userId}:`, errorText);
+            return { userId, success: false, error: errorText };
           }
-  
-          return response;
+          
+          return { userId, success: true };
         } catch (error) {
-          console.error(`Error en la solicitud de actualización de pago para usuario ${userId}:`, error);
-          // No interrumpimos el proceso si falla un pago
-          return Promise.resolve();
+          console.error(`Error en solicitud de pago para usuario ${userId}:`, error);
+          return { userId, success: false, error: error.message };
         }
       });
 
-      // Esperamos a que se completen todas las actualizaciones
-      await Promise.all([
-        ...explorerStatusPromises, 
-        ...paymentStatusPromises.filter(p => p)
-      ]);
-
-      // Show success message
-      alert('Cambios guardados exitosamente' + (!tripUpdateSuccess ? ' (Excepto estado del viaje)' : ''));
+      // Esperar a que se completen todas las actualizaciones
+      const explorerResults = await Promise.all(explorerPromises);
+      const paymentResults = await Promise.all(paymentPromises);
       
-      // Refresh data or close modal
-      onClose();
+      // Verificar resultados para mostrar mensaje apropiado
+      const failedExplorers = explorerResults.filter(r => !r.success);
+      const failedPayments = paymentResults.filter(r => !r.success && !r.skipped);
+      
+      if (failedExplorers.length === 0 && failedPayments.length === 0) {
+        alert('¡Todos los cambios guardados exitosamente!');
+        onClose();
+      } else {
+        let errorMessage = 'Se guardaron algunos cambios, pero hubo errores:\n\n';
+        
+        if (failedExplorers.length > 0) {
+          errorMessage += `- ${failedExplorers.length} estados de exploradores no se actualizaron\n`;
+        }
+        
+        if (failedPayments.length > 0) {
+          errorMessage += `- ${failedPayments.length} estados de pago no se actualizaron\n`;
+        }
+        
+        alert(errorMessage);
+      }
+      
     } catch (error) {
-      console.error('Error saving changes:', error);
-      alert(`Error al guardar los cambios: ${error.message}`);
+      console.error('Error general al guardar cambios:', error);
+      alert(`Error al guardar cambios: ${error.message}`);
     }
   };
 
-  // Format date function (from original component)
+  // Formatear fecha
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
     
@@ -575,9 +499,9 @@ const TripDetailsModal = ({ trip, show, onClose }) => {
     }
   };
 
-  // Calculate duration function
+  // Calcular duración
   const calculateDuration = () => {
-    if (!trip.start_date || !trip.end_date) return 'N/A';
+    if (!trip?.start_date || !trip?.end_date) return 'N/A';
     
     try {
       const startDate = new Date(trip.start_date);
@@ -595,7 +519,6 @@ const TripDetailsModal = ({ trip, show, onClose }) => {
     }
   };
 
-  // If show is false, return null (existing behavior)
   if (!show) return null;
 
   return (
@@ -610,56 +533,48 @@ const TripDetailsModal = ({ trip, show, onClose }) => {
       alignItems: 'flex-start',
       justifyContent: 'center',
       zIndex: 1050,
-      overflow: 'hidden',
-      paddingTop: '30px',
-      paddingBottom: '30px'
+      overflow: 'auto',
+      padding: '30px 0'
     }}>
-      <div 
-        ref={modalRef}
-        className="modal-content" 
-        onClick={e => e.stopPropagation()} 
-        style={{
-          position: 'relative',
-          backgroundColor: 'white',
-          borderRadius: '0.3rem',
-          width: '95%',
-          maxWidth: '1200px',
-          maxHeight: 'calc(100vh - 80px)',
-          overflowY: 'auto',
-          margin: '0 auto',
-          padding: 0,
-          boxShadow: '0 5px 15px rgba(0,0,0,.5)'
-        }}>
+      <div className="modal-content" onClick={e => e.stopPropagation()} style={{
+        backgroundColor: 'white',
+        borderRadius: '0.3rem',
+        width: '95%',
+        maxWidth: '1200px',
+        maxHeight: 'calc(100vh - 60px)',
+        overflow: 'auto',
+        margin: '0 auto',
+        boxShadow: '0 5px 15px rgba(0,0,0,.5)'
+      }}>
         <div className="modal-header">
           <h3 className="modal-title">{trip?.trip_name || 'Detalles del Viaje'}</h3>
           <button type="button" className="btn-close" onClick={onClose}></button>
         </div>
         <div className="modal-body">
-          {/* Trip Details Section */}
+          {/* Información del Viaje */}
           <div className="trip-details-section mb-4">
             <h4>Información del Viaje</h4>
-            <div className="trip-info-grid">
-              <div className="trip-info-item">
+            <div className="row">
+              <div className="col-md-6 mb-2">
                 <strong>Precio:</strong> ${trip?.total_cost || 'N/A'}
               </div>
-              <div className="trip-info-item">
-                <strong>Estado:</strong> 
-                <TripStatusDropdown />
+              <div className="col-md-6 mb-2">
+                <strong>Estado:</strong> <TripStatusDropdown />
               </div>
-              <div className="trip-info-item">
+              <div className="col-md-6 mb-2">
                 <strong>Fecha:</strong> {trip?.start_date ? formatDate(trip.start_date) : 'N/A'}
                 {trip?.end_date ? ` - ${formatDate(trip.end_date)}` : ''}
               </div>
-              <div className="trip-info-item">
+              <div className="col-md-6 mb-2">
                 <strong>Duración:</strong> {calculateDuration()} días
               </div>
-              <div className="trip-info-item col-span-2">
+              <div className="col-12 mb-2">
                 <strong>Descripción:</strong> {trip?.description || 'Sin descripción disponible'}
               </div>
             </div>
           </div>
 
-          {/* Existing Activities Section */}
+          {/* Actividades */}
           <div className="activities-section mb-4">
             <h4>Actividades del Viaje</h4>
             
@@ -711,8 +626,8 @@ const TripDetailsModal = ({ trip, show, onClose }) => {
             )}
           </div>
 
-          {/* Explorers Section with Payment Status */}
-          <div className="explorers-section">
+          {/* Explorers */}
+          <div className="explorers-section mb-4">
             <h4>Explorers Registrados</h4>
             
             {isLoading.explorers ? (
@@ -775,8 +690,8 @@ const TripDetailsModal = ({ trip, show, onClose }) => {
             )}
           </div>
           
-          {/* Nueva sección de Pagos */}
-          <div className="payments-section mt-4">
+          {/* Pagos */}
+          <div className="payments-section">
             <h4>Registro de Pagos</h4>
             
             {isLoading.payments ? (
@@ -792,14 +707,12 @@ const TripDetailsModal = ({ trip, show, onClose }) => {
                 <table className="table table-striped">
                   <thead>
                     <tr>
-                      <th>Viaje</th>
                       <th>Explorer</th>
                       <th>Monto</th>
                       <th>Estado Viaje</th>
                       <th>Estado Reserva</th>
                       <th>Estado Pago</th>
-                      <th>Fecha Pago</th>
-                      <th>Comprobante</th>
+                      <th>Fecha Actualización</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -810,9 +723,8 @@ const TripDetailsModal = ({ trip, show, onClose }) => {
                       
                       return (
                         <tr key={`payment-${explorer.id || index}`}>
-                          <td>{trip?.trip_name || 'N/A'}</td>
                           <td>{explorer.name || 'N/A'}</td>
-                          <td>${payment.payment_amount || 0}</td>
+                          <td>${payment.payment_amount || trip?.total_cost || 0}</td>
                           <td>
                             <span className={`badge ${
                               tripStatus === 'Confirmado' ? 'bg-success' : 
@@ -822,10 +734,7 @@ const TripDetailsModal = ({ trip, show, onClose }) => {
                             </span>
                           </td>
                           <td>
-                            <span className={`badge ${
-                              reservationStatus === 'Confirmado' ? 'bg-success' : 
-                              reservationStatus === 'Cancelado' ? 'bg-danger' : 'bg-warning'
-                            }`}>
+                            <span className={`badge ${explorerStatusClasses[reservationStatus]}`}>
                               {reservationStatus}
                             </span>
                           </td>
@@ -834,27 +743,13 @@ const TripDetailsModal = ({ trip, show, onClose }) => {
                               {paymentStatus}
                             </span>
                           </td>
-                          <td>{payment.payment_date ? formatDate(payment.payment_date) : 'N/A'}</td>
-                          <td>
-                            {payment.payment_voucher_url ? (
-                              <a 
-                                href={payment.payment_voucher_url} 
-                                target="_blank" 
-                                rel="noopener noreferrer" 
-                                className="btn btn-sm btn-primary"
-                              >
-                                Ver
-                              </a>
-                            ) : (
-                              'N/A'
-                            )}
-                          </td>
+                          <td>{new Date().toLocaleDateString()}</td>
                         </tr>
                       );
                     })}
                     {explorers.length === 0 && (
                       <tr>
-                        <td colSpan="8" className="text-center py-3">
+                        <td colSpan="6" className="text-center py-3">
                           No hay registros de pago disponibles
                         </td>
                       </tr>
@@ -866,18 +761,10 @@ const TripDetailsModal = ({ trip, show, onClose }) => {
           </div>
         </div>
         <div className="modal-footer">
-          <button 
-            type="button" 
-            className="btn btn-secondary me-2" 
-            onClick={onClose}
-          >
-            Cerrar
+          <button type="button" className="btn btn-secondary me-2" onClick={onClose}>
+            Cancelar
           </button>
-          <button 
-            type="button" 
-            className="btn btn-primary" 
-            onClick={handleSave}
-          >
+          <button type="button" className="btn btn-primary" onClick={handleSave}>
             Guardar Cambios
           </button>
         </div>

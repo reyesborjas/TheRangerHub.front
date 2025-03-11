@@ -28,11 +28,13 @@ export const Trips = () => {
   };
 
   // Filtrado de viajes
-  const filteredTrips = trips.filter((trip) =>
-    trip.trip_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (trip.description &&
-      trip.description.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  // Replace the existing filter logic with something like this:
+const filteredTrips = trips?.filter(trip => 
+  trip && 
+  (searchTerm === '' || 
+   (trip.trip_name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+   (trip.lead_ranger || '').toLowerCase().includes(searchTerm.toLowerCase()))
+) || [];
 
   const handleReservation = async (tripId) => {
     if (!currentUser) {
