@@ -100,7 +100,7 @@ const CreateTrip = () => {
   };
 
   const handleRangerChange = (e) => {
-    const rangerId = e.target.value;
+    const rangerId = String(e.target.value);
     console.log("Ranger seleccionado:", rangerId);
     setFormData(prev => ({ ...prev, lead_ranger: rangerId }));
   };
@@ -544,36 +544,36 @@ const CreateTrip = () => {
                 )}
               </div>
   
-              <div className="mb-3">
-                <label className="form-label">Ranger Líder</label>
-                {loading.rangers ? (
-                  <p className="text-muted">Cargando rangers...</p>
-                ) : (
-                  <>
-                    <select 
-                      className="form-control"
-                      name="lead_ranger" 
-                      value={formData.lead_ranger} 
-                      onChange={handleRangerChange}
-                    >
-                      <option value="">Selecciona un ranger</option>
-                      {rangers.map((ranger) => (
-                        <option key={ranger.id} value={ranger.id}>
-                          {ranger.full_name}
-                        </option>
-                      ))}
-                    </select>
-                    
-                    {/* Mostrar el ranger seleccionado */}
-                    {formData.lead_ranger && (
-                      <div className="mt-2 p-2 bg-light rounded">
-                        <span className="fw-bold">Ranger seleccionado: </span>
-                        {rangers.find(r => r.id === formData.lead_ranger)?.full_name || "Ranger no encontrado"}
-                      </div>
-                    )}
-                  </>
-                )}               
-              </div>
+<div className="mb-3">
+  <label className="form-label">Ranger Líder</label>
+  {loading.rangers ? (
+    <p className="text-muted">Cargando rangers...</p>
+  ) : (
+    <>
+      <select 
+        className="form-control"
+        name="lead_ranger" 
+        value={formData.lead_ranger} 
+        onChange={handleRangerChange}
+      >
+        <option value="">Selecciona un ranger</option>
+        {rangers.map((ranger) => (
+          <option key={ranger.id} value={ranger.id}>
+            {ranger.name}
+          </option>
+        ))}
+      </select>
+      
+      {/* Mostrar el ranger seleccionado */}
+      {formData.lead_ranger && (
+        <div className="mt-2 p-2 bg-light rounded">
+          <span className="fw-bold">Ranger seleccionado: </span>
+          {rangers.find(r => r.id === formData.lead_ranger)?.name || "Ranger no encontrado"}
+        </div>
+      )}
+    </>
+  )}               
+</div>
   
               <div className="mb-3">
                 <label className="form-label">
