@@ -3,14 +3,14 @@ import axios from "axios";
 import "../styles/RangerCard.css";
 
 const RangerCard = ({ ranger, onClick }) => {
-    // Estado para almacenar el conteo de viajes si no viene incluido
+    // Estado para almacenar el conteo de viajes (en caso de que no venga incluido)
     const [tripsCount, setTripsCount] = useState(ranger.trips || 0);
     const [loading, setLoading] = useState(false);
     
     // Asegurarse de que rating sea un número para mostrar correctamente
     const rating = typeof ranger.rating === 'number' ? ranger.rating.toFixed(1) : '0.0';
     
-    // Obtener conteo de viajes solo si no viene incluido en los datos del ranger
+    // Obtener conteo de viajes si no viene incluido en los datos del ranger
     useEffect(() => {
         const fetchTripsCount = async () => {
             // Si ya tenemos el conteo, no hacemos la petición
@@ -18,8 +18,14 @@ const RangerCard = ({ ranger, onClick }) => {
             
             setLoading(true);
             try {
+                const API_URL = 'https://rangerhub-back.vercel.app';
+                const token = localStorage.getItem('token');
+                
                 const response = await axios.get(
-                    `/rangers/${ranger.id}/trips-count`
+                    `${API_URL}/api/rangers/${ranger.id}/trips-count`,
+                    {
+                        headers: token ? { Authorization: `Bearer ${token}` } : {}
+                    }
                 );
                 
                 if (response.data && response.data.trips_count !== undefined) {
@@ -65,7 +71,7 @@ const RangerCard = ({ ranger, onClick }) => {
                     <div className="stat">
                         <i className="bi bi-compass"></i>
                         <span>
-                            {loading ? "..." : `${displayTrips} viaje${displayTrips === 1 ? '' : 's'}`}
+                            {loading ? "Cargando..." : `${displayTrips} viaje${displayTrips === 1 ? '' : 's'}`}
                         </span>
                     </div>
                 </div>
