@@ -564,13 +564,7 @@ const CreateTrip = () => {
         ))}
       </select>
       
-      {/* Mostrar el ranger seleccionado */}
-      {formData.lead_ranger && (
-        <div className="mt-2 p-2 bg-light rounded">
-          <span className="fw-bold">Ranger seleccionado: </span>
-          {rangers.find(r => r.id === formData.lead_ranger)?.name || "Ranger no encontrado"}
-        </div>
-      )}
+     
     </>
   )}               
 </div>
