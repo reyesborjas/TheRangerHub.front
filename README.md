@@ -42,3 +42,7 @@ The Ranger Hub aspira a transformar la manera en que las personas exploran el mu
 ## Comunidad
 
 Únete a nuestra creciente comunidad de viajeros apasionados y guías expertos. Ya sea que quieras compartir tu conocimiento como Ranger o explorar nuevos destinos como viajero, The Ranger Hub es tu punto de partida para aventuras inolvidables.
+
+## Otros:
+
+Backend: https://github.com/reyesborjas/TheRangerhub.back.git
